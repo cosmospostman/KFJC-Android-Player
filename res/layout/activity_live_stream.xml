@@ -8,10 +8,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="org.kfjc.droid.LiveStream" >
 
-    <TextView
-        android:id="@+id/textView1"
+    <MediaController
+        android:id="@+id/mediaController1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" >
+
+    </MediaController>
 
 </RelativeLayout>
