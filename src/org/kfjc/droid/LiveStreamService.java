@@ -46,7 +46,6 @@ public class LiveStreamService extends Service implements
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		mPlayer.prepareAsync();
 	}
 
 	@Override
@@ -60,9 +59,12 @@ public class LiveStreamService extends Service implements
 		return false;
 	}
 
-	@Override
-	public void onPrepared(MediaPlayer mp) {
-		mp.start();
+	public void play() {
+		mPlayer.prepareAsync();
+	}
+	
+	public void stop() {
+		mPlayer.stop();
 	}
 
 	@Override
@@ -81,5 +83,11 @@ public class LiveStreamService extends Service implements
 		LiveStreamService getService() {
 			return LiveStreamService.this;
 		}
+	}
+
+	@Override
+	public void onPrepared(MediaPlayer arg0) {
+		mPlayer.seekTo(0);
+		mPlayer.start();
 	}
 }

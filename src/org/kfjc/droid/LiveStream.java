@@ -11,17 +11,23 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 public class LiveStream extends Activity {
 
 	private LiveStreamService streamService;
 	private Intent playIntent;
 	private boolean streamServiceBound = false;
+	Button playButton;
+	Button stopButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_live_stream);
+		playButton = (Button) findViewById(R.id.playbutton);
+		stopButton = (Button) findViewById(R.id.stopbutton);
 	}
 
 	private ServiceConnection musicConnection = new ServiceConnection() {
@@ -31,6 +37,7 @@ public class LiveStream extends Activity {
 			LiveStreamBinder binder = (LiveStreamBinder) service;
 			streamService = binder.getService();
 			streamServiceBound = true;
+			addButtonListeners();
 		}
 
 		@Override
@@ -39,23 +46,36 @@ public class LiveStream extends Activity {
 		}
 	};
 	
+	private void addButtonListeners() {
+		playButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                streamService.play();
+            }
+        });
+		stopButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                streamService.stop();
+            }
+        });
+	}
+
 	@Override
 	protected void onStart() {
-	  super.onStart();
-	  if (playIntent == null) {
-	    playIntent = new Intent(this, LiveStreamService.class);
-	    bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-	    startService(playIntent);
-	  }
+		super.onStart();
+		if (playIntent == null) {
+			playIntent = new Intent(this, LiveStreamService.class);
+			bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+			startService(playIntent);
+		}
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		stopService(playIntent);
 		streamService = null;
 		super.onDestroy();
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
