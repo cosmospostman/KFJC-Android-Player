@@ -2,6 +2,8 @@ package org.kfjc.droid;
 
 import java.io.IOException;
 
+import org.kfjc.droid.TrackInfo.TrackInfoHandler;
+
 import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -62,7 +64,7 @@ public class LiveStreamService extends Service implements
 	public void play() {
 		mPlayer.prepareAsync();
 	}
-	
+
 	public void stop() {
 		mPlayer.stop();
 	}
@@ -89,5 +91,9 @@ public class LiveStreamService extends Service implements
 	public void onPrepared(MediaPlayer arg0) {
 		mPlayer.seekTo(0);
 		mPlayer.start();
+	}
+
+	public void getInfo(TrackInfoHandler handler) {
+		new TrackInfo(handler).execute(AAC_HI);
 	}
 }
