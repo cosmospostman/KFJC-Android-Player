@@ -10,24 +10,36 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/Kfjc">
+		
         <activity
-            android:name=".LiveStreamActivity"
-            android:label="@string/app_name" >
+            android:name="org.kfjc.android.player.HomeScreenActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name="org.kfjc.android.player.FullScreenActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Kfjc.LavaActivity" >
+            <intent-filter>
+                <action android:name="org.kfjc.android.player.FULLSCREEN" />
+       			<category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
         <service
-            android:name=".LiveStreamService"
+            android:name="org.kfjc.android.player.LiveStreamService"
             android:exported="false" />
     </application>
 
