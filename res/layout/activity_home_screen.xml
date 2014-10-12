@@ -1,44 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:layout_height="fill_parent"
+    android:background="@color/black"
+    android:paddingBottom="@dimen/activity_zero_margin"
+    android:paddingLeft="@dimen/activity_zero_margin"
+    android:paddingRight="@dimen/activity_zero_margin"
+    android:paddingTop="@dimen/activity_zero_margin"
     tools:context="org.kfjc.android.player.HomeScreenActivity" >
 
-    <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
         android:layout_alignParentTop="true"
-        android:orientation="vertical" >
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:src="@drawable/radiodevil" />
+    
+    <RelativeLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:layout_above="@+id/nowPlayingContainer">
+        
+        <ImageView
+            android:background="@color/kfjc_red"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="28dp" />
+
+        <ImageView
+            android:id="@+id/playstopbutton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_play" />
+
+        <ImageView
+            android:id="@+id/fullscreenbutton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_toLeftOf="@+id/playstopbutton"
+            android:src="@drawable/ic_fullscreen" />
+        
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/nowPlayingContainer"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:orientation="vertical"
+   		android:background="@color/kfjc_red"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_zero_margin" >
+
+        <TextView
+            android:id="@+id/currentDJ"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:text="Your DJ"
+            android:textColor="#ffffff"
+            android:textSize="34sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/currentTrack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:fontFamily="sans-serif-light"
             android:text="Track"
             android:textColor="#ffffff"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/currentArtist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:fontFamily="sans-serif-light"
             android:text="Artist"
-            android:textColor="#ffffff" />
-
-        <ImageView
-            android:id="@+id/logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:src="@drawable/radiodevil" />
+            android:textColor="#ffffff"
+            android:textSize="16sp" />
     </LinearLayout>
 
     <SeekBar
@@ -48,42 +106,5 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/linearLayout1"
         android:layout_marginTop="14dp" />
-
-    <RelativeLayout
-        android:id="@+id/relativeLayout1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" >
-
-        <ImageView
-            android:id="@+id/playbutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:minHeight="64dp"
-            android:minWidth="64dp"
-            android:src="@drawable/ic_play" />
-
-        <ImageView
-            android:id="@+id/stopbutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/playbutton"
-            android:minHeight="64dp"
-            android:minWidth="64dp"
-            android:src="@drawable/ic_stop" />
-
-        <ImageView
-            android:id="@+id/fullscreenbutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/stopbutton"
-            android:minHeight="64dp"
-            android:minWidth="64dp"
-            android:src="@drawable/ic_fullscreen" />
-    </RelativeLayout>
 
 </RelativeLayout>

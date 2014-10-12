@@ -33,17 +33,23 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 public class HomeScreenActivity extends Activity {
+	
+	enum PlayStopButtonState {
+		PLAY, // When showing the play icon
+		STOP  // When showing the stop icon
+	}
 
 	private LiveStreamService streamService;
 	private Intent playIntent;
-	private ImageView playButton;
-	private ImageView stopButton;
+	private ImageView playStopButton;
 	private ImageView fullscreenButton;
+	private TextView currentDjTextView;
 	private TextView currentTrackTextView;
 	private TextView currentArtistTextView;
 	private ImageView radioDevil;
 	private ServiceConnection musicConnection;
 	private boolean isPlaying = false;
+	private PlayStopButtonState playStopButtonState = PlayStopButtonState.PLAY;
 	private GraphicsUtil graphics;
 	private NotificationCompat.Builder nowPlayingNotification =
 			new NotificationCompat.Builder(this);
@@ -57,13 +63,12 @@ public class HomeScreenActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home_screen);
-		graphics = new GraphicsUtil(this.getApplicationContext());
-		playButton = (ImageView) findViewById(R.id.playbutton);
-		stopButton = (ImageView) findViewById(R.id.stopbutton);
-		stopButton.setVisibility(View.GONE);
+		graphics = new GraphicsUtil();
+		playStopButton = (ImageView) findViewById(R.id.playstopbutton);
 		fullscreenButton = (ImageView) findViewById(R.id.fullscreenbutton);
 		radioDevil = (ImageView) findViewById(R.id.logo);
-		radioDevil.setImageBitmap(graphics.radioDevilOff());
+		radioDevil.setImageResource(graphics.radioDevilOff());
+		currentDjTextView = (TextView) findViewById(R.id.currentDJ);
 		currentTrackTextView = (TextView) findViewById(R.id.currentTrack);
 		currentArtistTextView = (TextView) findViewById(R.id.currentArtist);
 		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -140,7 +145,7 @@ public class HomeScreenActivity extends Activity {
 		@Override
 		public void onPlay() {
 			graphics.bufferDevil(radioDevil, false);
-			radioDevil.setImageBitmap(graphics.radioDevilOn());
+			radioDevil.setImageResource(graphics.radioDevilOn());
 			isPlaying = true;
 			trackInfoUpdater.run();
 		}	
@@ -149,7 +154,7 @@ public class HomeScreenActivity extends Activity {
 	private NowPlayingHandler onTrackInfoChange = new NowPlayingHandler() {
 		@Override
 		public void onTrackInfoFetched(NowPlayingInfo nowPlaying) {
-			setTitle(UiUtil.getAppTitle(getApplicationContext(), nowPlaying));
+			currentDjTextView.setText(UiUtil.getAppTitle(getApplicationContext(), nowPlaying));
 			currentTrackTextView.setText(nowPlaying.getTrackTitle());
 			currentArtistTextView.setText(nowPlaying.getArtist());
 			if (HomeScreenActivity.this.isPlaying) {
@@ -159,30 +164,27 @@ public class HomeScreenActivity extends Activity {
 	};
 
 	private void addButtonListeners() {
-		playButton.setOnTouchListener(
+		playStopButton.setOnTouchListener(
 				UiUtil.makeButtonTouchListener(R.drawable.ic_play, R.drawable.ic_play_blur));
-		playButton.setOnClickListener(new View.OnClickListener() {
+		playStopButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				streamService.setOnPlayListener(onPlay);
-				streamService.setBufferingInfoListener(onBufferingUpdate);
-				streamService.play();
-				trackInfoUpdater.run();
-				playButton.setVisibility(View.GONE);
-				stopButton.setVisibility(View.VISIBLE);
-				graphics.bufferDevil(radioDevil, true);
-			}
-		});
-		stopButton.setOnTouchListener(
-				UiUtil.makeButtonTouchListener(R.drawable.ic_stop, R.drawable.ic_stop_blur));
-		stopButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				streamService.stop();
-				isPlaying = false;
-				cancelNowPlayNotification();
-				graphics.bufferDevil(radioDevil, false);
-				radioDevil.setImageBitmap(graphics.radioDevilOff());
-				stopButton.setVisibility(View.GONE);
-				playButton.setVisibility(View.VISIBLE);
+				if (playStopButtonState == PlayStopButtonState.STOP) { // Then stop
+					streamService.stop();
+					isPlaying = false;
+					cancelNowPlayNotification();
+					graphics.bufferDevil(radioDevil, false);
+					radioDevil.setImageResource(graphics.radioDevilOff());
+					playStopButton.setImageResource(R.drawable.ic_play);
+					playStopButtonState = PlayStopButtonState.PLAY;
+				} else { // Then play
+					streamService.setOnPlayListener(onPlay);
+					streamService.setBufferingInfoListener(onBufferingUpdate);
+					streamService.play();
+					trackInfoUpdater.run();
+					playStopButton.setImageResource(R.drawable.ic_stop);
+					graphics.bufferDevil(radioDevil, true);
+					playStopButtonState = PlayStopButtonState.STOP;
+				}
 			}
 		});
 		fullscreenButton.setOnTouchListener(
