@@ -6,5 +6,7 @@
     <string name="now_playing_format"
         	trabslation_description="Format of the currently playing track (%1s) and artist (%2s)">
         	Now playing: %1$s by %2$s</string>
+    <string name="settings_title">Settings</string>
+    <string name="ok">OK</string>
 
 </resources>

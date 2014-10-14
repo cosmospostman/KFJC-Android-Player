@@ -9,6 +9,7 @@ import org.kfjc.android.player.NowPlayingFetcher.NowPlayingHandler;
 import org.kfjc.droid.R;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,20 +17,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.ContentObserver;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 public class HomeScreenActivity extends Activity {
@@ -43,6 +39,7 @@ public class HomeScreenActivity extends Activity {
 	private Intent playIntent;
 	private ImageView playStopButton;
 	private ImageView fullscreenButton;
+	private ImageView settingsButton;
 	private TextView currentDjTextView;
 	private TextView currentTrackTextView;
 	private TextView currentArtistTextView;
@@ -56,8 +53,6 @@ public class HomeScreenActivity extends Activity {
 	private static final int NOWPLAYING_NOTIFICATION_ID = 1;
 	private NotificationManager notificationManager;
 	private Timer timer = new Timer("NowPlaying timer", true);
-	private SeekBar volumeSeekbar;
-    private AudioManager audioManager; 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,42 +61,13 @@ public class HomeScreenActivity extends Activity {
 		graphics = new GraphicsUtil();
 		playStopButton = (ImageView) findViewById(R.id.playstopbutton);
 		fullscreenButton = (ImageView) findViewById(R.id.fullscreenbutton);
+		settingsButton = (ImageView) findViewById(R.id.settingsbutton);
 		radioDevil = (ImageView) findViewById(R.id.logo);
 		radioDevil.setImageResource(graphics.radioDevilOff());
 		currentDjTextView = (TextView) findViewById(R.id.currentDJ);
 		currentTrackTextView = (TextView) findViewById(R.id.currentTrack);
 		currentArtistTextView = (TextView) findViewById(R.id.currentArtist);
 		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		initVolumeBar();
-	}
-	
-	private void initVolumeBar() {
-		volumeSeekbar = (SeekBar)findViewById(R.id.volumeSeekBar);
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        volumeSeekbar.setMax(audioManager
-                .getStreamMaxVolume(AudioManager.STREAM_MUSIC));
-        volumeSeekbar.setProgress(audioManager
-                .getStreamVolume(AudioManager.STREAM_MUSIC));
-        volumeSeekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-            @Override public void onStopTrackingTouch(SeekBar arg0) {}
-            @Override public void onStartTrackingTouch(SeekBar arg0) {}
-            @Override public void onProgressChanged(
-            		SeekBar arg0, int progress, boolean arg2) {
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
-            }
-        });
-        
-        ContentObserver mSettingsContentObserver =
-    		new ContentObserver(new Handler()){
-        		@Override
-        		public void onChange(boolean selfChange) {
-        			int volumeLevel = audioManager
-        	                .getStreamVolume(AudioManager.STREAM_MUSIC);
-        			volumeSeekbar.setProgress(volumeLevel);
-        		}
-        	};
-        getApplicationContext().getContentResolver().registerContentObserver(
-        		android.provider.Settings.System.CONTENT_URI, true, mSettingsContentObserver);
 	}
 	
 	@Override
@@ -195,6 +161,15 @@ public class HomeScreenActivity extends Activity {
 						HomeScreenActivity.this, FullScreenActivity.class);
 				fullscreenIntent.setAction("org.kfjc.android.player.FULLSCREEN");
 				startActivity(fullscreenIntent);
+			}
+		});
+		settingsButton.setOnTouchListener(
+				UiUtil.makeButtonTouchListener(R.drawable.ic_fullscreen, R.drawable.ic_fullscreen_blur));
+		settingsButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				DialogFragment settingsFragment = new SettingsDialog();
+				settingsFragment.show(getFragmentManager(), "settings");
 			}
 		});
 	}

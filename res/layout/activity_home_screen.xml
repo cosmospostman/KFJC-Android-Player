@@ -54,6 +54,13 @@
             android:layout_toLeftOf="@+id/playstopbutton"
             android:src="@drawable/ic_fullscreen" />
         
+        <ImageView
+            android:id="@+id/settingsbutton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_toLeftOf="@+id/fullscreenbutton"
+            android:src="@drawable/ic_fullscreen" />
+                
     </RelativeLayout>
 
     <LinearLayout
@@ -98,13 +105,5 @@
             android:textColor="#ffffff"
             android:textSize="16sp" />
     </LinearLayout>
-
-    <SeekBar
-        android:id="@+id/volumeSeekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/linearLayout1"
-        android:layout_marginTop="14dp" />
 
 </RelativeLayout>
