@@ -71,6 +71,8 @@ public class LiveStreamService extends Service implements
 				PowerManager.PARTIAL_WAKE_LOCK);
 		mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		mPlayer.setOnPreparedListener(this);
+		mPlayer.setOnErrorListener(this);
+		mPlayer.setOnCompletionListener(this);
 		try {
 			mPlayer.setDataSource(AAC_HI);
 		} catch (Exception e) {
