@@ -84,6 +84,8 @@ public class LiveStreamService extends Service implements
 	public void onCompletion(MediaPlayer arg0) {
 		// TODO Replay the stream. Should only stop explicitly.
 		mediaListener.onError();
+		this.mPlayer.release();
+		this.mPlayer = null;
 	}
 
 	@Override
@@ -91,7 +93,7 @@ public class LiveStreamService extends Service implements
 		mediaListener.onError();
 		this.mPlayer.release();
 		this.mPlayer = null;
-		return false;
+		return true;
 	}
 
 	@Override
