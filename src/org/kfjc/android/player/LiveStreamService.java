@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -12,7 +11,7 @@ import android.util.Log;
 
 public class LiveStreamService extends Service implements
 		MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
-		MediaPlayer.OnCompletionListener, MediaPlayer.OnBufferingUpdateListener {
+		MediaPlayer.OnCompletionListener {
 	
 	public class LiveStreamBinder extends Binder {
 		LiveStreamService getService() {
@@ -20,23 +19,18 @@ public class LiveStreamService extends Service implements
 		}
 	}
 	
-	public interface OnPlayListener {
+	public interface MediaListener {
 		public void onPlay();
+		public void onError();
 	};
 
 	private static final String AAC_HI = "http://netcast6.kfjc.org:80/";
 	private MediaPlayer mPlayer;
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
-	private OnBufferingUpdateListener bufferingListener;
-	private OnPlayListener onPlayListener;
-
+	private MediaListener mediaListener;
 	
-	public void setBufferingInfoListener(OnBufferingUpdateListener listener) {
-		this.bufferingListener = listener;
-	}
-	
-	public void setOnPlayListener(OnPlayListener listener) {
-		this.onPlayListener = listener;
+	public void setOnPlayListener(MediaListener listener) {
+		this.mediaListener = listener;
 	}
 	
 	@Override
@@ -77,7 +71,6 @@ public class LiveStreamService extends Service implements
 				PowerManager.PARTIAL_WAKE_LOCK);
 		mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		mPlayer.setOnPreparedListener(this);
-		mPlayer.setOnBufferingUpdateListener(this);
 		try {
 			mPlayer.setDataSource(AAC_HI);
 		} catch (Exception e) {
@@ -88,10 +81,12 @@ public class LiveStreamService extends Service implements
 	@Override
 	public void onCompletion(MediaPlayer arg0) {
 		// TODO Replay the stream. Should only stop explicitly.
+		mediaListener.onError();
 	}
 
 	@Override
 	public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
+		mediaListener.onError();
 		this.mPlayer.release();
 		this.mPlayer = null;
 		return false;
@@ -101,13 +96,8 @@ public class LiveStreamService extends Service implements
 	public void onPrepared(MediaPlayer arg0) {
 		mPlayer.seekTo(0);
 		mPlayer.start();
-		if (onPlayListener != null) {
-			onPlayListener.onPlay();
+		if (mediaListener != null) {
+			mediaListener.onPlay();
 		}
-	}
-
-	@Override
-	public void onBufferingUpdate(MediaPlayer mp, int percent) {
-		bufferingListener.onBufferingUpdate(mp, percent);
 	}
 }

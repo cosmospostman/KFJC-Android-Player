@@ -4,7 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.kfjc.android.player.LiveStreamService.LiveStreamBinder;
-import org.kfjc.android.player.LiveStreamService.OnPlayListener;
+import org.kfjc.android.player.LiveStreamService.MediaListener;
 import org.kfjc.android.player.NowPlayingFetcher.NowPlayingHandler;
 import org.kfjc.droid.R;
 
@@ -17,13 +17,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -79,6 +75,7 @@ public class HomeScreenActivity extends Activity {
 				public void onServiceConnected(ComponentName name, IBinder service) {
 					LiveStreamBinder binder = (LiveStreamBinder) service;
 					streamService = binder.getService();
+					streamService.setOnPlayListener(mediaEventHandler);
 					addButtonListeners();
 					timer.scheduleAtFixedRate(trackInfoUpdater, 0, 30000);
 				}
@@ -101,20 +98,20 @@ public class HomeScreenActivity extends Activity {
 		//TODO: stop buffering timeouts, 
 		super.onDestroy();
 	}
-		
-	private OnBufferingUpdateListener onBufferingUpdate = new OnBufferingUpdateListener() {
-		@Override
-		public void onBufferingUpdate(MediaPlayer mp, int percent) {}
-	};
 
-	private OnPlayListener onPlay = new OnPlayListener() {
+	private MediaListener mediaEventHandler = new MediaListener() {
 		@Override
 		public void onPlay() {
 			graphics.bufferDevil(radioDevil, false);
 			radioDevil.setImageResource(graphics.radioDevilOn());
 			isPlaying = true;
 			trackInfoUpdater.run();
-		}	
+		}
+		
+		@Override
+		public void onError() {
+			stop();
+		}
 	};
 
 	private NowPlayingHandler onTrackInfoChange = new NowPlayingHandler() {
@@ -134,22 +131,11 @@ public class HomeScreenActivity extends Activity {
 				UiUtil.makeButtonTouchListener(R.drawable.ic_play, R.drawable.ic_play_blur));
 		playStopButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				if (playStopButtonState == PlayStopButtonState.STOP) { // Then stop
+				if (playStopButtonState == PlayStopButtonState.STOP) {
 					streamService.stop();
-					isPlaying = false;
-					cancelNowPlayNotification();
-					graphics.bufferDevil(radioDevil, false);
-					radioDevil.setImageResource(graphics.radioDevilOff());
-					playStopButton.setImageResource(R.drawable.ic_play);
-					playStopButtonState = PlayStopButtonState.PLAY;
-				} else { // Then play
-					streamService.setOnPlayListener(onPlay);
-					streamService.setBufferingInfoListener(onBufferingUpdate);
-					streamService.play();
-					trackInfoUpdater.run();
-					playStopButton.setImageResource(R.drawable.ic_stop);
-					graphics.bufferDevil(radioDevil, true);
-					playStopButtonState = PlayStopButtonState.STOP;
+					stop();
+				} else {
+					play();
 				}
 			}
 		});
@@ -172,6 +158,23 @@ public class HomeScreenActivity extends Activity {
 				settingsFragment.show(getFragmentManager(), "settings");
 			}
 		});
+	}
+	
+	private void play() {
+		streamService.play();
+		trackInfoUpdater.run();
+		playStopButton.setImageResource(R.drawable.ic_stop);
+		graphics.bufferDevil(radioDevil, true);
+		playStopButtonState = PlayStopButtonState.STOP;
+	}
+	
+	private void stop() {
+		isPlaying = false;
+		cancelNowPlayNotification();
+		graphics.bufferDevil(radioDevil, false);
+		radioDevil.setImageResource(graphics.radioDevilOff());
+		playStopButton.setImageResource(R.drawable.ic_play);
+		playStopButtonState = PlayStopButtonState.PLAY;		
 	}
 	
 	private TimerTask trackInfoUpdater = new TimerTask() {
