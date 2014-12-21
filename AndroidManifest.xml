@@ -19,7 +19,7 @@
         android:theme="@style/Kfjc">
 		
         <activity
-            android:name="org.kfjc.android.player.HomeScreenActivity"
+            android:name="org.kfjc.android.player.activity.HomeScreenActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop" >
             <intent-filter>
@@ -29,7 +29,7 @@
         </activity>
         
         <activity
-            android:name="org.kfjc.android.player.FullScreenActivity"
+            android:name="org.kfjc.android.player.activity.FullScreenActivity"
             android:label="@string/app_name"
             android:theme="@style/Kfjc.LavaActivity" >
             <intent-filter>
@@ -39,7 +39,7 @@
         </activity>
 
         <service
-            android:name="org.kfjc.android.player.LiveStreamService"
+            android:name="org.kfjc.android.player.control.LiveStreamService"
             android:exported="false" />
     </application>
 

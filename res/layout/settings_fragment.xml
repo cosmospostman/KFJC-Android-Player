@@ -9,28 +9,34 @@
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/volumeLess"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="-" />
-
-        <SeekBar
-            android:id="@+id/volumeSeekBar"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" 
-        	android:layout_toRightOf="@+id/volumeLess"
-        	android:layout_toLeftOf="@+id/volumeMore" />
-
-        <TextView
-            android:id="@+id/volumeMore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="+" />
+        android:layout_height="wrap_content">      
+		<ImageView
+	        android:id="@+id/volumeIcon"
+	        android:src="@drawable/ic_volume"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true" />
+	    <SeekBar
+	        android:id="@+id/volumeSeekBar"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content" 
+	    	android:layout_toRightOf="@+id/volumeIcon" />
+	    <RadioGroup
+	    	android:layout_width="fill_parent"
+	    	android:layout_height="wrap_content"
+	    	android:layout_below="@+id/volumeSeekBar"
+	    	android:layout_marginTop="8dp"
+	   		android:orientation="vertical">
+		    <RadioButton android:id="@+id/radio_pirates"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="High quality (128k mp3)"/>
+		    <RadioButton android:id="@+id/radio_ninjas"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="Low quality"/>
+		</RadioGroup>
+        
     </RelativeLayout>
 
 </LinearLayout>

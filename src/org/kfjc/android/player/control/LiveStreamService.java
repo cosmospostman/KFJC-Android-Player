@@ -1,4 +1,4 @@
-package org.kfjc.android.player;
+package org.kfjc.android.player.control;
 
 import android.app.Service;
 import android.content.Intent;
@@ -14,7 +14,7 @@ public class LiveStreamService extends Service implements
 		MediaPlayer.OnCompletionListener {
 	
 	public class LiveStreamBinder extends Binder {
-		LiveStreamService getService() {
+		public LiveStreamService getService() {
 			return LiveStreamService.this;
 		}
 	}
@@ -82,7 +82,7 @@ public class LiveStreamService extends Service implements
 
 	@Override
 	public void onCompletion(MediaPlayer arg0) {
-		// TODO Replay the stream. Should only stop explicitly.
+		// Reach this stage if, for example, network connection lost.
 		mediaListener.onError();
 		this.mPlayer.release();
 		this.mPlayer = null;

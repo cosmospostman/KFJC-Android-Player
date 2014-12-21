@@ -1,4 +1,4 @@
-package org.kfjc.android.player;
+package org.kfjc.android.player.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;

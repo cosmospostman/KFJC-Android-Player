@@ -1,4 +1,4 @@
-package org.kfjc.android.player;
+package org.kfjc.android.player.activity;
 
 import org.kfjc.droid.R;
 

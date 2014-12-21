@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_zero_margin"
     android:paddingRight="@dimen/activity_zero_margin"
     android:paddingTop="@dimen/activity_zero_margin"
-    tools:context="org.kfjc.android.player.HomeScreenActivity" >
+    tools:context="org.kfjc.android.player.activity.HomeScreenActivity" >
 
     <ImageView
         android:layout_width="match_parent"
@@ -45,6 +45,7 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_alignParentRight="true"
+            android:background="@drawable/oval"
             android:src="@drawable/ic_play" />
 
         <ImageView
