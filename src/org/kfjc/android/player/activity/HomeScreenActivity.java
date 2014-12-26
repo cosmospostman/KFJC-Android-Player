@@ -37,7 +37,7 @@ public class HomeScreenActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home_screen);
-		graphics = new GraphicsUtil();
+		graphics = new GraphicsUtil(getResources());
 		playStopButton = (ImageView) findViewById(R.id.playstopbutton);
 		fullscreenButton = (ImageView) findViewById(R.id.fullscreenbutton);
 		settingsButton = (ImageView) findViewById(R.id.settingsbutton);
