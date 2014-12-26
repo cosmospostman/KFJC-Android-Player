@@ -100,6 +100,8 @@ public class HomeScreenActivity extends Activity {
 	
 	public void onPlayerBuffer() {
 		graphics.bufferDevil(radioDevil, true);
+		playStopButton.setImageResource(R.drawable.ic_stop);
+		playStopButtonState = PlayStopButtonState.STOP;	
 	};
 	
 	public void onPlayerBufferComplete() {
@@ -110,6 +112,7 @@ public class HomeScreenActivity extends Activity {
 	}
 	
 	public void onPlayerStop() {
+		graphics.bufferDevil(radioDevil, false);
 		radioDevil.setImageResource(graphics.radioDevilOff());
 		playStopButton.setImageResource(R.drawable.ic_play);
 		playStopButtonState = PlayStopButtonState.PLAY;		

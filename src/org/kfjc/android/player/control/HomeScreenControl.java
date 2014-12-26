@@ -90,10 +90,10 @@ public class HomeScreenControl {
 	}
 	
 	public void stopStream() {
-		streamService.stop();
-		cancelNowPlayNotification();
 		isPlaying = false;
 		activity.onPlayerStop();
+		streamService.stop();
+		cancelNowPlayNotification();
 	}
 	
 	public void destroy() {

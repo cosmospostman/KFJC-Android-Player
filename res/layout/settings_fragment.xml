@@ -22,19 +22,12 @@
 	        android:layout_height="wrap_content" 
 	    	android:layout_toRightOf="@+id/volumeIcon" />
 	    <RadioGroup
+	        android:id="@+id/streamPreferenceRadioGroup"
 	    	android:layout_width="fill_parent"
 	    	android:layout_height="wrap_content"
 	    	android:layout_below="@+id/volumeSeekBar"
 	    	android:layout_marginTop="8dp"
 	   		android:orientation="vertical">
-		    <RadioButton android:id="@+id/radio_pirates"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="High quality (128k mp3)"/>
-		    <RadioButton android:id="@+id/radio_ninjas"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="Low quality"/>
 		</RadioGroup>
         
     </RelativeLayout>

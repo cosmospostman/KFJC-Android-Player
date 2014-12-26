@@ -1,5 +1,10 @@
 package org.kfjc.android.player;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.droid.R;
 
 import android.app.AlertDialog;
@@ -13,6 +18,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
@@ -20,11 +29,21 @@ public class SettingsDialog extends DialogFragment {
 	
 	private SeekBar volumeSeekbar;
     private AudioManager audioManager; 
+    private Context context;
+    private PreferenceControl preferences;
+    private List<String> streamNames;
+    private RadioGroup radioGroup;
+    private Map<String, Integer> streamNameToViewIdMap = new HashMap<String, Integer>();
 	
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
+    	context = getActivity().getApplicationContext();
+    	preferences = new PreferenceControl(context);
+		
 	    LayoutInflater inflater = getActivity().getLayoutInflater();
-	    View view = inflater.inflate(R.layout.settings_fragment, null);
+	    View view = inflater.inflate(R.layout.settings_fragment, new LinearLayout(context), false);
+		radioGroup = (RadioGroup) view.findViewById(R.id.streamPreferenceRadioGroup);
+		radioGroup.setOnCheckedChangeListener(checkChanged);
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 	    builder.setView(view);
@@ -34,7 +53,31 @@ public class SettingsDialog extends DialogFragment {
 		});
 
 		initVolumeBar(view);
+		initStreamOptions(view);
 		return builder.create();
+	}
+	
+	OnCheckedChangeListener checkChanged = new OnCheckedChangeListener() {
+		@Override
+		public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
+			RadioButton radioButton = (RadioButton) radioGroup.findViewById(radioGroup.getCheckedRadioButtonId());
+			String val = radioButton.getText().toString();
+			preferences.setStreamNamePreference(val);
+		}
+	};
+	
+	private void initStreamOptions(View view) {
+		radioGroup.removeAllViews();
+		streamNames = preferences.getStreamNames();
+		for (String stream : streamNames) {
+			RadioButton button = new RadioButton(context);
+		    button.setText(stream);
+		    radioGroup.addView(button);
+		    streamNameToViewIdMap.put(stream, button.getId());
+		}
+		
+		Integer selectedId = streamNameToViewIdMap.get(preferences.getStreamNamePreference());
+		radioGroup.check(selectedId);	
 	}
 	
 	private void initVolumeBar(View view) {
