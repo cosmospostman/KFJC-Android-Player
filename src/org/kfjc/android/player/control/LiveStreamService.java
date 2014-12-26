@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -50,19 +51,27 @@ public class LiveStreamService extends Service implements
 	}
 	
 	public void play() {
-		if (mPlayer != null && mPlayer.isPlaying()) {
-			return;
-		}
 		initPlayer();
 		mPlayer.prepareAsync();
 	}
 
 	public void stop() {
-		if (mPlayer != null) {
-			mPlayer.release();
-			mPlayer = null;
-		}
+		releaseAsync(mPlayer);
 	}
+	
+	private void releaseAsync(MediaPlayer mPlayer) {
+		new AsyncTask<MediaPlayer, Void, Void>() {
+			@Override
+			protected Void doInBackground(MediaPlayer... mediaPlayers) {
+				for (int i = 0; i < mediaPlayers.length; i++ ) {
+					if (mediaPlayers[i] != null) {
+						mediaPlayers[i].release();
+					}
+				}
+				return null;
+			}
+		}.execute(mPlayer, null, null);
+	};
 
 	private void initPlayer() {
 		mPlayer = new MediaPlayer();

@@ -56,12 +56,12 @@ public class GraphicsUtil {
 	}
 
 	public void bufferDevil(ImageView view, boolean isBuffering) {
-//		if (isBuffering) {
-//			this.runner = new BufferImageRunner(view);
-//			runner.run();
-//		} else {
-//			handler.removeCallbacks(this.runner);
-//		}
+		if (isBuffering) {
+			this.runner = new BufferImageRunner(view);
+			runner.run();
+		} else {
+			handler.removeCallbacks(this.runner);
+		}
 	}
 
 }
