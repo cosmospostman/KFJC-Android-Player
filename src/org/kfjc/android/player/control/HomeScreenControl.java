@@ -11,10 +11,13 @@ import org.kfjc.droid.R;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.AudioManager;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
@@ -29,6 +32,7 @@ public class HomeScreenControl {
 	private boolean isPlaying = false;
 	private NotificationCompat.Builder nowPlayingNotification;
 	private static final int NOWPLAYING_NOTIFICATION_ID = 1;
+	private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 
 	
 	public HomeScreenControl(HomeScreenActivity activity) {
@@ -86,6 +90,7 @@ public class HomeScreenControl {
 
 	public void playStream() {
 		streamService.play();
+		activity.registerReceiver(onAudioBecomingNoisy, intentFilter);
 		activity.onPlayerBuffer();
 	}
 	
@@ -93,13 +98,15 @@ public class HomeScreenControl {
 		isPlaying = false;
 		activity.onPlayerStop();
 		streamService.stop();
+	    unregisterBecomingNoisyReceiver();
 		cancelNowPlayNotification();
 	}
 	
 	public void destroy() {
 		activity.stopService(playIntent);
+		unregisterBecomingNoisyReceiver();
+		cancelNowPlayNotification();
 		streamService = null;
-		//TODO: stop buffering timeouts, 
 	}
 	
 	private void updateNowPlayNotification(NowPlayingInfo nowPlaying) {
@@ -122,5 +129,21 @@ public class HomeScreenControl {
 	private void cancelNowPlayNotification() {
 		notificationManager.cancel(NOWPLAYING_NOTIFICATION_ID);
 	}
-
+	
+	private void unregisterBecomingNoisyReceiver() {
+		try {
+			activity.unregisterReceiver(onAudioBecomingNoisy);
+		} catch (IllegalArgumentException e) {
+			// receiver was already unregistered.
+		}
+	}
+	
+	private BroadcastReceiver onAudioBecomingNoisy = new BroadcastReceiver() {
+	    @Override
+	    public void onReceive(Context context, Intent intent) {
+	        if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+	            stopStream();
+	        }
+	    }
+	};
 }

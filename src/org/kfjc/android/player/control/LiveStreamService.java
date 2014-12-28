@@ -75,7 +75,6 @@ public class LiveStreamService extends Service implements
 
 	private void initPlayer() {
 		mPlayer = new MediaPlayer();
-		// TODO: Add permissions to manifest.
 		mPlayer.setWakeMode(getApplicationContext(),
 				PowerManager.PARTIAL_WAKE_LOCK);
 		mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);

@@ -36,6 +36,7 @@ public class HomeScreenActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.activity_home_screen);
 		graphics = new GraphicsUtil(getResources());
 		playStopButton = (ImageView) findViewById(R.id.playstopbutton);
@@ -117,4 +118,5 @@ public class HomeScreenActivity extends Activity {
 		playStopButton.setImageResource(R.drawable.ic_play);
 		playStopButtonState = PlayStopButtonState.PLAY;		
 	}
+
 }
