@@ -62,5 +62,6 @@ public class NowPlayingFetcher {
     
     public void stop() {
     	timer.cancel();
+    	timer.purge();
     }
 }
