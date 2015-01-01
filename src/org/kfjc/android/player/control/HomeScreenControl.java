@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
+import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
@@ -33,13 +34,16 @@ public class HomeScreenControl {
 	private NotificationCompat.Builder nowPlayingNotification;
 	private static final int NOWPLAYING_NOTIFICATION_ID = 1;
 	private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+	AudioManager audioManager;
 	private boolean isMusicConnectionBound = false;
+	private int musicStreamVolumeBeforeDuck;
 	
 	public HomeScreenControl(HomeScreenActivity activity) {
 		this.activity = activity;
 		this.nowPlayingFetcher = new NowPlayingFetcher(nph);
 		this.notificationManager =
 				(NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
+		this.audioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
 		this.nowPlayingNotification =  new NotificationCompat.Builder(activity);
 
 		if (musicConnection == null) {
@@ -88,6 +92,8 @@ public class HomeScreenControl {
 	};
 
 	public void playStream() {
+		audioManager.requestAudioFocus(afChangeListener,
+				AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 		streamService.play();
 		activity.registerReceiver(onAudioBecomingNoisy, intentFilter);
 		activity.onPlayerBuffer();
@@ -96,6 +102,7 @@ public class HomeScreenControl {
 	public void stopStream() {
 		activity.onPlayerStop();
 		streamService.stop();
+		audioManager.abandonAudioFocus(afChangeListener);
 		nowPlayingFetcher.stop();
 	    unregisterBecomingNoisyReceiver();
 		cancelNowPlayNotification();
@@ -145,6 +152,24 @@ public class HomeScreenControl {
 	        if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
 	            stopStream();
 	        }
+	    }
+	};
+	
+	private OnAudioFocusChangeListener afChangeListener = new OnAudioFocusChangeListener() {
+	    public void onAudioFocusChange(int focusChange) {
+	    	switch (focusChange) {
+		    	case AudioManager.AUDIOFOCUS_LOSS:
+		    		stopStream();
+		            audioManager.abandonAudioFocus(afChangeListener);
+		            break;
+	    		case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+	    			musicStreamVolumeBeforeDuck = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+	    			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, musicStreamVolumeBeforeDuck/2, 0);
+	    			break;
+	    		case AudioManager.AUDIOFOCUS_GAIN:
+	    			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, musicStreamVolumeBeforeDuck, 0);
+	    			break;
+	    	}
 	    }
 	};
 }
