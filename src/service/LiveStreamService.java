@@ -1,4 +1,4 @@
-package org.kfjc.android.player.control;
+package service;
 
 import android.app.Service;
 import android.content.Intent;

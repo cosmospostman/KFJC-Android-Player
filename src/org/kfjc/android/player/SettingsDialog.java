@@ -41,7 +41,7 @@ public class SettingsDialog extends DialogFragment {
     	preferences = new PreferenceControl(context);
 		
 	    LayoutInflater inflater = getActivity().getLayoutInflater();
-	    View view = inflater.inflate(R.layout.settings_fragment, new LinearLayout(context), false);
+	    View view = inflater.inflate(R.layout.fragment_settings, new LinearLayout(context), false);
 		radioGroup = (RadioGroup) view.findViewById(R.id.streamPreferenceRadioGroup);
 		radioGroup.setOnCheckedChangeListener(checkChanged);
 		

@@ -39,7 +39,7 @@
         </activity>
 
         <service
-            android:name="org.kfjc.android.player.control.LiveStreamService"
+            android:name="service.LiveStreamService"
             android:exported="false" />
     </application>
 

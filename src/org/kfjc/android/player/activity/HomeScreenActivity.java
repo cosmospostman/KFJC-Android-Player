@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class HomeScreenActivity extends Activity {
@@ -24,7 +25,7 @@ public class HomeScreenActivity extends Activity {
 
 	private ImageView playStopButton;
 	private ImageView fullscreenButton;
-	private ImageView settingsButton;
+	private LinearLayout settingsButton;
 	private TextView currentDjTextView;
 	private TextView currentTrackTextView;
 	private TextView currentArtistTextView;
@@ -41,13 +42,14 @@ public class HomeScreenActivity extends Activity {
 		graphics = new GraphicsUtil(getResources());
 		playStopButton = (ImageView) findViewById(R.id.playstopbutton);
 		fullscreenButton = (ImageView) findViewById(R.id.fullscreenbutton);
-		settingsButton = (ImageView) findViewById(R.id.settingsbutton);
+		settingsButton = (LinearLayout) findViewById(R.id.settingsButton);
 		radioDevil = (ImageView) findViewById(R.id.logo);
 		radioDevil.setImageResource(graphics.radioDevilOff());
 		currentDjTextView = (TextView) findViewById(R.id.currentDJ);
 		currentTrackTextView = (TextView) findViewById(R.id.currentTrack);
 		currentArtistTextView = (TextView) findViewById(R.id.currentArtist);
 		
+		settingsButton.setAlpha(0.3f);
 		addButtonListeners();
 	}
 	
