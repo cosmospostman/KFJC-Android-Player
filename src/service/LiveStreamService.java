@@ -41,11 +41,14 @@ public class LiveStreamService extends Service implements
 
 	@Override
 	public boolean onUnbind(Intent intent) {
-		if (this.mPlayer != null) {
-			if (mPlayer.isPlaying()) {
-				mPlayer.stop();
-			}
+		if (this.mPlayer == null) {
+			return false;
+		}
+		try {
+			mPlayer.stop();
 			mPlayer.release();
+		} catch (IllegalStateException e) {
+			// Thrown if player has already been released.
 		}
 		return false;
 	}

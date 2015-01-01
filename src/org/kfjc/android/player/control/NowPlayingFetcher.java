@@ -23,6 +23,10 @@ public class NowPlayingFetcher {
     
 	public NowPlayingFetcher(final NowPlayingHandler handler) {
 		this.handler = handler;
+		
+	}
+	
+	private void initTimerTask() {
 		this.timerTask = new TimerTask() {
     		@Override 
     		public void run() {
@@ -44,6 +48,7 @@ public class NowPlayingFetcher {
 	}
 	
     public void run() {
+    	initTimerTask();
     	if (!this.isRunning) {
     		timer.scheduleAtFixedRate(this.timerTask, 0, POLL_DELAY_MS);
     	}
@@ -51,6 +56,11 @@ public class NowPlayingFetcher {
     }
     
     public void runOnce() {
+    	initTimerTask();
 	    this.timerTask.run();
+    }
+    
+    public void stop() {
+    	timer.cancel();
     }
 }
