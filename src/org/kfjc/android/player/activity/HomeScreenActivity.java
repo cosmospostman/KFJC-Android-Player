@@ -33,7 +33,7 @@ public class HomeScreenActivity extends Activity {
 	private PlayStopButtonState playStopButtonState = PlayStopButtonState.PLAY;
 	private GraphicsUtil graphics;
 	private HomeScreenControl control;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -120,5 +120,4 @@ public class HomeScreenActivity extends Activity {
 		playStopButton.setImageResource(R.drawable.ic_play);
 		playStopButtonState = PlayStopButtonState.PLAY;		
 	}
-
 }

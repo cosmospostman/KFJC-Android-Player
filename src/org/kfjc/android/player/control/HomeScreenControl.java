@@ -2,7 +2,6 @@ package org.kfjc.android.player.control;
 
 import org.kfjc.android.player.NowPlayingInfo;
 import org.kfjc.android.player.activity.HomeScreenActivity;
-import org.kfjc.android.player.control.NowPlayingFetcher.NowPlayingHandler;
 import org.kfjc.android.player.util.UiUtil;
 import org.kfjc.droid.R;
 
@@ -29,18 +28,16 @@ public class HomeScreenControl {
 	private LiveStreamService streamService;
 	private ServiceConnection musicConnection;
 	private HomeScreenActivity activity;
-	private NowPlayingFetcher nowPlayingFetcher;
 	private NotificationManager notificationManager;
 	private NotificationCompat.Builder nowPlayingNotification;
 	private static final int NOWPLAYING_NOTIFICATION_ID = 1;
 	private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 	AudioManager audioManager;
-	private boolean isMusicConnectionBound = false;
 	private int musicStreamVolumeBeforeDuck;
+	public boolean isPlaying = false;
 	
 	public HomeScreenControl(HomeScreenActivity activity) {
 		this.activity = activity;
-		this.nowPlayingFetcher = new NowPlayingFetcher(nph);
 		this.notificationManager =
 				(NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
 		this.audioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
@@ -52,42 +49,41 @@ public class HomeScreenControl {
 				public void onServiceConnected(ComponentName name, IBinder service) {
 					LiveStreamBinder binder = (LiveStreamBinder) service;
 					streamService = binder.getService();
-					streamService.setOnPlayListener(mediaEventHandler);
-					nowPlayingFetcher.run();
-					isMusicConnectionBound = true;
+					streamService.setMediaEventListener(mediaEventHandler);
+					streamService.runPlaylistFetcher();
 				}
 
 				@Override
 				public void onServiceDisconnected(ComponentName arg0) {
-					isMusicConnectionBound = false;
 				}
 			};
 		}
+		
 		if (playIntent == null) {
 			playIntent = new Intent(activity, LiveStreamService.class);
 			activity.bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
 			activity.startService(playIntent);
-		}		
-	};
-	
-	NowPlayingHandler nph = new NowPlayingHandler() {
-		@Override
-		public void onTrackInfoFetched(NowPlayingInfo trackInfo) {
-			activity.updateTrackInfo(trackInfo);
-			updateNowPlayNotification(trackInfo);
 		}
 	};
 	
 	private MediaListener mediaEventHandler = new MediaListener() {
 		@Override
 		public void onPlay() {
-			nowPlayingFetcher.runOnce();
+			streamService.runPlaylistFetcherOnce();
 			activity.onPlayerBufferComplete();
 		}
 		
 		@Override
 		public void onError() {
 			stopStream();
+		}
+		
+		@Override
+		public void onTrackInfoFetched(NowPlayingInfo trackInfo) {
+			activity.updateTrackInfo(trackInfo);
+			if (streamService.isPlaying()) {
+				updateNowPlayNotification(trackInfo);
+			}
 		}
 	};
 
@@ -97,24 +93,24 @@ public class HomeScreenControl {
 		streamService.play();
 		activity.registerReceiver(onAudioBecomingNoisy, intentFilter);
 		activity.onPlayerBuffer();
+		isPlaying = true;
 	}
 	
 	public void stopStream() {
 		activity.onPlayerStop();
 		streamService.stop();
 		audioManager.abandonAudioFocus(afChangeListener);
-		nowPlayingFetcher.stop();
 	    unregisterBecomingNoisyReceiver();
 		cancelNowPlayNotification();
+		isPlaying = false;
 	}
 	
 	public void destroy() {
 		stopStream();
 		activity.stopService(playIntent);
-		if (isMusicConnectionBound) {
-			activity.unbindService(musicConnection);
-		}
+		activity.unbindService(musicConnection);
 		streamService = null;
+		notificationManager.cancel(NOWPLAYING_NOTIFICATION_ID);
 	}
 	
 	private void updateNowPlayNotification(NowPlayingInfo nowPlaying) {
