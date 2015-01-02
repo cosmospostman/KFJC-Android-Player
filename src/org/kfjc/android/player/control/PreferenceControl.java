@@ -21,8 +21,8 @@ public class PreferenceControl {
 	private static final String FALLBACK_STREAM_URL = "http://netcast6.kfjc.org:80/";
 	private static final int PREFERENCE_MODE = Context.MODE_PRIVATE;
 	
-	private SharedPreferences preferences;
-	private Map<String, String> streamMap = new LinkedHashMap<String, String>();
+	private static SharedPreferences preferences;
+	private static Map<String, String> streamMap = new LinkedHashMap<String, String>();
 	
 	public PreferenceControl(Context context) {
 		preferences = context.getSharedPreferences(PREFERENCE_KEY, PREFERENCE_MODE);
@@ -50,13 +50,13 @@ public class PreferenceControl {
 				"  { name:'Low/20k mp3', url:'http://netcast2.kfjc.org:8972/' } ]";
 	}
 	
-	public String getStreamNamePreference() {
+	public static String getStreamNamePreference() {
 		String pref = preferences.getString(STREAM_PREFERENCE_KEY, "");
 		if (pref == null || pref.isEmpty()) { return FALLBACK_STREAM_NAME; }
 		return pref;
 	}
-
-	public String getUrlPreference() {
+	
+	public static String getUrlPreference() {
 		String pref = streamMap.get(getStreamNamePreference());
 		if (pref == null || pref.isEmpty()) { return FALLBACK_STREAM_URL; }
 		return pref;

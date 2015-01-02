@@ -47,7 +47,7 @@
 	            android:layout_height="wrap_content"
 	        	android:layout_marginRight="8dp"
 	            android:fontFamily="sans-serif-light"
-	            android:text="HQ"
+	            android:text=""
 	            android:textColor="@android:color/white"
 	            android:textSize="16sp"
 	            android:textStyle="bold" />

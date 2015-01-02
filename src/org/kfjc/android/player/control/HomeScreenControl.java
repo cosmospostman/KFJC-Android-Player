@@ -1,13 +1,14 @@
 package org.kfjc.android.player.control;
 
 import org.kfjc.android.player.NowPlayingInfo;
+import org.kfjc.android.player.SettingsDialog;
+import org.kfjc.android.player.SettingsDialog.StreamUrlPreferenceChangeHandler;
 import org.kfjc.android.player.activity.HomeScreenActivity;
 import org.kfjc.android.player.service.LiveStreamService;
 import org.kfjc.android.player.service.LiveStreamService.LiveStreamBinder;
 import org.kfjc.android.player.service.LiveStreamService.MediaListener;
 import org.kfjc.android.player.util.UiUtil;
 import org.kfjc.droid.R;
-
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -36,6 +37,7 @@ public class HomeScreenControl {
 	AudioManager audioManager;
 	private int musicStreamVolumeBeforeDuck;
 	public boolean isPlaying = false;
+	public static PreferenceControl preferenceControl;
 	
 	public HomeScreenControl(HomeScreenActivity activity) {
 		this.activity = activity;
@@ -43,6 +45,8 @@ public class HomeScreenControl {
 				(NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
 		this.audioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
 		this.nowPlayingNotification =  new NotificationCompat.Builder(activity);
+		HomeScreenControl.preferenceControl = new PreferenceControl(activity.getApplicationContext());
+		activity.updateStreamNickname(PreferenceControl.getStreamNamePreference());
 
 		if (musicConnection == null) {
 			musicConnection = new ServiceConnection() {
@@ -91,7 +95,7 @@ public class HomeScreenControl {
 	public void playStream() {
 		audioManager.requestAudioFocus(afChangeListener,
 				AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-		streamService.play();
+		streamService.play(PreferenceControl.getUrlPreference());
 		activity.registerReceiver(onAudioBecomingNoisy, intentFilter);
 		activity.onPlayerBuffer();
 		isPlaying = true;
@@ -114,6 +118,12 @@ public class HomeScreenControl {
 		notificationManager.cancel(NOWPLAYING_NOTIFICATION_ID);
 	}
 	
+	public void showSettings() {
+		SettingsDialog settingsFragment = new SettingsDialog();
+		settingsFragment.setUrlPreferenceChangeHandler(onUrlPreferenceChange);
+		settingsFragment.show(activity.getFragmentManager(), "settings");
+	}
+	
 	private void updateNowPlayNotification(NowPlayingInfo nowPlaying) {
 		String artistTrackString = nowPlaying.getArtist() +
 				" - " + nowPlaying.getTrackTitle();
@@ -134,6 +144,17 @@ public class HomeScreenControl {
 	private void cancelNowPlayNotification() {
 		notificationManager.cancel(NOWPLAYING_NOTIFICATION_ID);
 	}
+	
+	private StreamUrlPreferenceChangeHandler onUrlPreferenceChange = new StreamUrlPreferenceChangeHandler() {	
+		@Override
+		public void onStreamUrlPreferenceChange() {
+			activity.updateStreamNickname(PreferenceControl.getStreamNamePreference());
+			if (streamService.isPlaying()) {
+				stopStream();
+				playStream();
+			}
+		}
+	};
 	
 	private void unregisterBecomingNoisyReceiver() {
 		try {

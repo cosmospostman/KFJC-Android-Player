@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.kfjc.android.player.control.HomeScreenControl;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.droid.R;
 
@@ -27,18 +28,23 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class SettingsDialog extends DialogFragment {
 	
+	public interface StreamUrlPreferenceChangeHandler {
+		public void onStreamUrlPreferenceChange();
+	}
+	
 	private SeekBar volumeSeekbar;
     private AudioManager audioManager; 
     private Context context;
-    private PreferenceControl preferences;
     private List<String> streamNames;
     private RadioGroup radioGroup;
     private Map<String, Integer> streamNameToViewIdMap = new HashMap<String, Integer>();
+    private String previousUrlPreference;
+    private StreamUrlPreferenceChangeHandler urlPreferenceChangeHandler;
 	
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
     	context = getActivity().getApplicationContext();
-    	preferences = new PreferenceControl(context);
+    	previousUrlPreference = PreferenceControl.getUrlPreference();
 		
 	    LayoutInflater inflater = getActivity().getLayoutInflater();
 	    View view = inflater.inflate(R.layout.fragment_settings, new LinearLayout(context), false);
@@ -49,7 +55,13 @@ public class SettingsDialog extends DialogFragment {
 	    builder.setView(view);
 		builder.setTitle(R.string.settings_title);
 		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-	       public void onClick(DialogInterface dialog, int id) {}
+	       public void onClick(DialogInterface dialog, int id) {
+	    	   boolean urlPreferenceChanged =
+	    	       !previousUrlPreference.equals(PreferenceControl.getUrlPreference());
+	    	   if (urlPreferenceChanged && urlPreferenceChangeHandler != null) {
+	    		   urlPreferenceChangeHandler.onStreamUrlPreferenceChange();
+	    	   }
+	       }
 		});
 
 		initVolumeBar(view);
@@ -57,18 +69,22 @@ public class SettingsDialog extends DialogFragment {
 		return builder.create();
 	}
 	
+	public void setUrlPreferenceChangeHandler(StreamUrlPreferenceChangeHandler handler) {
+		this.urlPreferenceChangeHandler = handler;
+	}
+	
 	OnCheckedChangeListener checkChanged = new OnCheckedChangeListener() {
 		@Override
 		public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
 			RadioButton radioButton = (RadioButton) radioGroup.findViewById(radioGroup.getCheckedRadioButtonId());
 			String val = radioButton.getText().toString();
-			preferences.setStreamNamePreference(val);
+			HomeScreenControl.preferenceControl.setStreamNamePreference(val);
 		}
 	};
 	
 	private void initStreamOptions(View view) {
 		radioGroup.removeAllViews();
-		streamNames = preferences.getStreamNames();
+		streamNames = HomeScreenControl.preferenceControl.getStreamNames();
 		for (String stream : streamNames) {
 			RadioButton button = new RadioButton(context);
 		    button.setText(stream);
@@ -76,7 +92,7 @@ public class SettingsDialog extends DialogFragment {
 		    streamNameToViewIdMap.put(stream, button.getId());
 		}
 		
-		Integer selectedId = streamNameToViewIdMap.get(preferences.getStreamNamePreference());
+		Integer selectedId = streamNameToViewIdMap.get(PreferenceControl.getStreamNamePreference());
 		radioGroup.check(selectedId);	
 	}
 	

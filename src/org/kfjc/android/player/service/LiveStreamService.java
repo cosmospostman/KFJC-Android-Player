@@ -27,7 +27,6 @@ public class LiveStreamService extends Service {
 		public void onTrackInfoFetched(NowPlayingInfo trackInfo);
 	};
 
-	private static final String AAC_HI = "http://netcast6.kfjc.org:80/";
 	private MediaPlayer mPlayer;
 	private MediaListener mediaListener;
 	private NowPlayingFetcher nowPlayingFetcher;
@@ -64,8 +63,8 @@ public class LiveStreamService extends Service {
 		this.nowPlayingFetcher = new NowPlayingFetcher(mediaListener);
 	}
 	
-	public void play() {
-		initPlayer();
+	public void play(String streamUrl) {
+		initPlayer(streamUrl);
 		mPlayer.prepareAsync();
 	}
 
@@ -105,7 +104,7 @@ public class LiveStreamService extends Service {
 		}.execute(mPlayer, null, null);
 	};
 
-	private void initPlayer() {
+	private void initPlayer(String streamUrl) {
 		mPlayer = new MediaPlayer();
 		mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		mPlayer.setWakeMode(getApplicationContext(),
@@ -114,7 +113,8 @@ public class LiveStreamService extends Service {
 		mPlayer.setOnErrorListener(onError);
 		mPlayer.setOnCompletionListener(onComplete);
 		try {
-			mPlayer.setDataSource(AAC_HI);
+			mPlayer.setDataSource(streamUrl);
+			Log.i("kfjc", "Set stream source to " + streamUrl);
 		} catch (Exception e) {
             Log.d("Error setting media player datasource", e.getLocalizedMessage());
 		}

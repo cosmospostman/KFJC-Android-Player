@@ -1,14 +1,12 @@
 package org.kfjc.android.player.activity;
 
 import org.kfjc.android.player.NowPlayingInfo;
-import org.kfjc.android.player.SettingsDialog;
 import org.kfjc.android.player.control.HomeScreenControl;
 import org.kfjc.android.player.util.GraphicsUtil;
 import org.kfjc.android.player.util.UiUtil;
 import org.kfjc.droid.R;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -29,6 +27,7 @@ public class HomeScreenActivity extends Activity {
 	private TextView currentDjTextView;
 	private TextView currentTrackTextView;
 	private TextView currentArtistTextView;
+	private TextView streamNicknameTextView;
 	private ImageView radioDevil;
 	private PlayStopButtonState playStopButtonState = PlayStopButtonState.PLAY;
 	private GraphicsUtil graphics;
@@ -48,8 +47,9 @@ public class HomeScreenActivity extends Activity {
 		currentDjTextView = (TextView) findViewById(R.id.currentDJ);
 		currentTrackTextView = (TextView) findViewById(R.id.currentTrack);
 		currentArtistTextView = (TextView) findViewById(R.id.currentArtist);
+		streamNicknameTextView = (TextView) findViewById(R.id.streamQuality);
 		
-		settingsButton.setAlpha(0.3f);
+		settingsButton.setAlpha(0.4f);
 		addButtonListeners();
 	}
 	
@@ -89,12 +89,15 @@ public class HomeScreenActivity extends Activity {
 		settingsButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				DialogFragment settingsFragment = new SettingsDialog();
-				settingsFragment.show(getFragmentManager(), "settings");
+				control.showSettings();
 			}
 		});
 	}
 	
+	public void updateStreamNickname(String streamname) {
+		streamNicknameTextView.setText(streamname);
+	}
+		
 	public void updateTrackInfo(NowPlayingInfo nowPlaying) {
 		currentDjTextView.setText(UiUtil.getAppTitle(getApplicationContext(), nowPlaying));
 		currentTrackTextView.setText(nowPlaying.getTrackTitle());
