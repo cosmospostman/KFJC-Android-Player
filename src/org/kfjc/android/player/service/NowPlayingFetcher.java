@@ -1,9 +1,10 @@
-package service;
+package org.kfjc.android.player.service;
 
 import org.kfjc.android.player.NowPlayingInfo;
+import org.kfjc.android.player.service.LiveStreamService.MediaListener;
 import org.kfjc.android.player.util.HttpUtil;
 
-import service.LiveStreamService.MediaListener;
+
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;

@@ -2,12 +2,13 @@ package org.kfjc.android.player.control;
 
 import org.kfjc.android.player.NowPlayingInfo;
 import org.kfjc.android.player.activity.HomeScreenActivity;
+import org.kfjc.android.player.service.LiveStreamService;
+import org.kfjc.android.player.service.LiveStreamService.LiveStreamBinder;
+import org.kfjc.android.player.service.LiveStreamService.MediaListener;
 import org.kfjc.android.player.util.UiUtil;
 import org.kfjc.droid.R;
 
-import service.LiveStreamService;
-import service.LiveStreamService.LiveStreamBinder;
-import service.LiveStreamService.MediaListener;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;

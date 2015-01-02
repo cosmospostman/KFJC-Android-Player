@@ -1,4 +1,4 @@
-package service;
+package org.kfjc.android.player.service;
 
 import org.kfjc.android.player.NowPlayingInfo;
 
