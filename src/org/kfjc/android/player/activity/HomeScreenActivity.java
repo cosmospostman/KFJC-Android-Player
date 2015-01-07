@@ -6,8 +6,10 @@ import org.kfjc.android.player.util.GraphicsUtil;
 import org.kfjc.android.player.util.UiUtil;
 import org.kfjc.droid.R;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -49,8 +51,15 @@ public class HomeScreenActivity extends Activity {
 		currentArtistTextView = (TextView) findViewById(R.id.currentArtist);
 		streamNicknameTextView = (TextView) findViewById(R.id.streamQuality);
 		
-		settingsButton.setAlpha(0.4f);
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB){
+			setSettingsButtonAlpha();
+		}
 		addButtonListeners();
+	}
+	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	private void setSettingsButtonAlpha() {
+		settingsButton.setAlpha(0.4f);
 	}
 	
 	@Override
