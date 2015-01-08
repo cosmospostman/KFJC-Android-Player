@@ -1,11 +1,5 @@
 package org.kfjc.android.player.activity;
 
-import org.kfjc.android.player.NowPlayingInfo;
-import org.kfjc.android.player.control.HomeScreenControl;
-import org.kfjc.android.player.util.GraphicsUtil;
-import org.kfjc.android.player.util.UiUtil;
-import org.kfjc.droid.R;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -15,6 +9,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.kfjc.android.player.NowPlayingInfo;
+import org.kfjc.android.player.control.HomeScreenControl;
+import org.kfjc.android.player.util.GraphicsUtil;
+import org.kfjc.android.player.util.UiUtil;
+import org.kfjc.droid.R;
 
 public class HomeScreenActivity extends Activity {
 	
@@ -50,7 +50,7 @@ public class HomeScreenActivity extends Activity {
 		currentTrackTextView = (TextView) findViewById(R.id.currentTrack);
 		currentArtistTextView = (TextView) findViewById(R.id.currentArtist);
 		streamNicknameTextView = (TextView) findViewById(R.id.streamQuality);
-		
+
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB){
 			setSettingsButtonAlpha();
 		}
@@ -103,8 +103,8 @@ public class HomeScreenActivity extends Activity {
 		});
 	}
 	
-	public void updateStreamNickname(String streamname) {
-		streamNicknameTextView.setText(streamname);
+	public void updateStreamNickname(String streamName) {
+		streamNicknameTextView.setText(streamName);
 	}
 		
 	public void updateTrackInfo(NowPlayingInfo nowPlaying) {
@@ -117,7 +117,7 @@ public class HomeScreenActivity extends Activity {
 		graphics.bufferDevil(radioDevil, true);
 		playStopButton.setImageResource(R.drawable.ic_stop);
 		playStopButtonState = PlayStopButtonState.STOP;	
-	};
+	}
 	
 	public void onPlayerBufferComplete() {
 		graphics.bufferDevil(radioDevil, false);

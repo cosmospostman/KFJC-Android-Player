@@ -1,7 +1,5 @@
 package org.kfjc.android.player.activity;
 
-import org.kfjc.droid.R;
-
 import android.app.Activity;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -11,6 +9,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.VideoView;
+
+import org.kfjc.droid.R;
 
 public class FullScreenActivity extends Activity {
 

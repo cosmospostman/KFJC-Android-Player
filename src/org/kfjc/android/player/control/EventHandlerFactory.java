@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 
 public class EventHandlerFactory {
 
@@ -42,6 +44,30 @@ public class EventHandlerFactory {
 		};
 		
 	}
+
+    static PhoneStateListener onPhoneStateChange(final HomeScreenControl control) {
+        return new PhoneStateListener() {
+            private boolean isStoppedDueToPhone = false;
+            @Override
+            public void onCallStateChanged(int callState, String incomingNumber) {
+                switch (callState) {
+                    case TelephonyManager.CALL_STATE_RINGING:
+                    case TelephonyManager.CALL_STATE_OFFHOOK:
+                        if (control.isStreamServicePlaying()) {
+                            control.stopStream();
+                            isStoppedDueToPhone = true;
+                        }
+                        break;
+                    case TelephonyManager.CALL_STATE_IDLE:
+                        if (isStoppedDueToPhone) {
+                            control.playStream();
+                            isStoppedDueToPhone = false;
+                        }
+                        break;
+                }
+            }
+        };
+    }
 	
 	/**
 	 * When the user changes stream quality preference, we should restart the stream if it's
