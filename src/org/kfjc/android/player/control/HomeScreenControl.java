@@ -30,7 +30,7 @@ public class HomeScreenControl {
 	
 	public static PreferenceControl preferenceControl;
 	private static final int NOWPLAYING_NOTIFICATION_ID = 1;
-	private static final IntentFilter becomingNoisyIntentFilter =
+    private static final IntentFilter becomingNoisyIntentFilter =
 			new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 		
 	private Intent playIntent;
@@ -132,6 +132,7 @@ public class HomeScreenControl {
 				AudioManager.AUDIOFOCUS_GAIN);
 		streamService.play(PreferenceControl.getUrlPreference());
 		activity.registerReceiver(audioBecomingNoisyReceiver, becomingNoisyIntentFilter);
+        postBufferNotificatoin();
 		activity.onPlayerBuffer();
 	}
 	
@@ -157,22 +158,31 @@ public class HomeScreenControl {
 		settingsFragment.setUrlPreferenceChangeHandler(streamUrlPreferenceChangeListener);
 		settingsFragment.show(activity.getFragmentManager(), "settings");
 	}
+
+    private void postBufferNotificatoin() {
+        postNotification(
+                "KFJC",
+                "Buffering stream: " + preferenceControl.getStreamNamePreference());
+    }
 	
 	private void updateNowPlayNotification(NowPlayingInfo nowPlaying) {
-		String artistTrackString = nowPlaying.getArtist() +
+        String currentDj = UiUtil.getAppTitle(activity.getApplicationContext(), nowPlaying);
+        String artistTrackString = nowPlaying.getArtist() +
 				" - " + nowPlaying.getTrackTitle();
-		Notification nowPlayingNotification = new NotificationCompat.Builder(activity)
-		    .setSmallIcon(R.drawable.ic_kfjc_notification)
-		    .setContentTitle(UiUtil.getAppTitle(activity.getApplicationContext(), nowPlaying))
-		    .setContentText(artistTrackString)
-			.setOngoing(true)
-			.setWhen(0)
-			.setContentIntent(kfjcPlayerIntent)
-			.build();
-		notificationManager.notify(
-				NOWPLAYING_NOTIFICATION_ID,
-				nowPlayingNotification);
+        postNotification(currentDj, artistTrackString);
 	}
+
+    private void postNotification(String title, String text) {
+        Notification notification = new NotificationCompat.Builder(activity)
+                .setSmallIcon(R.drawable.ic_kfjc_notification)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setOngoing(true)
+                .setWhen(0)
+                .setContentIntent(kfjcPlayerIntent)
+                .build();
+        notificationManager.notify(NOWPLAYING_NOTIFICATION_ID, notification);
+    }
 	
 	private void cancelNowPlayNotification() {
 		notificationManager.cancel(NOWPLAYING_NOTIFICATION_ID);

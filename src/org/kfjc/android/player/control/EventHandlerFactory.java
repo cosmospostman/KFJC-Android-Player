@@ -45,6 +45,10 @@ public class EventHandlerFactory {
 		
 	}
 
+    /**
+     * Listen for telephone events. Stop playback if phone is in use; start it again when phone
+     * is hung up.
+     */
     static PhoneStateListener onPhoneStateChange(final HomeScreenControl control) {
         return new PhoneStateListener() {
             private boolean isStoppedDueToPhone = false;

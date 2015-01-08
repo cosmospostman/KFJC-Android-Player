@@ -92,7 +92,7 @@
 	            android:layout_marginRight="16dp"
 	            android:layout_alignParentRight="true"
 	            android:background="@drawable/oval"
-	            android:src="@drawable/ic_play"/>
+	            android:src="@drawable/ic_play" />
 	
 	        <ImageView
 	            android:id="@+id/fullscreenbutton"
