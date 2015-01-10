@@ -9,6 +9,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.kfjc.android.player.Constants;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,9 +18,7 @@ public class PreferenceControl {
 	
 	private static final String PREFERENCE_KEY = "kfjc.preferences";
 	private static final String STREAM_PREFERENCE_KEY = "kfjc.preferences.streamname";
-	private static final String FALLBACK_STREAM_NAME = "High/128k mp3";
-	private static final String FALLBACK_STREAM_URL = "http://netcast6.kfjc.org:80/";
-	private static final int PREFERENCE_MODE = Context.MODE_PRIVATE;
+    private static final int PREFERENCE_MODE = Context.MODE_PRIVATE;
 	
 	private static SharedPreferences preferences;
 	private static Map<String, String> streamMap = new LinkedHashMap<String, String>();
@@ -52,13 +51,13 @@ public class PreferenceControl {
 	
 	public static String getStreamNamePreference() {
 		String pref = preferences.getString(STREAM_PREFERENCE_KEY, "");
-		if (pref == null || pref.isEmpty()) { return FALLBACK_STREAM_NAME; }
+		if (pref == null || pref.isEmpty()) { return Constants.FALLBACK_STREAM_NAME; }
 		return pref;
 	}
 	
 	public static String getUrlPreference() {
 		String pref = streamMap.get(getStreamNamePreference());
-		if (pref == null || pref.isEmpty()) { return FALLBACK_STREAM_URL; }
+		if (pref == null || pref.isEmpty()) { return Constants.FALLBACK_STREAM_URL; }
 		return pref;
 	}
 	

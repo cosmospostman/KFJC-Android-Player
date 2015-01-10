@@ -1,4 +1,4 @@
-package org.kfjc.android.player;
+package org.kfjc.android.player.dialog;
 
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +65,7 @@ public class SettingsDialog extends DialogFragment {
 		});
 
 		initVolumeBar(view);
-		initStreamOptions(view);
+		initStreamOptions();
 		return builder.create();
 	}
 	
@@ -82,7 +82,7 @@ public class SettingsDialog extends DialogFragment {
 		}
 	};
 	
-	private void initStreamOptions(View view) {
+	private void initStreamOptions() {
 		radioGroup.removeAllViews();
 		streamNames = HomeScreenControl.preferenceControl.getStreamNames();
 		for (String stream : streamNames) {

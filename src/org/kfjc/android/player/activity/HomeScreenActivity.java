@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.kfjc.android.player.NowPlayingInfo;
+import org.kfjc.android.player.model.TrackInfo;
 import org.kfjc.android.player.control.HomeScreenControl;
 import org.kfjc.android.player.util.GraphicsUtil;
 import org.kfjc.android.player.util.UiUtil;
@@ -107,7 +107,7 @@ public class HomeScreenActivity extends Activity {
 		streamNicknameTextView.setText(streamName);
 	}
 		
-	public void updateTrackInfo(NowPlayingInfo nowPlaying) {
+	public void updateTrackInfo(TrackInfo nowPlaying) {
 		currentDjTextView.setText(UiUtil.getAppTitle(getApplicationContext(), nowPlaying));
 		currentTrackTextView.setText(nowPlaying.getTrackTitle());
 		currentArtistTextView.setText(nowPlaying.getArtist());

@@ -1,6 +1,6 @@
 package org.kfjc.android.player.util;
 
-import org.kfjc.android.player.NowPlayingInfo;
+import org.kfjc.android.player.model.TrackInfo;
 import org.kfjc.droid.R;
 
 import android.content.Context;
@@ -35,7 +35,7 @@ public class UiUtil {
 	 * @param nowPlaying
 	 * @return The DJ Name if non-null/non-empty, otherwise app name.
 	 */
-	public static String getAppTitle(Context context, NowPlayingInfo nowPlaying) {
+	public static String getAppTitle(Context context, TrackInfo nowPlaying) {
 		String djName = nowPlaying.getDjAirName();
 		if (djName != null && !djName.isEmpty()) {
 			return djName;

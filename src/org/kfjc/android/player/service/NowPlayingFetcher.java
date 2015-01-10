@@ -1,6 +1,7 @@
 package org.kfjc.android.player.service;
 
-import org.kfjc.android.player.NowPlayingInfo;
+import org.kfjc.android.player.Constants;
+import org.kfjc.android.player.model.TrackInfo;
 import org.kfjc.android.player.service.LiveStreamService.MediaListener;
 import org.kfjc.android.player.util.HttpUtil;
 
@@ -10,31 +11,29 @@ import android.util.Log;
 
 public class NowPlayingFetcher {
 
-	private static final String METADATA = "http://kfjc.org/api/playlists/current.php";
-	private static final int POLL_DELAY_MS = 10000;
-	private MediaListener nowPlayingHandler;
-	private Handler handler = new Handler();
+    private MediaListener nowPlayingHandler;
+	private Handler handler;
     
 	public NowPlayingFetcher(final MediaListener nowPlayingHandler) {
 		this.nowPlayingHandler = nowPlayingHandler;
+        this.handler = new Handler();
 	}
 	
 	Runnable fetchRunner = new Runnable() {
-		@Override 
-		public void run() {
+		@Override public void run() {
 			makeFetchTask().execute();
-			handler.postDelayed(this, POLL_DELAY_MS);
+			handler.postDelayed(this, Constants.CURRENT_TRACK_POLL_DELAY_MS);
 		}
 	};
 	
-	private AsyncTask<Void, Void, NowPlayingInfo> makeFetchTask() {
-		return new AsyncTask<Void, Void, NowPlayingInfo>() {
-		    protected NowPlayingInfo doInBackground(Void... unusedParams) {
-		    	Log.i("kfjc", "Fetching track info");
-		    	return new NowPlayingInfo(HttpUtil.getUrl(METADATA));
+	private AsyncTask<Void, Void, TrackInfo> makeFetchTask() {
+		return new AsyncTask<Void, Void, TrackInfo>() {
+		    protected TrackInfo doInBackground(Void... unusedParams) {
+		    	Log.i(Constants.LOG_TAG, "Fetching current track info");
+		    	return new TrackInfo(HttpUtil.getUrl(Constants.CURRENT_TRACK_URL));
 		    }
 
-		    protected void onPostExecute(NowPlayingInfo nowPlaying) {
+		    protected void onPostExecute(TrackInfo nowPlaying) {
 				nowPlayingHandler.onTrackInfoFetched(nowPlaying);
 		    }
 		};
@@ -43,7 +42,7 @@ public class NowPlayingFetcher {
     public void run() {
     	stop();
     	runOnce();
-    	handler.postDelayed(fetchRunner, POLL_DELAY_MS);
+    	handler.postDelayed(fetchRunner, Constants.CURRENT_TRACK_POLL_DELAY_MS);
     }
     
     public void runOnce() {

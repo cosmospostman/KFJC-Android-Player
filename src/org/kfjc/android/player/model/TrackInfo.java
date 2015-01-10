@@ -1,24 +1,25 @@
-package org.kfjc.android.player;
+package org.kfjc.android.player.model;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.kfjc.android.player.Constants;
 
 import android.util.Log;
 
-public class NowPlayingInfo {
+public class TrackInfo {
 	
 	private String artist;
 	private String trackTitle;
 	private String djAirName;
 	
-	public NowPlayingInfo(String nowPlayingApiResponse) {
+	public TrackInfo(String trackApiResponse) {
 		try {
-			JSONObject nowPlayingJson = new JSONObject(nowPlayingApiResponse);
-			this.artist = nowPlayingJson.getString("artist");
-			this.trackTitle = nowPlayingJson.getString("track_title");
-			this.djAirName = nowPlayingJson.getString("air_name");
+			JSONObject trackJson = new JSONObject(trackApiResponse);
+			this.artist = trackJson.getString("artist");
+			this.trackTitle = trackJson.getString("track_title");
+			this.djAirName = trackJson.getString("air_name");
 		} catch (JSONException e) {
-            Log.d("JSONException", e.getLocalizedMessage());
+            Log.d(Constants.LOG_TAG, e.getLocalizedMessage());
 			this.artist = "";
 			this.trackTitle = "";
 			this.djAirName = "";

@@ -1,6 +1,6 @@
 package org.kfjc.android.player.control;
 
-import org.kfjc.android.player.SettingsDialog.StreamUrlPreferenceChangeHandler;
+import org.kfjc.android.player.dialog.SettingsDialog.StreamUrlPreferenceChangeHandler;
 import org.kfjc.android.player.activity.HomeScreenActivity;
 
 import android.app.Activity;

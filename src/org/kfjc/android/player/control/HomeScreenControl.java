@@ -16,9 +16,9 @@ import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
-import org.kfjc.android.player.NowPlayingInfo;
-import org.kfjc.android.player.SettingsDialog;
-import org.kfjc.android.player.SettingsDialog.StreamUrlPreferenceChangeHandler;
+import org.kfjc.android.player.model.TrackInfo;
+import org.kfjc.android.player.dialog.SettingsDialog;
+import org.kfjc.android.player.dialog.SettingsDialog.StreamUrlPreferenceChangeHandler;
 import org.kfjc.android.player.activity.HomeScreenActivity;
 import org.kfjc.android.player.service.LiveStreamService;
 import org.kfjc.android.player.service.LiveStreamService.LiveStreamBinder;
@@ -41,7 +41,6 @@ public class HomeScreenControl {
 	private PendingIntent kfjcPlayerIntent;
 	private AudioManager audioManager;
     private TelephonyManager telephonyManager;
-
 
     private OnAudioFocusChangeListener audioFocusListener;
 	private BroadcastReceiver audioBecomingNoisyReceiver;
@@ -117,7 +116,7 @@ public class HomeScreenControl {
 		}
 		
 		@Override
-		public void onTrackInfoFetched(NowPlayingInfo trackInfo) {
+		public void onTrackInfoFetched(TrackInfo trackInfo) {
 			activity.updateTrackInfo(trackInfo);
 			if (streamService.isPlaying()) {
 				updateNowPlayNotification(trackInfo);
@@ -132,7 +131,7 @@ public class HomeScreenControl {
 				AudioManager.AUDIOFOCUS_GAIN);
 		streamService.play(PreferenceControl.getUrlPreference());
 		activity.registerReceiver(audioBecomingNoisyReceiver, becomingNoisyIntentFilter);
-        postBufferNotificatoin();
+        postBufferNotification();
 		activity.onPlayerBuffer();
 	}
 	
@@ -159,13 +158,13 @@ public class HomeScreenControl {
 		settingsFragment.show(activity.getFragmentManager(), "settings");
 	}
 
-    private void postBufferNotificatoin() {
+    private void postBufferNotification() {
         postNotification(
                 "KFJC",
-                "Buffering stream: " + preferenceControl.getStreamNamePreference());
+                "Buffering stream: " + PreferenceControl.getStreamNamePreference());
     }
 	
-	private void updateNowPlayNotification(NowPlayingInfo nowPlaying) {
+	private void updateNowPlayNotification(TrackInfo nowPlaying) {
         String currentDj = UiUtil.getAppTitle(activity.getApplicationContext(), nowPlaying);
         String artistTrackString = nowPlaying.getArtist() +
 				" - " + nowPlaying.getTrackTitle();

@@ -1,6 +1,7 @@
 package org.kfjc.android.player.service;
 
-import org.kfjc.android.player.NowPlayingInfo;
+import org.kfjc.android.player.Constants;
+import org.kfjc.android.player.model.TrackInfo;
 
 import android.app.Service;
 import android.content.Intent;
@@ -24,8 +25,8 @@ public class LiveStreamService extends Service {
 	public interface MediaListener {
 		public void onPlay();
 		public void onError();
-		public void onTrackInfoFetched(NowPlayingInfo trackInfo);
-	};
+		public void onTrackInfoFetched(TrackInfo trackInfo);
+	}
 
 	private MediaPlayer mPlayer;
 	private MediaListener mediaListener;
@@ -85,24 +86,19 @@ public class LiveStreamService extends Service {
 		isFetching = true;
 	}
 	
-	public void stopPlaylistFetcher() {
-		nowPlayingFetcher.stop();
-		isFetching = false;
-	}
-	
 	private void releaseAsync(MediaPlayer mPlayer) {
 		new AsyncTask<MediaPlayer, Void, Void>() {
 			@Override
 			protected Void doInBackground(MediaPlayer... mediaPlayers) {
-				for (int i = 0; i < mediaPlayers.length; i++ ) {
-					if (mediaPlayers[i] != null) {
-						mediaPlayers[i].release();
+				for (MediaPlayer mp : mediaPlayers) {
+					if (mp != null) {
+						mp.release();
 					}
 				}
 				return null;
 			}
 		}.execute(mPlayer, null, null);
-	};
+	}
 
 	private void initPlayer(String streamUrl) {
 		mPlayer = new MediaPlayer();
@@ -114,9 +110,10 @@ public class LiveStreamService extends Service {
 		mPlayer.setOnCompletionListener(onComplete);
 		try {
 			mPlayer.setDataSource(streamUrl);
-			Log.i("kfjc", "Set stream source to " + streamUrl);
+			Log.i(Constants.LOG_TAG, "Set stream source to " + streamUrl);
 		} catch (Exception e) {
-            Log.d("Error setting media player datasource", e.getLocalizedMessage());
+            Log.d(Constants.LOG_TAG,
+                    "Error setting media player datasource:" + e.getLocalizedMessage());
 		}
 	}
 	
