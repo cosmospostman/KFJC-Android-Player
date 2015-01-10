@@ -32,7 +32,6 @@ public class LiveStreamService extends Service {
 	private MediaListener mediaListener;
 	private NowPlayingFetcher nowPlayingFetcher;
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
-	private boolean isPlaying = false;
 	private boolean isFetching = false;
 	
 	@Override
@@ -56,7 +55,12 @@ public class LiveStreamService extends Service {
 	}
 	
 	public boolean isPlaying() {
-		return isPlaying;
+        try {
+            return mPlayer != null && mPlayer.isPlaying();
+        } catch (IllegalStateException e) {
+            // Fall through and return false
+        }
+        return false;
 	}
 	
 	public void setMediaEventListener(MediaListener listener) {
@@ -71,7 +75,6 @@ public class LiveStreamService extends Service {
 
 	public void stop() {
 		releaseAsync(mPlayer);
-		isPlaying = false;
 	}
 	
 	public void runPlaylistFetcherOnce() {
@@ -125,7 +128,6 @@ public class LiveStreamService extends Service {
 				mPlayer.start();
 				if (mediaListener != null) {
 					mediaListener.onPlay();
-					isPlaying = true;
 				}
 			}
 		}
@@ -137,7 +139,6 @@ public class LiveStreamService extends Service {
 			mediaListener.onError();
 			mPlayer.release();
 			mPlayer = null;
-			isPlaying = false;
 			return true;
 		}
 	};
@@ -149,7 +150,6 @@ public class LiveStreamService extends Service {
 			mediaListener.onError();
 			mPlayer.release();
 			mPlayer = null;
-			isPlaying = false;
 		}
 	};	
 }

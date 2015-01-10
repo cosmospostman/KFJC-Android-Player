@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
+import android.os.Handler;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
@@ -25,8 +26,10 @@ public class EventHandlerFactory {
 		return new OnAudioFocusChangeListener() {
 			
 			private int volumeBeforeDuck;
+            private static final String AUDIOFOCUS_KEY =
+                    "org.kfjc.android.player.control_AUDIO_FOCUS_CHANGE_LISTENER";
 			
-			public void onAudioFocusChange(int focusChange) {
+			@Override public void onAudioFocusChange(int focusChange) {
 				switch (focusChange) {
 				case AudioManager.AUDIOFOCUS_LOSS:
 					control.stopStream();
@@ -41,7 +44,15 @@ public class EventHandlerFactory {
 					break;
 				}
 			}
-		};
+
+            // Objects are recreated after activity resume. Audio focus is requested and released
+            // by reference to an OnAudioFocusChangeListener, and subsequently its toString()
+            // method. By returning a constant string, we can consistently refer to the audio
+            // focus we requested before the app was paused and resumed.
+            @Override public String toString() {
+                return AUDIOFOCUS_KEY;
+            }
+        };
 		
 	}
 
@@ -79,13 +90,13 @@ public class EventHandlerFactory {
 	 */
 	static StreamUrlPreferenceChangeHandler onUrlPreferenceChange(
 			final HomeScreenControl control, final HomeScreenActivity activity) {
+        final Handler handler = new Handler();
 		return new StreamUrlPreferenceChangeHandler() {	
-			@Override
-			public void onStreamUrlPreferenceChange() {
+			@Override public void onStreamUrlPreferenceChange() {
 				activity.updateStreamNickname(PreferenceControl.getStreamNamePreference());
 				if (control.isStreamServicePlaying()) {
 					control.stopStream();
-					control.playStream();
+                    control.playStream();
 				}
 			}
 		};

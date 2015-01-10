@@ -12,13 +12,14 @@
     tools:context="org.kfjc.android.player.activity.HomeScreenActivity" >
 
     <ImageView
+        android:id="@+id/backgroundImageView"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="0dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/background"
+        android:src="@drawable/bg_tower"
         tools:ignore="ContentDescription" />
     
     <LinearLayout

@@ -8,6 +8,10 @@ import android.util.Log;
 
 public class TrackInfo {
 
+    // Returned by the website when no dj signed in.
+    private static final String NULL_STRING = "null";
+    private static final String NULL_DJ_NAME = "George Foothill";
+
     private boolean couldNotFetch;
 	private String artist;
 	private String trackTitle;
@@ -22,7 +26,8 @@ public class TrackInfo {
 			JSONObject trackJson = new JSONObject(trackApiResponse);
 			this.artist = trackJson.getString("artist");
 			this.trackTitle = trackJson.getString("track_title");
-			this.djName = trackJson.getString("air_name");
+            String djName = trackJson.getString("air_name");
+            this.djName = djName.equals(NULL_STRING) ? NULL_DJ_NAME : djName;
             this.couldNotFetch = false;
 		} catch (JSONException e) {
             Log.d(Constants.LOG_TAG, e.getLocalizedMessage());

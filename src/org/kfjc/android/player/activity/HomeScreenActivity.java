@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.Calendar;
+
 import org.kfjc.android.player.model.TrackInfo;
 import org.kfjc.android.player.control.HomeScreenControl;
 import org.kfjc.android.player.util.GraphicsUtil;
@@ -31,6 +33,7 @@ public class HomeScreenActivity extends Activity {
 
     private ImageView radioDevil;
     private LinearLayout settingsButton;
+    private ImageView backgroundImageView;
     private TextView streamNicknameTextView;
     private ImageView fullscreenButton;
     private ImageView playStopButton;
@@ -56,6 +59,7 @@ public class HomeScreenActivity extends Activity {
 		graphics = new GraphicsUtil(getResources());
 		playStopButton = (ImageView) findViewById(R.id.playstopbutton);
 		fullscreenButton = (ImageView) findViewById(R.id.fullscreenbutton);
+        backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
 		settingsButton = (LinearLayout) findViewById(R.id.settingsButton);
 		radioDevil = (ImageView) findViewById(R.id.logo);
 		radioDevil.setImageResource(graphics.radioDevilOff());
@@ -88,7 +92,14 @@ public class HomeScreenActivity extends Activity {
 		control = new HomeScreenControl(this);
 	}
 
-	@Override
+    @Override
+    protected void onResume() {
+        super.onResume();
+        int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        backgroundImageView.setImageResource(GraphicsUtil.imagesOfTheHour[hourOfDay]);
+    }
+
+    @Override
 	public void onDestroy() {
 		control.destroy();
 		super.onDestroy();
