@@ -12,7 +12,7 @@ import android.widget.VideoView;
 
 import org.kfjc.droid.R;
 
-public class FullScreenActivity extends Activity {
+public class LavaLampActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

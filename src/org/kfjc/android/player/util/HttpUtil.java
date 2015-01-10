@@ -10,27 +10,19 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import org.kfjc.android.player.Constants;
-
-import android.util.Log;
-
 public class HttpUtil {
 	
 	/**
 	 * Fetches a URL over HTTP and returns content as a String.
 	 */
-	public static String getUrl(String url){
+	public static String getUrl(String url) throws IOException {
         InputStream inputStream;
         String result = "";
-        try {
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
-            inputStream = httpResponse.getEntity().getContent();
-            if (inputStream != null) {
-                result = convertInputStreamToString(inputStream);
-            }
-        } catch (Exception e) {
-            Log.d(Constants.LOG_TAG, e.getLocalizedMessage());
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
+        inputStream = httpResponse.getEntity().getContent();
+        if (inputStream != null) {
+            result = convertInputStreamToString(inputStream);
         }
         return result;
     }

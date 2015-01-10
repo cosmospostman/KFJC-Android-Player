@@ -53,7 +53,7 @@ public class SettingsDialog extends DialogFragment {
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 	    builder.setView(view);
-		builder.setTitle(R.string.settings_title);
+		builder.setTitle(R.string.settings_dialog_title);
 		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 	       public void onClick(DialogInterface dialog, int id) {
 	    	   boolean urlPreferenceChanged =

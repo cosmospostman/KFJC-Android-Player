@@ -7,24 +7,35 @@ import org.kfjc.android.player.Constants;
 import android.util.Log;
 
 public class TrackInfo {
-	
+
+    private boolean couldNotFetch;
 	private String artist;
 	private String trackTitle;
-	private String djAirName;
+	private String djName;
+
+    public TrackInfo() {
+        setCouldNotFetchTrue();
+    }
 	
 	public TrackInfo(String trackApiResponse) {
 		try {
 			JSONObject trackJson = new JSONObject(trackApiResponse);
 			this.artist = trackJson.getString("artist");
 			this.trackTitle = trackJson.getString("track_title");
-			this.djAirName = trackJson.getString("air_name");
+			this.djName = trackJson.getString("air_name");
+            this.couldNotFetch = false;
 		} catch (JSONException e) {
             Log.d(Constants.LOG_TAG, e.getLocalizedMessage());
-			this.artist = "";
-			this.trackTitle = "";
-			this.djAirName = "";
+            setCouldNotFetchTrue();
 		}
 	}
+
+    private void setCouldNotFetchTrue() {
+        this.couldNotFetch = true;
+        this.artist = "";
+        this.trackTitle = "";
+        this.djName = "";
+    }
 	
 	public String getArtist() {
 		return this.artist;
@@ -34,8 +45,12 @@ public class TrackInfo {
 		return this.trackTitle;
 	}
 	
-	public String getDjAirName() {
-		return this.djAirName;
+	public String getDjName() {
+		return this.djName;
 	}
+
+    public boolean getCouldNotFetch() {
+        return this.couldNotFetch;
+    }
 
 }

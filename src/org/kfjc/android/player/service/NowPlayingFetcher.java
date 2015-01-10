@@ -25,12 +25,16 @@ public class NowPlayingFetcher {
 			handler.postDelayed(this, Constants.CURRENT_TRACK_POLL_DELAY_MS);
 		}
 	};
-	
+
 	private AsyncTask<Void, Void, TrackInfo> makeFetchTask() {
 		return new AsyncTask<Void, Void, TrackInfo>() {
 		    protected TrackInfo doInBackground(Void... unusedParams) {
 		    	Log.i(Constants.LOG_TAG, "Fetching current track info");
-		    	return new TrackInfo(HttpUtil.getUrl(Constants.CURRENT_TRACK_URL));
+                try {
+                    return new TrackInfo(HttpUtil.getUrl(Constants.CURRENT_TRACK_URL));
+                } catch (Exception e) {
+                    return new TrackInfo();
+                }
 		    }
 
 		    protected void onPostExecute(TrackInfo nowPlaying) {

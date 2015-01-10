@@ -20,10 +20,10 @@ import org.kfjc.android.player.model.TrackInfo;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.dialog.SettingsDialog.StreamUrlPreferenceChangeHandler;
 import org.kfjc.android.player.activity.HomeScreenActivity;
+import org.kfjc.android.player.activity.HomeScreenActivity.StatusState;
 import org.kfjc.android.player.service.LiveStreamService;
 import org.kfjc.android.player.service.LiveStreamService.LiveStreamBinder;
 import org.kfjc.android.player.service.LiveStreamService.MediaListener;
-import org.kfjc.android.player.util.UiUtil;
 import org.kfjc.droid.R;
 
 public class HomeScreenControl {
@@ -113,7 +113,8 @@ public class HomeScreenControl {
 		@Override
 		public void onError() {
 			stopStream();
-		}
+            activity.setStatusState(HomeScreenActivity.StatusState.CONNECTION_ERROR);
+        }
 		
 		@Override
 		public void onTrackInfoFetched(TrackInfo trackInfo) {
@@ -133,6 +134,7 @@ public class HomeScreenControl {
 		activity.registerReceiver(audioBecomingNoisyReceiver, becomingNoisyIntentFilter);
         postBufferNotification();
 		activity.onPlayerBuffer();
+        activity.setStatusState(StatusState.CONNECTING);
 	}
 	
 	public void stopStream() {
@@ -165,10 +167,9 @@ public class HomeScreenControl {
     }
 	
 	private void updateNowPlayNotification(TrackInfo nowPlaying) {
-        String currentDj = UiUtil.getAppTitle(activity.getApplicationContext(), nowPlaying);
         String artistTrackString = nowPlaying.getArtist() +
 				" - " + nowPlaying.getTrackTitle();
-        postNotification(currentDj, artistTrackString);
+        postNotification(nowPlaying.getDjName(), artistTrackString);
 	}
 
     private void postNotification(String title, String text) {
@@ -190,4 +191,5 @@ public class HomeScreenControl {
 	boolean isStreamServicePlaying() {
 		return streamService.isPlaying();
 	}
+
 }

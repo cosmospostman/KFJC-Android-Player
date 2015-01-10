@@ -1,9 +1,5 @@
 package org.kfjc.android.player.util;
 
-import org.kfjc.android.player.model.TrackInfo;
-import org.kfjc.droid.R;
-
-import android.content.Context;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,16 +26,4 @@ public class UiUtil {
 		}
 	};
 
-	/**
-	 * @param context Context (contains string resources)
-	 * @param nowPlaying
-	 * @return The DJ Name if non-null/non-empty, otherwise app name.
-	 */
-	public static String getAppTitle(Context context, TrackInfo nowPlaying) {
-		String djName = nowPlaying.getDjAirName();
-		if (djName != null && !djName.isEmpty()) {
-			return djName;
-		}
-		return context.getString(R.string.app_name);
-	}
 }
