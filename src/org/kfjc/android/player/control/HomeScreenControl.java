@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
@@ -48,10 +49,9 @@ public class HomeScreenControl {
     private PhoneStateListener phoneStateListener;
 	
 	public HomeScreenControl(HomeScreenActivity activity) {
-		HomeScreenControl.preferenceControl =
-				new PreferenceControl(activity.getApplicationContext());
+        loadAvailableStreams(activity);
 
-		this.activity = activity;
+        this.activity = activity;
 		this.notificationManager =
 				(NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
 		this.audioManager =
@@ -64,7 +64,6 @@ public class HomeScreenControl {
 		this.streamUrlPreferenceChangeListener =
 				EventHandlerFactory.onUrlPreferenceChange(this, activity);
 
-		activity.updateStreamNickname(PreferenceControl.getStreamNamePreference());
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 
         kfjcPlayerIntent = PendingIntent.getActivity(
@@ -80,6 +79,25 @@ public class HomeScreenControl {
 			bindMusicConnection();
 		}
 	}
+
+    private void loadAvailableStreams(final HomeScreenActivity activity) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override protected Void doInBackground(Void... unsedParams) {
+                HomeScreenControl.preferenceControl =
+                        new PreferenceControl(activity.getApplicationContext());
+                return null;
+            }
+
+            @Override protected void onPostExecute(Void aVoid) {
+                onStreamUrlsLoaded();
+            }
+        }.execute();
+    }
+
+    public void onStreamUrlsLoaded() {
+        activity.updateStreamNickname(PreferenceControl.getStreamNamePreference());
+        activity.enablePlayStopButton();
+    }
 	
 	private void createMusicConnection() {
 		musicConnection = new ServiceConnection() {

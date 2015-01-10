@@ -1,5 +1,6 @@
 package org.kfjc.android.player.control;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -10,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.kfjc.android.player.Constants;
+import org.kfjc.android.player.util.HttpUtil;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -42,11 +44,12 @@ public class PreferenceControl {
 		}
 	}
 	
-	// TODO: replace this with a http endpoint.
 	private String getAvailableStreams() {
-		return 	"[ { name:'High/128k mp3', url:'http://netcast6.kfjc.org:80/' }," +
-				"  { name:'Low/40k mp3', url:'http://netcast4.kfjc.org:8974/' }," +
-				"  { name:'Low/20k mp3', url:'http://netcast2.kfjc.org:8972/' } ]";
+        try {
+            return HttpUtil.getUrl(Constants.AVAILABLE_STREAMS_URL);
+        } catch (IOException e) {
+            return Constants.FALLBACK_STREAM_JSON;
+        }
 	}
 	
 	public static String getStreamNamePreference() {
@@ -57,9 +60,9 @@ public class PreferenceControl {
 	
 	public static String getUrlPreference() {
 		String pref = streamMap.get(getStreamNamePreference());
-		if (pref == null || pref.isEmpty()) { return Constants.FALLBACK_STREAM_URL; }
-		return pref;
-	}
+        if (pref == null || pref.isEmpty()) { return Constants.FALLBACK_STREAM_URL; }
+        return pref;
+    }
 	
 	public List<String> getStreamNames() {
 		return new ArrayList<String>(streamMap.keySet());

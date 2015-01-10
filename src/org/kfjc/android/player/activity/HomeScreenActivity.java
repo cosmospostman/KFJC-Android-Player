@@ -105,6 +105,7 @@ public class HomeScreenActivity extends Activity {
 				}
 			}
 		});
+        playStopButton.setEnabled(false);
 		fullscreenButton.setOnTouchListener(UiUtil.buttonTouchListener);
 		fullscreenButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -157,6 +158,10 @@ public class HomeScreenActivity extends Activity {
 		playStopButton.setImageResource(R.drawable.ic_play);
 		playStopButtonState = PlayStopButtonState.PLAY;		
 	}
+
+    public void enablePlayStopButton() {
+        this.playStopButton.setEnabled(true);
+    }
 
     public void setStatusState(StatusState state) {
         nowPlayingContainer.setVisibility(View.GONE);
