@@ -180,14 +180,21 @@ public class HomeScreenControl {
 
     private void postBufferNotification() {
         postNotification(
-                "KFJC",
-                "Buffering stream: " + PreferenceControl.getStreamNamePreference());
+                activity.getString(R.string.app_name),
+                activity.getString(R.string.buffering_format,
+                        PreferenceControl.getStreamNamePreference()));
     }
 	
 	private void updateNowPlayNotification(TrackInfo nowPlaying) {
-        String artistTrackString = nowPlaying.getArtist() +
-				" - " + nowPlaying.getTrackTitle();
-        postNotification(nowPlaying.getDjName(), artistTrackString);
+        if (nowPlaying.getCouldNotFetch()) {
+            postNotification(
+                    activity.getString(R.string.app_name),
+                    activity.getString(R.string.status_not_connected));
+        } else {
+            String artistTrackString = activity.getString(R.string.artist_track_format,
+                    nowPlaying.getArtist(), nowPlaying.getTrackTitle());
+            postNotification(nowPlaying.getDjName(), artistTrackString);
+        }
 	}
 
     private void postNotification(String title, String text) {

@@ -1,9 +1,7 @@
 package org.kfjc.android.player.activity;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -71,17 +69,10 @@ public class HomeScreenActivity extends Activity {
         statusContainer = (LinearLayout) findViewById(R.id.statusContainer);
         statusMessageTextView = (TextView) findViewById(R.id.statusMessage);
 
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB){
-			setSettingsButtonAlpha();
-		}
+        settingsButton.setAlpha(0.4f);
 		addButtonListeners();
 
         setStatusState(StatusState.CONNECTING);
-	}
-	
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	private void setSettingsButtonAlpha() {
-		settingsButton.setAlpha(0.4f);
 	}
 	
 	@Override
