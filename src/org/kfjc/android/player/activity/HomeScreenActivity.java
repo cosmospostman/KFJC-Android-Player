@@ -35,7 +35,6 @@ public class HomeScreenActivity extends Activity {
     private LinearLayout settingsButton;
     private ImageView backgroundImageView;
     private TextView streamNicknameTextView;
-    private ImageView fullscreenButton;
     private ImageView playStopButton;
 
     private LinearLayout nowPlayingContainer;
@@ -58,7 +57,6 @@ public class HomeScreenActivity extends Activity {
 		setContentView(R.layout.activity_home_screen);
 		graphics = new GraphicsUtil(getResources());
 		playStopButton = (ImageView) findViewById(R.id.playstopbutton);
-		fullscreenButton = (ImageView) findViewById(R.id.fullscreenbutton);
         backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
 		settingsButton = (LinearLayout) findViewById(R.id.settingsButton);
 		radioDevil = (ImageView) findViewById(R.id.logo);
@@ -122,15 +120,16 @@ public class HomeScreenActivity extends Activity {
 			}
 		});
         playStopButton.setEnabled(false);
-		fullscreenButton.setOnTouchListener(UiUtil.buttonTouchListener);
-		fullscreenButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Intent fullscreenIntent = new Intent(
-						HomeScreenActivity.this, LavaLampActivity.class);
-				fullscreenIntent.setAction("org.kfjc.android.player.FULLSCREEN");
-				startActivity(fullscreenIntent);
-			}
-		});
+		radioDevil.setOnTouchListener(UiUtil.buttonTouchListener);
+		radioDevil.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent fullscreenIntent = new Intent(
+                        HomeScreenActivity.this, LavaLampActivity.class);
+                fullscreenIntent.setAction("org.kfjc.android.player.FULLSCREEN");
+                startActivity(fullscreenIntent);
+            }
+        });
+        radioDevil.setEnabled(false);
 		settingsButton.setOnTouchListener(UiUtil.buttonTouchListener);
 		settingsButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -166,11 +165,13 @@ public class HomeScreenActivity extends Activity {
 		radioDevil.setImageResource(graphics.radioDevilOn());
 		playStopButton.setImageResource(R.drawable.ic_stop);
 		playStopButtonState = PlayStopButtonState.STOP;
+        radioDevil.setEnabled(true);
 	}
 	
 	public void onPlayerStop() {
 		graphics.bufferDevil(radioDevil, false);
-		radioDevil.setImageResource(graphics.radioDevilOff());
+        radioDevil.setEnabled(false);
+        radioDevil.setImageResource(graphics.radioDevilOff());
 		playStopButton.setImageResource(R.drawable.ic_play);
 		playStopButtonState = PlayStopButtonState.PLAY;		
 	}

@@ -93,13 +93,6 @@
 	            android:layout_alignParentRight="true"
 	            android:background="@drawable/oval"
 	            android:src="@drawable/ic_play" />
-	
-	        <ImageView
-	            android:id="@+id/fullscreenbutton"
-	            android:layout_width="56dp"
-	            android:layout_height="56dp"
-	            android:layout_toLeftOf="@+id/playstopbutton"
-	            android:src="@drawable/ic_fullscreen" />
                 
     	</RelativeLayout>
 

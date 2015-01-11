@@ -206,7 +206,7 @@ public class HomeScreenControl {
 		notificationManager.cancel(NOWPLAYING_NOTIFICATION_ID);
 	}
 	
-	boolean isStreamServicePlaying() {
+	public boolean isStreamServicePlaying() {
 		return streamService.isPlaying();
 	}
 
