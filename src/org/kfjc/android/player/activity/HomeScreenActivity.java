@@ -105,7 +105,12 @@ public class HomeScreenActivity extends Activity {
 		super.onDestroy();
 	}
 
-	private void addButtonListeners() {
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
+
+    private void addButtonListeners() {
 		playStopButton.setOnTouchListener(UiUtil.buttonTouchListener);
 		playStopButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
