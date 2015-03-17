@@ -14,14 +14,14 @@ public class GraphicsUtil {
     private Runnable runner;
     private Drawable[] grayRadioDevils;
     public static final int[] imagesOfTheHour = new int[] {
-        R.drawable.bg_tower, R.drawable.bg_tree, R.drawable.bg_tower,   // 0 1 2
-        R.drawable.bg_tree, R.drawable.bg_tower, R.drawable.bg_tree,    // 3 4 5
-        R.drawable.bg_tower, R.drawable.bg_tree, R.drawable.bg_tower,   // 6 7 8
-        R.drawable.bg_tree, R.drawable.bg_tower, R.drawable.bg_tree,    // 9 10 11
-        R.drawable.bg_tower, R.drawable.bg_tree, R.drawable.bg_tower,   // 12 13 14
-        R.drawable.bg_tree, R.drawable.bg_tower, R.drawable.bg_tree,    // 15 16 17
-        R.drawable.bg_tower, R.drawable.bg_tree, R.drawable.bg_tower,   // 18 19 20
-        R.drawable.bg_tree, R.drawable.bg_tower, R.drawable.bg_tree     // 21 22 23
+        R.drawable.b0, R.drawable.b0, R.drawable.b2,   // 0 1 2
+        R.drawable.b2, R.drawable.b4, R.drawable.b4,    // 3 4 5
+        R.drawable.b6, R.drawable.b6, R.drawable.b8,   // 6 7 8
+        R.drawable.b8, R.drawable.b10, R.drawable.b10,    // 9 10 11
+        R.drawable.b12, R.drawable.b12, R.drawable.b14,   // 12 13 14
+        R.drawable.b14, R.drawable.b16, R.drawable.b16,    // 15 16 17
+        R.drawable.b18, R.drawable.b18, R.drawable.b20,   // 18 19 20
+        R.drawable.b20, R.drawable.b22, R.drawable.b22     // 21 22 23
     };
 
     public GraphicsUtil(Resources res) {

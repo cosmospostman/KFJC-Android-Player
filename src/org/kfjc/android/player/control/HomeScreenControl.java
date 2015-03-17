@@ -95,7 +95,6 @@ public class HomeScreenControl {
     }
 
     public void onStreamUrlsLoaded() {
-        activity.updateStreamNickname(PreferenceControl.getStreamNamePreference());
         activity.enablePlayStopButton();
     }
 	

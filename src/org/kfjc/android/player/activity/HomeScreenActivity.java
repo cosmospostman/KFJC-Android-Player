@@ -30,9 +30,8 @@ public class HomeScreenActivity extends Activity {
     }
 
     private ImageView radioDevil;
-    private LinearLayout settingsButton;
+    private ImageView settingsButton;
     private ImageView backgroundImageView;
-    private TextView streamNicknameTextView;
     private ImageView playStopButton;
 
     private LinearLayout nowPlayingContainer;
@@ -52,11 +51,13 @@ public class HomeScreenActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
 		setContentView(R.layout.activity_home_screen);
 		graphics = new GraphicsUtil(getResources());
 		playStopButton = (ImageView) findViewById(R.id.playstopbutton);
         backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
-		settingsButton = (LinearLayout) findViewById(R.id.settingsButton);
+		settingsButton = (ImageView) findViewById(R.id.settingsButton);
 		radioDevil = (ImageView) findViewById(R.id.logo);
 		radioDevil.setImageResource(graphics.radioDevilOff());
 
@@ -64,14 +65,11 @@ public class HomeScreenActivity extends Activity {
 		currentDjTextView = (TextView) findViewById(R.id.currentDJ);
 		currentTrackTextView = (TextView) findViewById(R.id.currentTrack);
 		currentArtistTextView = (TextView) findViewById(R.id.currentArtist);
-		streamNicknameTextView = (TextView) findViewById(R.id.streamQuality);
 
         statusContainer = (LinearLayout) findViewById(R.id.statusContainer);
         statusMessageTextView = (TextView) findViewById(R.id.statusMessage);
 
-        settingsButton.setAlpha(0.4f);
 		addButtonListeners();
-
         setStatusState(StatusState.CONNECTING);
 	}
 	
@@ -129,11 +127,7 @@ public class HomeScreenActivity extends Activity {
 			}
 		});
 	}
-	
-	public void updateStreamNickname(String streamName) {
-		streamNicknameTextView.setText(streamName);
-	}
-		
+
 	public void updateTrackInfo(TrackInfo nowPlaying) {
         setStatusState(StatusState.HIDDEN);
         if (nowPlaying.getCouldNotFetch()) {

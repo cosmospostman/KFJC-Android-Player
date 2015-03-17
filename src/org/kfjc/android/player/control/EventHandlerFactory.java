@@ -93,7 +93,6 @@ public class EventHandlerFactory {
         final Handler handler = new Handler();
 		return new StreamUrlPreferenceChangeHandler() {	
 			@Override public void onStreamUrlPreferenceChange() {
-				activity.updateStreamNickname(PreferenceControl.getStreamNamePreference());
 				if (control.isStreamServicePlaying()) {
 					control.stopStream();
                     control.playStream();
