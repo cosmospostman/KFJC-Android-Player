@@ -28,4 +28,9 @@ proguard/
 # Eclipse settings
 .settings/
 
+.idea/
 res/raw/lavalava.mpg
+
+.idea/misc.xml
+
+.idea/workspace.xml
