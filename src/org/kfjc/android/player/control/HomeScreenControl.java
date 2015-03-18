@@ -11,6 +11,8 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -42,6 +44,7 @@ public class HomeScreenControl {
 	private PendingIntent kfjcPlayerIntent;
 	private AudioManager audioManager;
     private TelephonyManager telephonyManager;
+    private ConnectivityManager connectivityManager;
 
     private OnAudioFocusChangeListener audioFocusListener;
 	private BroadcastReceiver audioBecomingNoisyReceiver;
@@ -52,12 +55,14 @@ public class HomeScreenControl {
         loadAvailableStreams(activity);
 
         this.activity = activity;
-		this.notificationManager =
-				(NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
-		this.audioManager =
-                (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
-        this.telephonyManager =
-                (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
+		this.notificationManager = (NotificationManager)
+                activity.getSystemService(Context.NOTIFICATION_SERVICE);
+		this.audioManager = (AudioManager)
+                activity.getSystemService(Context.AUDIO_SERVICE);
+        this.telephonyManager = (TelephonyManager)
+                activity.getSystemService(Context.TELEPHONY_SERVICE);
+        this.connectivityManager = (ConnectivityManager)
+                activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         this.audioFocusListener = EventHandlerFactory.onAudioFocusChange(this, audioManager);
 		this.audioBecomingNoisyReceiver = EventHandlerFactory.onAudioBecomingNoisy(this);
         this.phoneStateListener = EventHandlerFactory.onPhoneStateChange(this);
@@ -79,6 +84,11 @@ public class HomeScreenControl {
 			bindMusicConnection();
 		}
 	}
+
+    private boolean isConnectedToNetwork() {
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnected();
+    }
 
     private void loadAvailableStreams(final HomeScreenActivity activity) {
         new AsyncTask<Void, Void, Void>() {
@@ -131,6 +141,7 @@ public class HomeScreenControl {
 		public void onError() {
 			stopStream();
             activity.setStatusState(HomeScreenActivity.StatusState.CONNECTION_ERROR);
+            boolean isConnectedToNetwork = isConnectedToNetwork();
         }
 		
 		@Override

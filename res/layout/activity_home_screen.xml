@@ -49,7 +49,7 @@
         android:id="@+id/buttonContainer"
         android:layout_width="fill_parent"
        	android:layout_height="56dp">
-        
+
 	        <ImageView
 	            android:background="@color/kfjc_transparent_black"
 	            android:layout_alignParentBottom="true"
@@ -71,7 +71,7 @@
                 android:padding="6dp"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginRight="8dp"
                 android:layout_toLeftOf="@+id/playstopbutton"
                 android:layout_centerVertical="true"
                 android:background="@drawable/oval_mute"
@@ -96,8 +96,10 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-thin"
                 android:textColor="#ffffff"
+                android:text="Ras Babo"
+                android:layout_marginBottom="4dp"
                 android:textSize="28sp" />
-	
+
 	        <TextView
 	            android:id="@+id/currentTrack"
 	            android:layout_width="wrap_content"
@@ -105,14 +107,7 @@
 	            android:fontFamily="sans-serif-thin"
 	            android:textColor="#ffffff"
 	            android:textSize="16sp" />
-	
-	        <TextView
-	            android:id="@+id/currentArtist"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:fontFamily="sans-serif-thin"
-	            android:textColor="#ffffff"
-	            android:textSize="16sp" />
+
 	    </LinearLayout>
 
         <LinearLayout
@@ -132,7 +127,6 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-thin"
                 android:text="@string/status_connecting"
-                android:textStyle="bold"
                 android:textColor="#ffffff"
                 android:textSize="16sp" />
 

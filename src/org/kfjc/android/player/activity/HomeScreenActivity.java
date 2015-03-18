@@ -3,6 +3,7 @@ package org.kfjc.android.player.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -37,7 +38,6 @@ public class HomeScreenActivity extends Activity {
     private LinearLayout nowPlayingContainer;
 	private TextView currentDjTextView;
 	private TextView currentTrackTextView;
-	private TextView currentArtistTextView;
 
     private LinearLayout statusContainer;
     private TextView statusMessageTextView;
@@ -64,7 +64,6 @@ public class HomeScreenActivity extends Activity {
         nowPlayingContainer = (LinearLayout) findViewById(R.id.nowPlayingContainer);
 		currentDjTextView = (TextView) findViewById(R.id.currentDJ);
 		currentTrackTextView = (TextView) findViewById(R.id.currentTrack);
-		currentArtistTextView = (TextView) findViewById(R.id.currentArtist);
 
         statusContainer = (LinearLayout) findViewById(R.id.statusContainer);
         statusMessageTextView = (TextView) findViewById(R.id.statusMessage);
@@ -134,8 +133,8 @@ public class HomeScreenActivity extends Activity {
             setStatusState(StatusState.CONNECTION_ERROR);
         } else {
             currentDjTextView.setText(nowPlaying.getDjName());
-            currentTrackTextView.setText(nowPlaying.getTrackTitle());
-            currentArtistTextView.setText(nowPlaying.getArtist());
+            currentTrackTextView.setText(Html.fromHtml(nowPlaying.getArtist()
+                    + " <i>" + nowPlaying.getTrackTitle() + "</i>"));
         }
 	}
 	
