@@ -23,6 +23,7 @@
         <activity
             android:name="org.kfjc.android.player.activity.HomeScreenActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,6 +34,7 @@
         <activity
             android:name="org.kfjc.android.player.activity.LavaLampActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/Kfjc.LavaActivity" >
             <intent-filter>
                 <action android:name="org.kfjc.android.player.FULLSCREEN" />

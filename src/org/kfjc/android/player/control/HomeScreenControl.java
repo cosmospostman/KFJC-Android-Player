@@ -131,20 +131,31 @@ public class HomeScreenControl {
 	}
 	
 	private MediaListener mediaEventHandler = new MediaListener() {
-		@Override
+        @Override
+        public void onBuffer() {
+            activity.onPlayerBuffer();
+        }
+
+        @Override
 		public void onPlay() {
 			streamService.runPlaylistFetcherOnce();
 			activity.onPlayerBufferComplete();
 		}
 		
 		@Override
-		public void onError() {
+		public void onError(String message) {
+            activity.showDebugAlert(message);
 			stopStream();
             activity.setStatusState(HomeScreenActivity.StatusState.CONNECTION_ERROR);
             boolean isConnectedToNetwork = isConnectedToNetwork();
         }
-		
-		@Override
+
+        @Override
+        public void onEnd() {
+            activity.onPlayerStop();
+        }
+
+        @Override
 		public void onTrackInfoFetched(TrackInfo trackInfo) {
 			activity.updateTrackInfo(trackInfo);
 			if (streamService.isPlaying()) {
@@ -158,10 +169,9 @@ public class HomeScreenControl {
 				audioFocusListener,
 				AudioManager.STREAM_MUSIC,
 				AudioManager.AUDIOFOCUS_GAIN);
-		streamService.play(PreferenceControl.getUrlPreference());
+		streamService.play(activity.getApplicationContext(), PreferenceControl.getUrlPreference());
 		activity.registerReceiver(audioBecomingNoisyReceiver, becomingNoisyIntentFilter);
         postBufferNotification();
-		activity.onPlayerBuffer();
         activity.setStatusState(StatusState.CONNECTING);
 	}
 	

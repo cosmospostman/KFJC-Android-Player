@@ -1,6 +1,11 @@
 package org.kfjc.android.player.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -185,5 +190,20 @@ public class HomeScreenActivity extends Activity {
                 break;
         }
         this.connectionStatusState = state;
+    }
+
+    public void showDebugAlert(final String message) {
+        new AlertDialog.Builder(this)
+                .setTitle("Error details")
+                .setMessage(message)
+                .setPositiveButton("Copy", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        ClipboardManager clipboard = (ClipboardManager)
+                                getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("KFJC error", message);
+                        clipboard.setPrimaryClip(clip);
+                    }
+                })
+                .show();
     }
 }
