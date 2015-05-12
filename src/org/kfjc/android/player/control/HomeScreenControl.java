@@ -158,7 +158,7 @@ public class HomeScreenControl {
         @Override
 		public void onTrackInfoFetched(TrackInfo trackInfo) {
 			activity.updateTrackInfo(trackInfo);
-			if (streamService.isPlaying()) {
+			if (streamService != null && streamService.isPlaying()) {
 				updateNowPlayNotification(trackInfo);
 			}
 		}

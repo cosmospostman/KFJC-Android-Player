@@ -1,10 +1,13 @@
 package org.kfjc.android.player.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -12,7 +15,13 @@ import android.widget.VideoView;
 
 import org.kfjc.droid.R;
 
+import java.io.IOException;
+
 public class LavaLampActivity extends Activity {
+
+    private SurfaceView surfaceView;
+    private SurfaceHolder surfaceHolder;
+    private MediaPlayer mediaPlayer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,24 +32,70 @@ public class LavaLampActivity extends Activity {
 		getWindow().setFlags(
 				WindowManager.LayoutParams.FLAG_FULLSCREEN, 
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	}
-	
-	@Override
-	protected void onStart() {
-		super.onStart();
-		final VideoView videoView = (VideoView) findViewById(R.id.lavaView);
-		videoView.setLayoutParams(new FrameLayout.LayoutParams(1440, 2160));
-		videoView.setOnPreparedListener (new OnPreparedListener() {                    
-		    @Override
-		    public void onPrepared(MediaPlayer mp) {
-		        mp.setLooping(true);
-		    }
-		});
-		Uri video = Uri.parse(
-				"android.resource://" + getPackageName() + "/" + R.raw.lavalava);
-		videoView.setVideoURI(video);
-       	videoView.setMediaController(null);
-		videoView.start();
-	}
+
+        surfaceView = (SurfaceView) findViewById(R.id.lavaSurfaceView);
+        surfaceHolder = surfaceView.getHolder();
+        mediaPlayer = new MediaPlayer();
+
+        surfaceHolder.addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                playLava(holder);
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {}
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mediaPlayer.stop();
+        mediaPlayer.release();
+    }
+
+    private void playLava(SurfaceHolder holder) {
+        Context context = getApplicationContext();
+        int lavaSrcId = context.getResources().getIdentifier("lavalava", "raw",
+                context.getPackageName());
+        mediaPlayer = MediaPlayer.create(context, lavaSrcId);
+
+        mediaPlayer.setDisplay(holder);
+        mediaPlayer.setLooping(true);
+        setVideoSize();
+        mediaPlayer.start();
+
+        float video_Width = mediaPlayer.getVideoWidth();
+        float video_Height = mediaPlayer.getVideoHeight();
+    }
+
+    private void setVideoSize() {
+
+        // // Get the dimensions of the video
+        int videoWidth = mediaPlayer.getVideoWidth();
+        int videoHeight = mediaPlayer.getVideoHeight();
+        float videoProportion = (float) videoWidth / (float) videoHeight;
+
+        // Get the width of the screen
+        int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
+        int screenHeight = getWindowManager().getDefaultDisplay().getHeight();
+        float screenProportion = (float) screenWidth / (float) screenHeight;
+
+        // Get the SurfaceView layout parameters
+        android.view.ViewGroup.LayoutParams lp = surfaceView.getLayoutParams();
+        if (videoProportion > screenProportion) {
+            lp.width = screenWidth;
+            lp.height = (int) ((float) screenWidth / videoProportion);
+        } else {
+            lp.width = (int) (videoProportion * (float) screenHeight);
+            lp.height = screenHeight;
+        }
+        // Commit the layout parameters
+        surfaceView.setLayoutParams(lp);
+    }
 	
 }

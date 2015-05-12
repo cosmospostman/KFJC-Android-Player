@@ -25,22 +25,23 @@ public class EventHandlerFactory {
 			final HomeScreenControl control, final AudioManager audioManager) {
 		return new OnAudioFocusChangeListener() {
 			
-			private int volumeBeforeDuck;
+			private int volumeBeforeLoss;
             private static final String AUDIOFOCUS_KEY =
                     "org.kfjc.android.player.control_AUDIO_FOCUS_CHANGE_LISTENER";
 			
 			@Override public void onAudioFocusChange(int focusChange) {
 				switch (focusChange) {
 				case AudioManager.AUDIOFOCUS_LOSS:
-					control.stopStream();
+                    volumeBeforeLoss = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                    control.stopStream();
 					audioManager.abandonAudioFocus(this);
 					break;
 				case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-					volumeBeforeDuck = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-					audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeBeforeDuck/2, 0);
+					volumeBeforeLoss = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+					audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeBeforeLoss / 2, 0);
 					break;
 				case AudioManager.AUDIOFOCUS_GAIN:
-					audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeBeforeDuck, 0);
+					audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeBeforeLoss, 0);
 					break;
 				}
 			}
