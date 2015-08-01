@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
@@ -38,7 +40,7 @@ public class HomeScreenActivity extends Activity {
     private ImageView radioDevil;
     private ImageView settingsButton;
     private ImageView backgroundImageView;
-    private ImageView playStopButton;
+    private FloatingActionButton playStopButton;
 
     private LinearLayout nowPlayingContainer;
 	private TextView currentDjTextView;
@@ -50,7 +52,7 @@ public class HomeScreenActivity extends Activity {
     private StatusState connectionStatusState = StatusState.CONNECTION_ERROR;
 	private PlayStopButtonState playStopButtonState = PlayStopButtonState.PLAY;
 	private GraphicsUtil graphics;
-	private HomeScreenControl control;
+	private static HomeScreenControl control;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +62,7 @@ public class HomeScreenActivity extends Activity {
 
 		setContentView(R.layout.activity_home_screen);
 		graphics = new GraphicsUtil(getResources());
-		playStopButton = (ImageView) findViewById(R.id.playstopbutton);
+		playStopButton = (FloatingActionButton) findViewById(R.id.playstopbutton);
         backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
 		settingsButton = (ImageView) findViewById(R.id.settingsButton);
 		radioDevil = (ImageView) findViewById(R.id.logo);
@@ -80,8 +82,17 @@ public class HomeScreenActivity extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		control = new HomeScreenControl(this);
+        if (control == null) {
+            control = new HomeScreenControl(this);
+        }
+        control.onStart();
 	}
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        control.onStop();
+    }
 
     @Override
     protected void onResume() {
@@ -92,7 +103,9 @@ public class HomeScreenActivity extends Activity {
 
     @Override
 	public void onDestroy() {
-		control.destroy();
+        if (isFinishing()) {
+            control.destroy();
+        }
 		super.onDestroy();
 	}
 

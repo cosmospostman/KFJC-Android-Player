@@ -33,7 +33,7 @@ public class LiveStreamService extends Service {
 	}
 
 	private MediaListener mediaListener;
-	private NowPlayingFetcher nowPlayingFetcher;
+	private static NowPlayingFetcher nowPlayingFetcher;
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
 	private boolean isFetching = false;
     private ExoPlayer player;
