@@ -2,8 +2,11 @@ package org.kfjc.android.player.service;
 
 import android.app.Notification;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
@@ -15,12 +18,15 @@ import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.source.DefaultSampleSource;
 import com.google.android.exoplayer.source.FrameworkSampleExtractor;
 
+import org.kfjc.android.player.control.EventHandlerFactory;
 import org.kfjc.android.player.util.NotificationUtil;
 
 // TODO: Stop playlist fetcher when not playing and in background.
 public class StreamService extends Service {
 
     private static final String TAG = StreamService.class.getSimpleName();
+    private static final IntentFilter becomingNoisyIntentFilter =
+            new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 
     public interface MediaListener {
         void onBuffer();
@@ -38,6 +44,20 @@ public class StreamService extends Service {
 	private MediaListener mediaListener;
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
     private ExoPlayer player;
+
+    /**
+     * The Becoming Noisy broadcast intent is sent when audio output hardware changes, perhaps
+     * from headphones to internal speaker. In such cases, we stop the stream to avoid
+     * embarrassment.
+     */
+    private BroadcastReceiver onAudioBecomingNoisyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                stop();
+            }
+        }
+    };
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -63,13 +83,14 @@ public class StreamService extends Service {
                player.getPlaybackState() == ExoPlayer.STATE_READY ||
                player.getPlaybackState() == ExoPlayer.STATE_BUFFERING);
 	}
-	
+
 	public void setMediaEventListener(MediaListener listener) {
 		this.mediaListener = listener;
 	}
 	
 	public void play(Context context, String streamUrl) {
         initPlayer();
+        registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
 
         Notification n = NotificationUtil.kfjcNotification(getApplicationContext(), "KFJC", "StreamService");
         startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
@@ -89,6 +110,7 @@ public class StreamService extends Service {
         if (player != null) {
             player.stop();
         }
+        unregisterReceiver(onAudioBecomingNoisyReceiver);
         stopForeground(true);
         Log.i(TAG, "Service stopped");
 	}

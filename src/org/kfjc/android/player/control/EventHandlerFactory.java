@@ -102,22 +102,6 @@ public class EventHandlerFactory {
 		};
 	}
 	
-	/**
-	 * The Becoming Noisy broadcast intent is sent when audio output hardware changes, perhaps
-	 * from headphones to internal speaker. In such cases, we stop the stream to avoid
-	 * embarrassment.
-	 */
-	static BroadcastReceiver onAudioBecomingNoisy(final HomeScreenControl control) {
-		return new BroadcastReceiver() {
-		    @Override
-		    public void onReceive(Context context, Intent intent) {
-		        if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-		            control.stopStream();
-		        }
-		    }
-		};
-	}
-	
 	static void unregisterReceiver(Activity activity, BroadcastReceiver receiver) {
 		try {
 			activity.unregisterReceiver(receiver);

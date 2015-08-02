@@ -1,10 +1,8 @@
 package org.kfjc.android.player.control;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
@@ -20,18 +18,16 @@ import org.kfjc.android.player.activity.HomeScreenActivity.StatusState;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.dialog.SettingsDialog.StreamUrlPreferenceChangeHandler;
 import org.kfjc.android.player.model.TrackInfo;
+import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.service.StreamService.LiveStreamBinder;
 import org.kfjc.android.player.service.StreamService.MediaListener;
-import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.util.NotificationUtil;
 import org.kfjc.droid.R;
 
 public class HomeScreenControl {
 	
 	public static PreferenceControl preferenceControl;
-    private static final IntentFilter becomingNoisyIntentFilter =
-			new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 		
 	private Intent streamServiceIntent;
     private Intent playlistServiceIntent;
@@ -45,7 +41,6 @@ public class HomeScreenControl {
     private TelephonyManager telephonyManager;
     private ConnectivityManager connectivityManager;
     private OnAudioFocusChangeListener audioFocusListener;
-	private BroadcastReceiver audioBecomingNoisyReceiver;
 	private StreamUrlPreferenceChangeHandler streamUrlPreferenceChangeListener;
     private PhoneStateListener phoneStateListener;
 	
@@ -61,7 +56,6 @@ public class HomeScreenControl {
         this.connectivityManager = (ConnectivityManager)
                 activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         this.audioFocusListener = EventHandlerFactory.onAudioFocusChange(this, audioManager);
-		this.audioBecomingNoisyReceiver = EventHandlerFactory.onAudioBecomingNoisy(this);
         this.phoneStateListener = EventHandlerFactory.onPhoneStateChange(this);
 		this.streamUrlPreferenceChangeListener =
 				EventHandlerFactory.onUrlPreferenceChange(this, activity);
@@ -119,13 +113,11 @@ public class HomeScreenControl {
     public void onStart() {
         activity.bindService(streamServiceIntent, streamServiceConnection, Context.BIND_AUTO_CREATE);
         activity.bindService(playlistServiceIntent, playlistServiceConnection, Context.BIND_AUTO_CREATE);
-        registerReceivers();
     }
 
     public void onStop() {
         activity.unbindService(streamServiceConnection);
         activity.unbindService(playlistServiceConnection);
-        unregisterReceivers();
     }
 
     public void destroy() {
@@ -190,7 +182,6 @@ public class HomeScreenControl {
                 AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN);
 		streamService.play(activity.getApplicationContext(), PreferenceControl.getUrlPreference());
-        registerReceivers();
         postBufferNotification();
         notificationUtil.updateNowPlayNotification(playlistService.getLastFetchedTrackInfo());
         activity.setStatusState(StatusState.CONNECTING);
@@ -199,18 +190,9 @@ public class HomeScreenControl {
 	public void stopStream() {
 		activity.onPlayerStop();
 		streamService.stop();
-        unregisterReceivers();
 		audioManager.abandonAudioFocus(audioFocusListener);
         notificationUtil.cancelNowPlayNotification();
 	}
-
-    private void registerReceivers() {
-        activity.registerReceiver(audioBecomingNoisyReceiver, becomingNoisyIntentFilter);
-    }
-
-    private void unregisterReceivers() {
-        EventHandlerFactory.unregisterReceiver(activity, audioBecomingNoisyReceiver);
-    }
 	
 	public void showSettings() {
 		SettingsDialog settingsFragment = new SettingsDialog();
