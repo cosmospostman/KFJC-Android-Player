@@ -90,6 +90,9 @@ public class HomeScreenControl {
                     LiveStreamBinder binder = (LiveStreamBinder) service;
                     streamService = binder.getService();
                     streamService.setMediaEventListener(mediaEventHandler);
+                    activity.setButtonState(streamService.isPlaying()
+                            ? HomeScreenActivity.PlayStopButtonState.STOP
+                            : HomeScreenActivity.PlayStopButtonState.PLAY);
                 }
 
                 @Override
@@ -121,13 +124,6 @@ public class HomeScreenControl {
         }
 	}
 
-    public void onStart() {
-        activity.bindService(streamServiceIntent, streamServiceConnection, Context.BIND_AUTO_CREATE);
-        activity.bindService(playlistServiceIntent, playlistServiceConnection, Context.BIND_AUTO_CREATE);
-        registerReceivers();
-    }
-
-
     public void onCreate() {
         streamServiceIntent = new Intent(activity, LiveStreamService.class);
         playlistServiceIntent = new Intent(activity, PlaylistService.class);
@@ -136,17 +132,23 @@ public class HomeScreenControl {
 
     }
 
+    public void onStart() {
+        activity.bindService(streamServiceIntent, streamServiceConnection, Context.BIND_AUTO_CREATE);
+        activity.bindService(playlistServiceIntent, playlistServiceConnection, Context.BIND_AUTO_CREATE);
+        registerReceivers();
+    }
+
     public void onStop() {
         activity.unbindService(streamServiceConnection);
+        activity.unbindService(playlistServiceConnection);
         unregisterReceivers();
     }
 
     public void destroy() {
         notificationManager.cancel(NOWPLAYING_NOTIFICATION_ID);
         stopStream();
-        activity.unbindService(streamServiceConnection);
         activity.stopService(streamServiceIntent);
-        streamService = null;
+        activity.stopService(playlistServiceIntent);
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
     }
 

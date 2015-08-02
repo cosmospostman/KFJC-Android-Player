@@ -34,6 +34,7 @@ public class PlaylistService extends Service {
     private TrackInfo lastFetchedTrackInfo;
     private PlaylistBinder binder = new PlaylistBinder();
     private PlaylistCallback playlistCallback;
+    private boolean isStarted = false;
     private Runnable fetchRunner = new Runnable() {
         @Override public void run() {
             makeFetchTask().execute();
@@ -60,7 +61,10 @@ public class PlaylistService extends Service {
     }
 
     public void start() {
-        handler.postDelayed(fetchRunner, 0);
+        if (!isStarted) {
+            handler.postDelayed(fetchRunner, 0);
+            isStarted = true;
+        }
     }
 
     public void stop() {

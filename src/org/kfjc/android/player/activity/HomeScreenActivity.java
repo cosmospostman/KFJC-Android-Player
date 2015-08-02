@@ -26,7 +26,7 @@ import org.kfjc.droid.R;
 
 public class HomeScreenActivity extends Activity {
 	
-	enum PlayStopButtonState {
+	public enum PlayStopButtonState {
 		PLAY, // When showing the play icon
 		STOP  // When showing the stop icon
 	}
@@ -138,12 +138,24 @@ public class HomeScreenActivity extends Activity {
         radioDevil.setEnabled(false);
 		settingsButton.setOnTouchListener(UiUtil.buttonTouchListener);
 		settingsButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				control.showSettings();
-			}
-		});
+            @Override
+            public void onClick(View arg0) {
+                control.showSettings();
+            }
+        });
 	}
+
+    public void setButtonState(PlayStopButtonState state) {
+        playStopButtonState = state;
+        switch(state) {
+            case STOP:
+                playStopButton.setImageResource(R.drawable.ic_stop);
+                break;
+            case PLAY:
+                playStopButton.setImageResource(R.drawable.ic_play);
+                break;
+        }
+    }
 
 	public void updateTrackInfo(TrackInfo nowPlaying) {
         setStatusState(StatusState.HIDDEN);
@@ -158,15 +170,13 @@ public class HomeScreenActivity extends Activity {
 	
 	public void onPlayerBuffer() {
 		graphics.bufferDevil(radioDevil, true);
-		playStopButton.setImageResource(R.drawable.ic_stop);
-		playStopButtonState = PlayStopButtonState.STOP;	
+        setButtonState(PlayStopButtonState.STOP);
 	}
 	
 	public void onPlayerBufferComplete() {
 		graphics.bufferDevil(radioDevil, false);
 		radioDevil.setImageResource(graphics.radioDevilOn());
-		playStopButton.setImageResource(R.drawable.ic_stop);
-		playStopButtonState = PlayStopButtonState.STOP;
+        setButtonState(PlayStopButtonState.STOP);
         radioDevil.setEnabled(true);
 	}
 	
@@ -174,8 +184,7 @@ public class HomeScreenActivity extends Activity {
 		graphics.bufferDevil(radioDevil, false);
         radioDevil.setEnabled(false);
         radioDevil.setImageResource(graphics.radioDevilOff());
-		playStopButton.setImageResource(R.drawable.ic_play);
-		playStopButtonState = PlayStopButtonState.PLAY;		
+        setButtonState(PlayStopButtonState.PLAY);
 	}
 
     public void enablePlayStopButton() {
