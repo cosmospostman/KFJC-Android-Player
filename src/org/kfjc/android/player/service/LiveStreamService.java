@@ -1,11 +1,14 @@
 package org.kfjc.android.player.service;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
@@ -14,9 +17,13 @@ import com.google.android.exoplayer.source.DefaultSampleSource;
 import com.google.android.exoplayer.source.FrameworkSampleExtractor;
 
 import org.kfjc.android.player.model.TrackInfo;
+import org.kfjc.android.player.util.NotificationUtil;
+import org.kfjc.droid.R;
 
 // TODO: Stop playlist fetcher when not playing and in background.
 public class LiveStreamService extends Service {
+
+    private static final String TAG = LiveStreamService.class.getSimpleName();
 
     public interface MediaListener {
         void onBuffer();
@@ -32,14 +39,11 @@ public class LiveStreamService extends Service {
 	}
 
 	private MediaListener mediaListener;
-	private static NowPlayingFetcher nowPlayingFetcher;
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
-	private boolean isFetching = false;
     private ExoPlayer player;
 	
 	@Override
 	public IBinder onBind(Intent intent) {
-        this.nowPlayingFetcher = new NowPlayingFetcher();
         return liveStreamBinder;
 	}
 
@@ -70,6 +74,9 @@ public class LiveStreamService extends Service {
 	public void play(Context context, String streamUrl) {
         initPlayer();
 
+        Notification n = NotificationUtil.kfjcNotification(getApplicationContext(), "KFJC", "StreamService");
+        startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
+
         Uri streamUri = Uri.parse(streamUrl);
         FrameworkSampleExtractor sampleExtractor = new FrameworkSampleExtractor(context, streamUri, null);
         DefaultSampleSource sampleSource = new DefaultSampleSource(sampleExtractor, 1);
@@ -85,6 +92,8 @@ public class LiveStreamService extends Service {
         if (player != null) {
             player.stop();
         }
+        stopForeground(true);
+        Log.i(TAG, "Service stopped");
 	}
 
     private void initPlayer() {

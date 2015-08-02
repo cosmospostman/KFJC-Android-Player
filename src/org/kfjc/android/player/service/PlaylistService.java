@@ -18,7 +18,7 @@ import org.kfjc.android.player.util.HttpUtil;
  */
 public class PlaylistService extends Service {
 
-    private static final String TAG = "kfjc.playlistservice";
+    private static final String TAG = PlaylistService.class.getSimpleName();
 
     public interface PlaylistCallback {
         void onTrackInfoFetched(TrackInfo trackInfo);
@@ -68,6 +68,7 @@ public class PlaylistService extends Service {
     }
 
     public void stop() {
+        Log.i(TAG, "Service stopped");
         handler.removeCallbacks(null);
     }
 
@@ -87,6 +88,12 @@ public class PlaylistService extends Service {
                 onTrackInfoFetched(nowPlaying);
             }
         };
+    }
+
+    public TrackInfo getLastFetchedTrackInfo() {
+        return lastFetchedTrackInfo == null
+                ? new TrackInfo()
+                : lastFetchedTrackInfo;
     }
 
     public void registerPlaylistCallback(PlaylistCallback callback) {

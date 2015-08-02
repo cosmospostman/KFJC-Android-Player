@@ -1,11 +1,5 @@
 package org.kfjc.android.player.control;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -18,25 +12,24 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
-import org.kfjc.android.player.model.TrackInfo;
-import org.kfjc.android.player.dialog.SettingsDialog;
-import org.kfjc.android.player.dialog.SettingsDialog.StreamUrlPreferenceChangeHandler;
 import org.kfjc.android.player.activity.HomeScreenActivity;
 import org.kfjc.android.player.activity.HomeScreenActivity.StatusState;
+import org.kfjc.android.player.dialog.SettingsDialog;
+import org.kfjc.android.player.dialog.SettingsDialog.StreamUrlPreferenceChangeHandler;
+import org.kfjc.android.player.model.TrackInfo;
 import org.kfjc.android.player.service.LiveStreamService;
 import org.kfjc.android.player.service.LiveStreamService.LiveStreamBinder;
 import org.kfjc.android.player.service.LiveStreamService.MediaListener;
 import org.kfjc.android.player.service.PlaylistService;
+import org.kfjc.android.player.util.NotificationUtil;
 import org.kfjc.droid.R;
 
 public class HomeScreenControl {
 	
 	public static PreferenceControl preferenceControl;
-	private static final int NOWPLAYING_NOTIFICATION_ID = 1;
     private static final IntentFilter becomingNoisyIntentFilter =
 			new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 		
@@ -47,8 +40,7 @@ public class HomeScreenControl {
 	private ServiceConnection streamServiceConnection;
     private ServiceConnection playlistServiceConnection;
 	private final HomeScreenActivity activity;
-	private NotificationManager notificationManager;
-	private PendingIntent kfjcPlayerIntent;
+	private NotificationUtil notificationUtil;
 	private AudioManager audioManager;
     private TelephonyManager telephonyManager;
     private ConnectivityManager connectivityManager;
@@ -62,8 +54,7 @@ public class HomeScreenControl {
         loadAvailableStreams(activity);
 
         this.activity = activity;
-		this.notificationManager = (NotificationManager)
-                activity.getSystemService(Context.NOTIFICATION_SERVICE);
+        this.notificationUtil = new NotificationUtil(activity);
 		this.audioManager = (AudioManager)
                 activity.getSystemService(Context.AUDIO_SERVICE);
         this.telephonyManager = (TelephonyManager)
@@ -77,11 +68,6 @@ public class HomeScreenControl {
 				EventHandlerFactory.onUrlPreferenceChange(this, activity);
 
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-
-        kfjcPlayerIntent = PendingIntent.getActivity(
-				activity, 0,
-				new Intent(activity, HomeScreenActivity.class),
-				Notification.FLAG_ONGOING_EVENT); 
 
 		if (streamServiceConnection == null) {
             streamServiceConnection = new ServiceConnection() {
@@ -112,7 +98,7 @@ public class HomeScreenControl {
                         public void onTrackInfoFetched(TrackInfo trackInfo) {
                             activity.updateTrackInfo(trackInfo);
                             if (streamService != null && streamService.isPlaying()) {
-                                updateNowPlayNotification(trackInfo);
+                                notificationUtil.updateNowPlayNotification(trackInfo);
                             }
                         }
                     });
@@ -129,7 +115,6 @@ public class HomeScreenControl {
         playlistServiceIntent = new Intent(activity, PlaylistService.class);
         activity.startService(playlistServiceIntent);
         activity.startService(streamServiceIntent);
-
     }
 
     public void onStart() {
@@ -145,7 +130,7 @@ public class HomeScreenControl {
     }
 
     public void destroy() {
-        notificationManager.cancel(NOWPLAYING_NOTIFICATION_ID);
+        notificationUtil.cancelNowPlayNotification();
         stopStream();
         activity.stopService(streamServiceIntent);
         activity.stopService(playlistServiceIntent);
@@ -208,6 +193,7 @@ public class HomeScreenControl {
 		streamService.play(activity.getApplicationContext(), PreferenceControl.getUrlPreference());
         registerReceivers();
         postBufferNotification();
+        notificationUtil.updateNowPlayNotification(playlistService.getLastFetchedTrackInfo());
         activity.setStatusState(StatusState.CONNECTING);
 	}
 	
@@ -216,7 +202,7 @@ public class HomeScreenControl {
 		streamService.stop();
         unregisterReceivers();
 		audioManager.abandonAudioFocus(audioFocusListener);
-		cancelNowPlayNotification();
+        notificationUtil.cancelNowPlayNotification();
 	}
 
     private void registerReceivers() {
@@ -234,53 +220,14 @@ public class HomeScreenControl {
 	}
 
     private void postBufferNotification() {
-        postNotification(
+        notificationUtil.postNotification(
                 activity.getString(R.string.app_name),
                 activity.getString(R.string.buffering_format,
                         PreferenceControl.getStreamNamePreference()));
     }
 	
-	private void updateNowPlayNotification(TrackInfo nowPlaying) {
-        if (nowPlaying.getCouldNotFetch()) {
-            postNotification(
-                    activity.getString(R.string.app_name),
-                    activity.getString(R.string.status_not_connected));
-        } else {
-            String artistTrackString = activity.getString(R.string.artist_track_format,
-                    nowPlaying.getArtist(), nowPlaying.getTrackTitle());
-            postNotification(nowPlaying.getDjName(), artistTrackString);
-        }
-	}
-
-    private void postNotification(String title, String text) {
-        Notification notification = new NotificationCompat.Builder(activity)
-                .setSmallIcon(R.drawable.ic_kfjc_notification)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setOngoing(true)
-                .setWhen(0)
-                .setContentIntent(kfjcPlayerIntent)
-                .build();
-        notificationManager.notify(NOWPLAYING_NOTIFICATION_ID, notification);
-    }
-	
-	private void cancelNowPlayNotification() {
-		notificationManager.cancel(NOWPLAYING_NOTIFICATION_ID);
-	}
-	
 	public boolean isStreamServicePlaying() {
 		return streamService != null && streamService.isPlaying();
 	}
-
-    private static boolean isServiceRunning(Activity activity, Class<?> serviceClass) {
-        ActivityManager manager =
-                (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
-        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
 
 }
