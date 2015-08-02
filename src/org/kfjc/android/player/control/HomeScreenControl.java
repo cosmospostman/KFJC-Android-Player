@@ -30,6 +30,7 @@ import org.kfjc.android.player.activity.HomeScreenActivity.StatusState;
 import org.kfjc.android.player.service.LiveStreamService;
 import org.kfjc.android.player.service.LiveStreamService.LiveStreamBinder;
 import org.kfjc.android.player.service.LiveStreamService.MediaListener;
+import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.droid.R;
 
 public class HomeScreenControl {
@@ -39,10 +40,13 @@ public class HomeScreenControl {
     private static final IntentFilter becomingNoisyIntentFilter =
 			new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 		
-	private Intent playIntent;
+	private Intent streamServiceIntent;
+    private Intent playlistServiceIntent;
 	private LiveStreamService streamService;
-	private ServiceConnection musicConnection;
-	private HomeScreenActivity activity;
+    private PlaylistService playlistService;
+	private ServiceConnection streamServiceConnection;
+    private ServiceConnection playlistServiceConnection;
+	private final HomeScreenActivity activity;
 	private NotificationManager notificationManager;
 	private PendingIntent kfjcPlayerIntent;
 	private AudioManager audioManager;
@@ -54,7 +58,7 @@ public class HomeScreenControl {
 	private StreamUrlPreferenceChangeHandler streamUrlPreferenceChangeListener;
     private PhoneStateListener phoneStateListener;
 	
-	public HomeScreenControl(HomeScreenActivity activity) {
+	public HomeScreenControl(final HomeScreenActivity activity) {
         loadAvailableStreams(activity);
 
         this.activity = activity;
@@ -79,25 +83,71 @@ public class HomeScreenControl {
 				new Intent(activity, HomeScreenActivity.class),
 				Notification.FLAG_ONGOING_EVENT); 
 
-		if (musicConnection == null) {
-			createMusicConnection();
+		if (streamServiceConnection == null) {
+            streamServiceConnection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    LiveStreamBinder binder = (LiveStreamBinder) service;
+                    streamService = binder.getService();
+                    streamService.setMediaEventListener(mediaEventHandler);
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName arg0) {
+                }
+            };
 		}
+        if (playlistServiceConnection == null) {
+            playlistServiceConnection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    PlaylistService.PlaylistBinder binder = (PlaylistService.PlaylistBinder) service;
+                    playlistService = binder.getService();
+                    playlistService.start();
+                    playlistService.registerPlaylistCallback(new PlaylistService.PlaylistCallback() {
+                        @Override
+                        public void onTrackInfoFetched(TrackInfo trackInfo) {
+                            activity.updateTrackInfo(trackInfo);
+                            if (streamService != null && streamService.isPlaying()) {
+                                updateNowPlayNotification(trackInfo);
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName name) {}
+            };
+        }
 	}
 
     public void onStart() {
-        playIntent = new Intent(activity, LiveStreamService.class);
-        activity.bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-        if (! isServiceRunning(activity, LiveStreamService.class)) {
-            activity.startService(playIntent);
-        }
-        if (isStreamServicePlaying()) {
-            registerReceivers();
-        }
+        activity.bindService(streamServiceIntent, streamServiceConnection, Context.BIND_AUTO_CREATE);
+        activity.bindService(playlistServiceIntent, playlistServiceConnection, Context.BIND_AUTO_CREATE);
+        registerReceivers();
+    }
+
+
+    public void onCreate() {
+        streamServiceIntent = new Intent(activity, LiveStreamService.class);
+        playlistServiceIntent = new Intent(activity, PlaylistService.class);
+        activity.startService(playlistServiceIntent);
+        activity.startService(streamServiceIntent);
+
     }
 
     public void onStop() {
-        activity.unbindService(musicConnection);
+        activity.unbindService(streamServiceConnection);
         unregisterReceivers();
+    }
+
+    public void destroy() {
+        notificationManager.cancel(NOWPLAYING_NOTIFICATION_ID);
+        stopStream();
+        activity.unbindService(streamServiceConnection);
+        activity.stopService(streamServiceIntent);
+        streamService = null;
+        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
     }
 
     private boolean isConnectedToNetwork() {
@@ -123,22 +173,6 @@ public class HomeScreenControl {
         activity.enablePlayStopButton();
     }
 	
-	private void createMusicConnection() {
-		musicConnection = new ServiceConnection() {
-			@Override
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				LiveStreamBinder binder = (LiveStreamBinder) service;
-				streamService = binder.getService();
-				streamService.setMediaEventListener(mediaEventHandler);
-				streamService.runPlaylistFetcher();
-			}
-
-			@Override
-			public void onServiceDisconnected(ComponentName arg0) {
-			}
-		};
-	}
-	
 	private MediaListener mediaEventHandler = new MediaListener() {
         @Override
         public void onBuffer() {
@@ -147,7 +181,6 @@ public class HomeScreenControl {
 
         @Override
 		public void onPlay() {
-			streamService.runPlaylistFetcherOnce();
 			activity.onPlayerBufferComplete();
 		}
 		
@@ -163,21 +196,13 @@ public class HomeScreenControl {
         public void onEnd() {
             activity.onPlayerStop();
         }
-
-        @Override
-		public void onTrackInfoFetched(TrackInfo trackInfo) {
-			activity.updateTrackInfo(trackInfo);
-			if (streamService != null && streamService.isPlaying()) {
-				updateNowPlayNotification(trackInfo);
-			}
-		}
 	};
 
 	public void playStream() {
 		audioManager.requestAudioFocus(
-				audioFocusListener,
-				AudioManager.STREAM_MUSIC,
-				AudioManager.AUDIOFOCUS_GAIN);
+                audioFocusListener,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN);
 		streamService.play(activity.getApplicationContext(), PreferenceControl.getUrlPreference());
         registerReceivers();
         postBufferNotification();
@@ -190,15 +215,6 @@ public class HomeScreenControl {
         unregisterReceivers();
 		audioManager.abandonAudioFocus(audioFocusListener);
 		cancelNowPlayNotification();
-	}
-	
-	public void destroy() {
-        notificationManager.cancel(NOWPLAYING_NOTIFICATION_ID);
-        stopStream();
-        activity.unbindService(musicConnection);
-        activity.stopService(playIntent);
-		streamService = null;
-        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
 	}
 
     private void registerReceivers() {

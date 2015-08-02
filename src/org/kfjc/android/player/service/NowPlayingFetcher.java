@@ -11,49 +11,38 @@ import android.util.Log;
 
 public class NowPlayingFetcher {
 
-    private MediaListener nowPlayingHandler;
-	private Handler handler;
-    
-	public NowPlayingFetcher(final MediaListener nowPlayingHandler) {
-		this.nowPlayingHandler = nowPlayingHandler;
-        this.handler = new Handler();
-	}
-	
-	Runnable fetchRunner = new Runnable() {
-		@Override public void run() {
-			makeFetchTask().execute();
-			handler.postDelayed(this, Constants.CURRENT_TRACK_POLL_DELAY_MS);
-		}
-	};
-
-	private AsyncTask<Void, Void, TrackInfo> makeFetchTask() {
-		return new AsyncTask<Void, Void, TrackInfo>() {
-		    protected TrackInfo doInBackground(Void... unusedParams) {
-		    	Log.i(Constants.LOG_TAG, "Fetching current track info");
-                try {
-                    return new TrackInfo(HttpUtil.getUrl(Constants.CURRENT_TRACK_URL));
-                } catch (Exception e) {
-                    return new TrackInfo();
-                }
-		    }
-
-		    protected void onPostExecute(TrackInfo nowPlaying) {
-				nowPlayingHandler.onTrackInfoFetched(nowPlaying);
-		    }
-		};
-	}
-	
-    public void run() {
-    	stop();
-    	runOnce();
-    	handler.postDelayed(fetchRunner, Constants.CURRENT_TRACK_POLL_DELAY_MS);
-    }
-    
-    public void runOnce() {
-    	makeFetchTask().execute();
-    }
-    
-    public void stop() {
-    	handler.removeCallbacks(null);
-    }
+//    private MediaListener nowPlayingHandler;
+//	private Handler handler;
+//
+//	public NowPlayingFetcher() {
+//        this.handler = new Handler();
+//	}
+//
+//	public void setNowPlayingHandler(final MediaListener nowPlayingHandler) {
+//		this.nowPlayingHandler = nowPlayingHandler;
+//		if (lastFetchedTrackInfo != null) {
+//			nowPlayingHandler.onTrackInfoFetched(lastFetchedTrackInfo);
+//		}
+//	}
+//
+//	Runnable fetchRunner = new Runnable() {
+//		@Override public void run() {
+//			makeFetchTask().execute();
+//			handler.postDelayed(this, Constants.CURRENT_TRACK_POLL_DELAY_MS);
+//		}
+//	};
+//
+//    public void run() {
+//    	stop();
+//    	runOnce();
+//    	handler.postDelayed(fetchRunner, Constants.CURRENT_TRACK_POLL_DELAY_MS);
+//    }
+//
+//    public void runOnce() {
+//    	makeFetchTask().execute();
+//    }
+//
+//    public void stop() {
+//    	handler.removeCallbacks(null);
+//    }
 }

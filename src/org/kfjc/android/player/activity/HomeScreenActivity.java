@@ -77,14 +77,14 @@ public class HomeScreenActivity extends Activity {
 
 		addButtonListeners();
         setStatusState(StatusState.CONNECTING);
+
+        control = new HomeScreenControl(this);
+        control.onCreate();
 	}
 	
 	@Override
 	protected void onStart() {
 		super.onStart();
-        if (control == null) {
-            control = new HomeScreenControl(this);
-        }
         control.onStart();
 	}
 

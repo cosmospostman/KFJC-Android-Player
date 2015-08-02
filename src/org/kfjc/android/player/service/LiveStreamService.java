@@ -19,11 +19,10 @@ import org.kfjc.android.player.model.TrackInfo;
 public class LiveStreamService extends Service {
 
     public interface MediaListener {
-        public void onBuffer();
-        public void onPlay();
-        public void onError(String message);
-        public void onEnd();
-        public void onTrackInfoFetched(TrackInfo trackInfo);
+        void onBuffer();
+        void onPlay();
+        void onError(String message);
+        void onEnd();
     }
 
 	public class LiveStreamBinder extends Binder {
@@ -40,20 +39,25 @@ public class LiveStreamService extends Service {
 	
 	@Override
 	public IBinder onBind(Intent intent) {
-		return liveStreamBinder;
+        this.nowPlayingFetcher = new NowPlayingFetcher();
+        return liveStreamBinder;
 	}
 
 	@Override
 	public boolean onUnbind(Intent intent) {
-		nowPlayingFetcher.stop();
+		return false;
+	}
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
         if (player != null) {
             player.stop();
             player.release();
         }
-		return false;
-	}
-	
-	public boolean isPlaying() {
+    }
+
+    public boolean isPlaying() {
         return player != null && (
                player.getPlaybackState() == ExoPlayer.STATE_READY ||
                player.getPlaybackState() == ExoPlayer.STATE_BUFFERING);
@@ -61,7 +65,6 @@ public class LiveStreamService extends Service {
 	
 	public void setMediaEventListener(MediaListener listener) {
 		this.mediaListener = listener;
-		this.nowPlayingFetcher = new NowPlayingFetcher(mediaListener);
 	}
 	
 	public void play(Context context, String streamUrl) {
@@ -87,18 +90,6 @@ public class LiveStreamService extends Service {
     private void initPlayer() {
         player = ExoPlayer.Factory.newInstance(1);
     }
-	
-	public void runPlaylistFetcherOnce() {
-		nowPlayingFetcher.runOnce();
-	}
-	
-	public void runPlaylistFetcher() {
-		if (!isFetching) {
-			nowPlayingFetcher.runOnce();
-			nowPlayingFetcher.run();
-		}
-		isFetching = true;
-	}
 
     private ExoPlayer.Listener makeExoplayerListener() {
         return new ExoPlayer.Listener() {

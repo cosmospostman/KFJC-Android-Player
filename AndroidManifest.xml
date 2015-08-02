@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="16"
         android:targetSdkVersion="22" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -43,6 +43,9 @@
 
         <service
             android:name="org.kfjc.android.player.service.LiveStreamService"
+            android:exported="false" />
+        <service
+            android:name="org.kfjc.android.player.service.PlaylistService"
             android:exported="false" />
     </application>
 
