@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.exoplayer.ExoPlaybackException;
@@ -16,14 +15,12 @@ import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.source.DefaultSampleSource;
 import com.google.android.exoplayer.source.FrameworkSampleExtractor;
 
-import org.kfjc.android.player.model.TrackInfo;
 import org.kfjc.android.player.util.NotificationUtil;
-import org.kfjc.droid.R;
 
 // TODO: Stop playlist fetcher when not playing and in background.
-public class LiveStreamService extends Service {
+public class StreamService extends Service {
 
-    private static final String TAG = LiveStreamService.class.getSimpleName();
+    private static final String TAG = StreamService.class.getSimpleName();
 
     public interface MediaListener {
         void onBuffer();
@@ -33,8 +30,8 @@ public class LiveStreamService extends Service {
     }
 
 	public class LiveStreamBinder extends Binder {
-		public LiveStreamService getService() {
-			return LiveStreamService.this;
+		public StreamService getService() {
+			return StreamService.this;
 		}
 	}
 

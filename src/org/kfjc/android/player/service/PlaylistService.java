@@ -13,9 +13,6 @@ import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.model.TrackInfo;
 import org.kfjc.android.player.util.HttpUtil;
 
-/**
- * Created by mitchell on 8/1/15.
- */
 public class PlaylistService extends Service {
 
     private static final String TAG = PlaylistService.class.getSimpleName();

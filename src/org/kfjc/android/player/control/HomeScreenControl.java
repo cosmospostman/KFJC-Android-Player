@@ -20,9 +20,9 @@ import org.kfjc.android.player.activity.HomeScreenActivity.StatusState;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.dialog.SettingsDialog.StreamUrlPreferenceChangeHandler;
 import org.kfjc.android.player.model.TrackInfo;
-import org.kfjc.android.player.service.LiveStreamService;
-import org.kfjc.android.player.service.LiveStreamService.LiveStreamBinder;
-import org.kfjc.android.player.service.LiveStreamService.MediaListener;
+import org.kfjc.android.player.service.StreamService;
+import org.kfjc.android.player.service.StreamService.LiveStreamBinder;
+import org.kfjc.android.player.service.StreamService.MediaListener;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.util.NotificationUtil;
 import org.kfjc.droid.R;
@@ -35,7 +35,7 @@ public class HomeScreenControl {
 		
 	private Intent streamServiceIntent;
     private Intent playlistServiceIntent;
-	private LiveStreamService streamService;
+	private StreamService streamService;
     private PlaylistService playlistService;
 	private ServiceConnection streamServiceConnection;
     private ServiceConnection playlistServiceConnection;
@@ -44,7 +44,6 @@ public class HomeScreenControl {
 	private AudioManager audioManager;
     private TelephonyManager telephonyManager;
     private ConnectivityManager connectivityManager;
-
     private OnAudioFocusChangeListener audioFocusListener;
 	private BroadcastReceiver audioBecomingNoisyReceiver;
 	private StreamUrlPreferenceChangeHandler streamUrlPreferenceChangeListener;
@@ -111,7 +110,7 @@ public class HomeScreenControl {
 	}
 
     public void onCreate() {
-        streamServiceIntent = new Intent(activity, LiveStreamService.class);
+        streamServiceIntent = new Intent(activity, StreamService.class);
         playlistServiceIntent = new Intent(activity, PlaylistService.class);
         activity.startService(playlistServiceIntent);
         activity.startService(streamServiceIntent);

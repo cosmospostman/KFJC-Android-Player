@@ -42,7 +42,7 @@
         </activity>
 
         <service
-            android:name="org.kfjc.android.player.service.LiveStreamService"
+            android:name="org.kfjc.android.player.service.StreamService"
             android:exported="false" />
         <service
             android:name="org.kfjc.android.player.service.PlaylistService"
