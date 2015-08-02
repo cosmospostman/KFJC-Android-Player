@@ -18,7 +18,6 @@ import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.source.DefaultSampleSource;
 import com.google.android.exoplayer.source.FrameworkSampleExtractor;
 
-import org.kfjc.android.player.control.EventHandlerFactory;
 import org.kfjc.android.player.util.NotificationUtil;
 
 // TODO: Stop playlist fetcher when not playing and in background.
@@ -44,6 +43,7 @@ public class StreamService extends Service {
 	private MediaListener mediaListener;
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
     private ExoPlayer player;
+    private boolean becomingNoisyReceiverRegistered = false;
 
     /**
      * The Becoming Noisy broadcast intent is sent when audio output hardware changes, perhaps
@@ -91,8 +91,9 @@ public class StreamService extends Service {
 	public void play(Context context, String streamUrl) {
         initPlayer();
         registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
+        becomingNoisyReceiverRegistered = true;
 
-        Notification n = NotificationUtil.kfjcNotification(getApplicationContext(), "KFJC", "StreamService");
+        Notification n = NotificationUtil.bufferingNotification(context);
         startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
 
         Uri streamUri = Uri.parse(streamUrl);
@@ -110,10 +111,21 @@ public class StreamService extends Service {
         if (player != null) {
             player.stop();
         }
-        unregisterReceiver(onAudioBecomingNoisyReceiver);
+        unregisterRecievers();
+        becomingNoisyReceiverRegistered = false;
         stopForeground(true);
         Log.i(TAG, "Service stopped");
 	}
+
+    private void unregisterRecievers() {
+        try {
+            if (becomingNoisyReceiverRegistered) {
+                unregisterReceiver(onAudioBecomingNoisyReceiver);
+            }
+        } catch (IllegalArgumentException e) {
+            // receiver was already unregistered.
+        }
+    }
 
     private void initPlayer() {
         player = ExoPlayer.Factory.newInstance(1);

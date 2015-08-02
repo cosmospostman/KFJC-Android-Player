@@ -182,7 +182,6 @@ public class HomeScreenControl {
                 AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN);
 		streamService.play(activity.getApplicationContext(), PreferenceControl.getUrlPreference());
-        postBufferNotification();
         notificationUtil.updateNowPlayNotification(playlistService.getLastFetchedTrackInfo());
         activity.setStatusState(StatusState.CONNECTING);
 	}
@@ -199,13 +198,6 @@ public class HomeScreenControl {
 		settingsFragment.setUrlPreferenceChangeHandler(streamUrlPreferenceChangeListener);
 		settingsFragment.show(activity.getFragmentManager(), "settings");
 	}
-
-    private void postBufferNotification() {
-        notificationUtil.postNotification(
-                activity.getString(R.string.app_name),
-                activity.getString(R.string.buffering_format,
-                        PreferenceControl.getStreamNamePreference()));
-    }
 	
 	public boolean isStreamServicePlaying() {
 		return streamService != null && streamService.isPlaying();

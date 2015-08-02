@@ -12,9 +12,9 @@
         android:layout_height="wrap_content">      
 		<ImageView
 	        android:id="@+id/volumeIcon"
-	        android:src="@drawable/ic_volume"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
+	        android:src="@drawable/ic_volume_up_white_36dp"
+	        android:layout_width="36dp"
+	        android:layout_height="36dp"
 	        android:layout_alignParentLeft="true" />
 	    <SeekBar
 	        android:id="@+id/volumeSeekBar"

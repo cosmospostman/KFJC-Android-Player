@@ -101,13 +101,5 @@ public class EventHandlerFactory {
 			}
 		};
 	}
-	
-	static void unregisterReceiver(Activity activity, BroadcastReceiver receiver) {
-		try {
-			activity.unregisterReceiver(receiver);
-		} catch (IllegalArgumentException e) {
-			// receiver was already unregistered.
-		}
-	}
 
 }

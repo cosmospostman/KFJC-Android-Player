@@ -149,10 +149,10 @@ public class HomeScreenActivity extends Activity {
         playStopButtonState = state;
         switch(state) {
             case STOP:
-                playStopButton.setImageResource(R.drawable.ic_stop);
+                playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
                 break;
             case PLAY:
-                playStopButton.setImageResource(R.drawable.ic_play_arrow_white);
+                playStopButton.setImageResource(R.drawable.ic_play_arrow_white_48dp);
                 break;
         }
     }

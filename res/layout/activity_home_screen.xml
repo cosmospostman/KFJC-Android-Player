@@ -64,23 +64,28 @@
                 android:layout_height="56dp"
                 android:layout_marginRight="16dp"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/ic_play_arrow_white"
+                android:src="@drawable/ic_play_arrow_white_48dp"
                 app:borderWidth="0dp"
                 app:backgroundTint="@color/kfjc_red_solid"
                 app:rippleColor="@color/kfjc_mute"
                 app:elevation="8dp"
                 />
 
-            <ImageView
+            <android.support.design.widget.FloatingActionButton
                 android:id="@+id/settingsButton"
-                android:padding="6dp"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="8dp"
+                android:layout_marginRight="16dp"
+                android:src="@drawable/ic_volume_up_white_48dp"
                 android:layout_toLeftOf="@+id/playstopbutton"
                 android:layout_centerVertical="true"
-                android:background="@drawable/oval_mute"
-                android:src="@drawable/ic_volume" />
+                app:fabSize="mini"
+                app:borderWidth="0dp"
+                app:backgroundTint="@color/kfjc_mute"
+                app:rippleColor="@color/kfjc_mute"
+                app:elevation="8dp"
+                />
+
                 
     	</RelativeLayout>
 

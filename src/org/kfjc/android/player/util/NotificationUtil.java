@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 import org.kfjc.android.player.activity.HomeScreenActivity;
+import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.model.TrackInfo;
 import org.kfjc.droid.R;
 
@@ -34,6 +35,13 @@ public class NotificationUtil {
                     nowPlaying.getArtist(), nowPlaying.getTrackTitle());
             postNotification(nowPlaying.getDjName(), artistTrackString);
         }
+    }
+
+    public static Notification bufferingNotification(Context context) {
+        return kfjcNotification(context,
+                context.getString(R.string.app_name),
+                context.getString(R.string.buffering_format,
+                        PreferenceControl.getStreamNamePreference()));
     }
 
     public static Notification kfjcNotification(Context context, String title, String text) {
