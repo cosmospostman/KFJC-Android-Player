@@ -148,6 +148,7 @@ public class HomeScreenControl {
     }
 
     public void onStreamUrlsLoaded() {
+        activity.enableSettingsButton();
         activity.enablePlayStopButton();
     }
 	

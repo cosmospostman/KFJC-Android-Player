@@ -29,7 +29,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 public class SettingsDialog extends DialogFragment {
 	
 	public interface StreamUrlPreferenceChangeHandler {
-		public void onStreamUrlPreferenceChange();
+		void onStreamUrlPreferenceChange();
 	}
 	
 	private SeekBar volumeSeekbar;

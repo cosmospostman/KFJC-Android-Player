@@ -137,6 +137,7 @@ public class HomeScreenActivity extends Activity {
             }
         });
         radioDevil.setEnabled(false);
+        settingsButton.setEnabled(false);
 		settingsButton.setOnTouchListener(UiUtil.buttonTouchListener);
 		settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,6 +188,10 @@ public class HomeScreenActivity extends Activity {
         radioDevil.setImageResource(graphics.radioDevilOff());
         setButtonState(PlayStopButtonState.PLAY);
 	}
+
+    public void enableSettingsButton() {
+        this.settingsButton.setEnabled(true);
+    }
 
     public void enablePlayStopButton() {
         this.playStopButton.setEnabled(true);
