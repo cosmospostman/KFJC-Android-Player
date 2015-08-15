@@ -7,16 +7,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.media.MediaCodec;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
-import com.google.android.exoplayer.source.DefaultSampleSource;
-import com.google.android.exoplayer.source.FrameworkSampleExtractor;
+import com.google.android.exoplayer.MediaCodecTrackRenderer;
+import com.google.android.exoplayer.audio.AudioTrack;
+import com.google.android.exoplayer.extractor.Extractor;
+import com.google.android.exoplayer.extractor.ExtractorSampleSource;
+import com.google.android.exoplayer.extractor.mp3.Mp3Extractor;
+import com.google.android.exoplayer.extractor.ts.AdtsExtractor;
+import com.google.android.exoplayer.upstream.Allocator;
+import com.google.android.exoplayer.upstream.DataSource;
+import com.google.android.exoplayer.upstream.DefaultAllocator;
+import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
 import org.kfjc.android.player.util.NotificationUtil;
 
@@ -24,6 +34,8 @@ import org.kfjc.android.player.util.NotificationUtil;
 public class StreamService extends Service {
 
     private static final String TAG = StreamService.class.getSimpleName();
+    private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
+    private static final int BUFFER_SEGMENT_COUNT = 160;
     private static final IntentFilter becomingNoisyIntentFilter =
             new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 
@@ -87,23 +99,33 @@ public class StreamService extends Service {
 	public void setMediaEventListener(MediaListener listener) {
 		this.mediaListener = listener;
 	}
-	
-	public void play(Context context, String streamUrl) {
-        initPlayer();
-        registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
-        becomingNoisyReceiverRegistered = true;
+
+    public void play(Context context, String streamUrl) {
+        player = ExoPlayer.Factory.newInstance(1);
 
         Notification n = NotificationUtil.bufferingNotification(context);
         startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
 
         Uri streamUri = Uri.parse(streamUrl);
-        FrameworkSampleExtractor sampleExtractor = new FrameworkSampleExtractor(context, streamUri, null);
-        DefaultSampleSource sampleSource = new DefaultSampleSource(sampleExtractor, 1);
-        MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(
-                sampleSource, null, true);
+        Allocator allocator = new DefaultAllocator(BUFFER_SEGMENT_SIZE * 128);
+        DataSource dataSource = new DefaultUriDataSource(context, "kfjc4droid");
+        Extractor extractor = new Mp3Extractor();
+        if (streamUrl.toLowerCase().contains("aac")) {
+            extractor = new AdtsExtractor();
+        }
+        ExtractorSampleSource sampleSource = new ExtractorSampleSource(
+                streamUri,
+                dataSource,
+                extractor,
+                allocator,
+                BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE);
+
+        MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
+                null, true, new Handler(), eventListener);
+
         player.prepare(audioRenderer);
         player.setPlayWhenReady(true);
-        player.addListener(makeExoplayerListener());
+        player.addListener(exoPlayerListener);
 
     }
 
@@ -127,38 +149,56 @@ public class StreamService extends Service {
         }
     }
 
-    private void initPlayer() {
-        player = ExoPlayer.Factory.newInstance(1);
-    }
-
-    private ExoPlayer.Listener makeExoplayerListener() {
-        return new ExoPlayer.Listener() {
-            @Override
-            public void onPlayerStateChanged(boolean playWhenReady, int state) {
-                switch (state) {
-                    case ExoPlayer.STATE_READY:
-                        if (playWhenReady) {
-                            mediaListener.onPlay();
-                        }
-                        break;
-                    case ExoPlayer.STATE_PREPARING:
-                        mediaListener.onBuffer();
-                        break;
-                    case ExoPlayer.STATE_ENDED:
-                    case ExoPlayer.STATE_IDLE:
-                        mediaListener.onEnd();
-                }
-
+    private ExoPlayer.Listener exoPlayerListener = new ExoPlayer.Listener() {
+        @Override
+        public void onPlayerStateChanged(boolean playWhenReady, int state) {
+            switch (state) {
+                case ExoPlayer.STATE_READY:
+                    if (playWhenReady) {
+                        mediaListener.onPlay();
+                        registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
+                        becomingNoisyReceiverRegistered = true;
+                    }
+                    break;
+                case ExoPlayer.STATE_PREPARING:
+                    mediaListener.onBuffer();
+                    break;
+                case ExoPlayer.STATE_ENDED:
+                case ExoPlayer.STATE_IDLE:
+                    mediaListener.onEnd();
+                    unregisterRecievers();
+                    break;
             }
+        }
 
-            @Override
-            public void onPlayWhenReadyCommitted() {}
+        @Override
+        public void onPlayWhenReadyCommitted() {}
 
-            @Override
-            public void onPlayerError(ExoPlaybackException e) {
-               mediaListener.onError(e.getMessage());
-            }
-        };
-    }
+        @Override
+        public void onPlayerError(ExoPlaybackException e) {
+           mediaListener.onError(e.getMessage());
+        }
+    };
+
+    MediaCodecAudioTrackRenderer.EventListener eventListener =
+            new MediaCodecAudioTrackRenderer.EventListener() {
+        @Override
+        public void onDecoderInitializationError(
+                MediaCodecTrackRenderer.DecoderInitializationException e) {}
+
+        @Override
+        public void onCryptoError(MediaCodec.CryptoException e) {}
+
+        @Override
+        public void onDecoderInitialized(
+                String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {}
+
+        @Override
+        public void onAudioTrackInitializationError(AudioTrack.InitializationException e) {}
+
+        @Override
+        public void onAudioTrackWriteError(AudioTrack.WriteException e) {}
+    };
+
 
 }

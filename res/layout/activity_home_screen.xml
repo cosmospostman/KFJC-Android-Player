@@ -20,7 +20,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="0dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/bg_tower"
         tools:ignore="ContentDescription" />
     
     <LinearLayout
@@ -49,13 +48,13 @@
         <RelativeLayout
         android:id="@+id/buttonContainer"
         android:layout_width="fill_parent"
-       	android:layout_height="56dp">
+       	android:layout_height="60dp">
 
 	        <ImageView
 	            android:background="@color/kfjc_transparent_black"
 	            android:layout_alignParentBottom="true"
 	            android:layout_width="match_parent"
-	            android:layout_height="28dp"
+	            android:layout_height="32dp"
 	            tools:ignore="ContentDescription" />
 
             <android.support.design.widget.FloatingActionButton
@@ -68,7 +67,7 @@
                 app:borderWidth="0dp"
                 app:backgroundTint="@color/kfjc_red_solid"
                 app:rippleColor="@color/kfjc_mute"
-                app:elevation="8dp"
+                app:elevation="2dp"
                 />
 
             <android.support.design.widget.FloatingActionButton
@@ -83,7 +82,7 @@
                 app:borderWidth="0dp"
                 app:backgroundTint="@color/kfjc_mute"
                 app:rippleColor="@color/kfjc_mute"
-                app:elevation="8dp"
+                app:elevation="2dp"
                 />
 
                 

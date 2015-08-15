@@ -7,6 +7,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -164,7 +165,7 @@ public class HomeScreenActivity extends Activity {
         } else {
             currentDjTextView.setText(nowPlaying.getDjName());
             currentTrackTextView.setText(Html.fromHtml(nowPlaying.getArtist()
-                    + " <i>" + nowPlaying.getTrackTitle() + "</i>"));
+                    + "&nbsp&nbsp&nbsp<i>" + nowPlaying.getTrackTitle() + "</i>"));
         }
 	}
 	
