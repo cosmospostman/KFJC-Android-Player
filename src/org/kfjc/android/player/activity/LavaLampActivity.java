@@ -3,19 +3,15 @@ package org.kfjc.android.player.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnPreparedListener;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.VideoView;
 
 import org.kfjc.droid.R;
-
-import java.io.IOException;
 
 public class LavaLampActivity extends Activity {
 
@@ -29,7 +25,8 @@ public class LavaLampActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 		setContentView(R.layout.activity_lavaplayer);
-		getWindow().setFlags(
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().setFlags(
 				WindowManager.LayoutParams.FLAG_FULLSCREEN, 
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -44,7 +41,8 @@ public class LavaLampActivity extends Activity {
             }
 
             @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            }
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {}
