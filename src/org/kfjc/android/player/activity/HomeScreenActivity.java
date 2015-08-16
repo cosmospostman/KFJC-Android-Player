@@ -53,6 +53,7 @@ public class HomeScreenActivity extends Activity {
 	private PlayerState playerState = PlayerState.PLAY;
 	private GraphicsUtil graphics;
 	private static HomeScreenControl control;
+    private boolean isForegroundActivity = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +96,15 @@ public class HomeScreenActivity extends Activity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        isForegroundActivity = false;
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        isForegroundActivity = true;
         int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         backgroundImageView.setImageResource(GraphicsUtil.imagesOfTheHour[hourOfDay]);
     }
@@ -213,6 +221,10 @@ public class HomeScreenActivity extends Activity {
                 break;
         }
         this.connectionStatusState = state;
+    }
+
+    public boolean isForegroundActivity() {
+        return isForegroundActivity;
     }
 
     public void showDebugAlert(final String message) {

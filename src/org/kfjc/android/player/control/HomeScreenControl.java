@@ -182,6 +182,9 @@ public class HomeScreenControl {
 		streamService.stop();
 		audioManager.abandonAudioFocus(audioFocusListener);
         notificationUtil.cancelNowPlayNotification();
+        if (!activity.isForegroundActivity()) {
+            playlistService.stop();
+        }
 	}
 	
 	public void showSettings() {

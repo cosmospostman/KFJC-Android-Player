@@ -64,7 +64,7 @@ public class PlaylistService extends Service {
 
     public void stop() {
         Log.i(TAG, "Service stopped");
-        handler.removeCallbacks(null);
+        handler.removeCallbacksAndMessages(null);
     }
 
     private AsyncTask<Void, Void, TrackInfo> makeFetchTask() {
