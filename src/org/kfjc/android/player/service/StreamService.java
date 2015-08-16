@@ -28,6 +28,7 @@ import com.google.android.exoplayer.upstream.DataSource;
 import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
+import org.kfjc.android.player.activity.HomeScreenActivity;
 import org.kfjc.android.player.util.NotificationUtil;
 
 // TODO: Stop playlist fetcher when not playing and in background.
@@ -38,6 +39,9 @@ public class StreamService extends Service {
     private static final int BUFFER_SEGMENT_COUNT = 160;
     private static final IntentFilter becomingNoisyIntentFilter =
             new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+
+    private static final int MIN_BUFFER_MS = 5000;
+    private static final int MIN_REBUFFER_MS = 2000;
 
     public interface MediaListener {
         void onBuffer();
@@ -90,6 +94,19 @@ public class StreamService extends Service {
         }
     }
 
+    public HomeScreenActivity.PlayerState getPlayerState() {
+        if (player == null) {
+            return HomeScreenActivity.PlayerState.STOP;
+        }
+        if (player.getPlaybackState() == ExoPlayer.STATE_BUFFERING) {
+            return HomeScreenActivity.PlayerState.BUFFER;
+        }
+        if (player.getPlaybackState() == ExoPlayer.STATE_READY) {
+            return HomeScreenActivity.PlayerState.PLAY;
+        }
+        return HomeScreenActivity.PlayerState.STOP;
+    }
+
     public boolean isPlaying() {
         return player != null && (
                player.getPlaybackState() == ExoPlayer.STATE_READY ||
@@ -101,7 +118,7 @@ public class StreamService extends Service {
 	}
 
     public void play(Context context, String streamUrl) {
-        player = ExoPlayer.Factory.newInstance(1);
+        player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
 
         Notification n = NotificationUtil.bufferingNotification(context);
         startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
@@ -118,7 +135,7 @@ public class StreamService extends Service {
                 dataSource,
                 extractor,
                 allocator,
-                BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE);
+                BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE * 128);
 
         MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
                 null, true, new Handler(), eventListener);

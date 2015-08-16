@@ -93,7 +93,9 @@ public class SettingsDialog extends DialogFragment {
 		}
 		
 		Integer selectedId = streamNameToViewIdMap.get(PreferenceControl.getStreamNamePreference());
-		radioGroup.check(selectedId);	
+		if (selectedId != null) {
+			radioGroup.check(selectedId);
+		}
 	}
 	
 	private void initVolumeBar(View view) {

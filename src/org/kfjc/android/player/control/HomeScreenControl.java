@@ -6,14 +6,13 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
 import org.kfjc.android.player.activity.HomeScreenActivity;
+import org.kfjc.android.player.activity.HomeScreenActivity.PlayerState;
 import org.kfjc.android.player.activity.HomeScreenActivity.StatusState;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.dialog.SettingsDialog.StreamUrlPreferenceChangeHandler;
@@ -23,7 +22,6 @@ import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.service.StreamService.LiveStreamBinder;
 import org.kfjc.android.player.service.StreamService.MediaListener;
 import org.kfjc.android.player.util.NotificationUtil;
-import org.kfjc.droid.R;
 
 public class HomeScreenControl {
 	
@@ -39,7 +37,6 @@ public class HomeScreenControl {
 	private NotificationUtil notificationUtil;
 	private AudioManager audioManager;
     private TelephonyManager telephonyManager;
-    private ConnectivityManager connectivityManager;
     private OnAudioFocusChangeListener audioFocusListener;
 	private StreamUrlPreferenceChangeHandler streamUrlPreferenceChangeListener;
     private PhoneStateListener phoneStateListener;
@@ -53,8 +50,6 @@ public class HomeScreenControl {
                 activity.getSystemService(Context.AUDIO_SERVICE);
         this.telephonyManager = (TelephonyManager)
                 activity.getSystemService(Context.TELEPHONY_SERVICE);
-        this.connectivityManager = (ConnectivityManager)
-                activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         this.audioFocusListener = EventHandlerFactory.onAudioFocusChange(this, audioManager);
         this.phoneStateListener = EventHandlerFactory.onPhoneStateChange(this);
 		this.streamUrlPreferenceChangeListener =
@@ -69,9 +64,7 @@ public class HomeScreenControl {
                     LiveStreamBinder binder = (LiveStreamBinder) service;
                     streamService = binder.getService();
                     streamService.setMediaEventListener(mediaEventHandler);
-                    activity.setButtonState(streamService.isPlaying()
-                            ? HomeScreenActivity.PlayStopButtonState.STOP
-                            : HomeScreenActivity.PlayStopButtonState.PLAY);
+                    activity.setState(streamService.getPlayerState());
                 }
 
                 @Override
@@ -128,11 +121,6 @@ public class HomeScreenControl {
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
     }
 
-    private boolean isConnectedToNetwork() {
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnected();
-    }
-
     private void loadAvailableStreams(final HomeScreenActivity activity) {
         new AsyncTask<Void, Void, Void>() {
             @Override protected Void doInBackground(Void... unsedParams) {
@@ -155,12 +143,12 @@ public class HomeScreenControl {
 	private MediaListener mediaEventHandler = new MediaListener() {
         @Override
         public void onBuffer() {
-            activity.onPlayerBuffer();
+            activity.setState(PlayerState.BUFFER);
         }
 
         @Override
 		public void onPlay() {
-			activity.onPlayerBufferComplete();
+			activity.setState(PlayerState.PLAY);
 		}
 		
 		@Override
@@ -168,12 +156,11 @@ public class HomeScreenControl {
             activity.showDebugAlert(message);
 			stopStream();
             activity.setStatusState(HomeScreenActivity.StatusState.CONNECTION_ERROR);
-            boolean isConnectedToNetwork = isConnectedToNetwork();
         }
 
         @Override
         public void onEnd() {
-            activity.onPlayerStop();
+            activity.setState(PlayerState.STOP);
         }
 	};
 
@@ -188,7 +175,7 @@ public class HomeScreenControl {
 	}
 	
 	public void stopStream() {
-		activity.onPlayerStop();
+        activity.setState(PlayerState.STOP);
 		streamService.stop();
 		audioManager.abandonAudioFocus(audioFocusListener);
         notificationUtil.cancelNowPlayNotification();

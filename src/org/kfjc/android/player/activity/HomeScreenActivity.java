@@ -7,10 +7,8 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
@@ -27,9 +25,10 @@ import org.kfjc.droid.R;
 
 public class HomeScreenActivity extends Activity {
 	
-	public enum PlayStopButtonState {
-		PLAY, // When showing the play icon
-		STOP  // When showing the stop icon
+	public enum PlayerState {
+		PLAY,
+        STOP,
+        BUFFER
 	}
 
     public enum StatusState {
@@ -51,7 +50,7 @@ public class HomeScreenActivity extends Activity {
     private TextView statusMessageTextView;
 
     private StatusState connectionStatusState = StatusState.CONNECTION_ERROR;
-	private PlayStopButtonState playStopButtonState = PlayStopButtonState.PLAY;
+	private PlayerState playerState = PlayerState.PLAY;
 	private GraphicsUtil graphics;
 	private static HomeScreenControl control;
 	
@@ -118,14 +117,18 @@ public class HomeScreenActivity extends Activity {
     private void addButtonListeners() {
 		playStopButton.setOnTouchListener(UiUtil.buttonTouchListener);
 		playStopButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				if (playStopButtonState == PlayStopButtonState.STOP) {
-					control.stopStream();
-				} else {
-					control.playStream();
-				}
-			}
-		});
+            public void onClick(View v) {
+                switch (playerState) {
+                    case STOP:
+                        control.playStream();
+                        break;
+                    case BUFFER:
+                    case PLAY:
+                        control.stopStream();
+                        break;
+                }
+            }
+        });
         playStopButton.setEnabled(false);
 		radioDevil.setOnTouchListener(UiUtil.buttonTouchListener);
 		radioDevil.setOnClickListener(new View.OnClickListener() {
@@ -147,14 +150,25 @@ public class HomeScreenActivity extends Activity {
         });
 	}
 
-    public void setButtonState(PlayStopButtonState state) {
-        playStopButtonState = state;
+    public void setState(PlayerState state) {
+        playerState = state;
         switch(state) {
             case STOP:
-                playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
+                graphics.bufferDevil(radioDevil, false);
+                playStopButton.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+                radioDevil.setImageResource(graphics.radioDevilOff());
+                radioDevil.setEnabled(false);
                 break;
             case PLAY:
-                playStopButton.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+                graphics.bufferDevil(radioDevil, false);
+                playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
+                radioDevil.setImageResource(graphics.radioDevilOn());
+                radioDevil.setEnabled(true);
+                break;
+            case BUFFER:
+                graphics.bufferDevil(radioDevil, true);
+                playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
+                radioDevil.setEnabled(false);
                 break;
         }
     }
@@ -168,25 +182,6 @@ public class HomeScreenActivity extends Activity {
             currentTrackTextView.setText(Html.fromHtml(nowPlaying.getArtist()
                     + "&nbsp&nbsp&nbsp<i>" + nowPlaying.getTrackTitle() + "</i>"));
         }
-	}
-	
-	public void onPlayerBuffer() {
-		graphics.bufferDevil(radioDevil, true);
-        setButtonState(PlayStopButtonState.STOP);
-	}
-	
-	public void onPlayerBufferComplete() {
-		graphics.bufferDevil(radioDevil, false);
-		radioDevil.setImageResource(graphics.radioDevilOn());
-        setButtonState(PlayStopButtonState.STOP);
-        radioDevil.setEnabled(true);
-	}
-	
-	public void onPlayerStop() {
-		graphics.bufferDevil(radioDevil, false);
-        radioDevil.setEnabled(false);
-        radioDevil.setImageResource(graphics.radioDevilOff());
-        setButtonState(PlayStopButtonState.PLAY);
 	}
 
     public void enableSettingsButton() {
