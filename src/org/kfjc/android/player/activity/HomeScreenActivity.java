@@ -21,7 +21,7 @@ import org.kfjc.android.player.model.TrackInfo;
 import org.kfjc.android.player.control.HomeScreenControl;
 import org.kfjc.android.player.util.GraphicsUtil;
 import org.kfjc.android.player.util.UiUtil;
-import org.kfjc.droid.R;
+import org.kfjc.android.player.R;
 
 public class HomeScreenActivity extends Activity {
 	

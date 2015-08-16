@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.kfjc.android.player.control.HomeScreenControl;
 import org.kfjc.android.player.control.PreferenceControl;
-import org.kfjc.droid.R;
+import org.kfjc.android.player.R;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

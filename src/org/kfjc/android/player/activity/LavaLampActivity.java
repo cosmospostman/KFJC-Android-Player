@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.Window;
 import android.view.WindowManager;
 
-import org.kfjc.droid.R;
+import org.kfjc.android.player.R;
 
 public class LavaLampActivity extends Activity {
 

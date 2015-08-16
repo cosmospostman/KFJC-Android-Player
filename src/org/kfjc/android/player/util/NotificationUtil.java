@@ -10,7 +10,7 @@ import android.support.v4.app.NotificationCompat;
 import org.kfjc.android.player.activity.HomeScreenActivity;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.model.TrackInfo;
-import org.kfjc.droid.R;
+import org.kfjc.android.player.R;
 
 public class NotificationUtil {
 

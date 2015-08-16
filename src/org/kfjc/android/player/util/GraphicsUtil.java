@@ -1,6 +1,6 @@
 package org.kfjc.android.player.util;
 
-import org.kfjc.droid.R;
+import org.kfjc.android.player.R;
 
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;

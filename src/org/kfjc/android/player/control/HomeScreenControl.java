@@ -109,6 +109,9 @@ public class HomeScreenControl {
     }
 
     public void onStop() {
+        if (!streamService.isPlaying()) {
+            playlistService.stop();
+        }
         activity.unbindService(streamServiceConnection);
         activity.unbindService(playlistServiceConnection);
     }
