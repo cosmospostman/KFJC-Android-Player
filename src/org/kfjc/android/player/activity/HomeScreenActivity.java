@@ -9,7 +9,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -105,6 +104,7 @@ public class HomeScreenActivity extends Activity {
     protected void onResume() {
         super.onResume();
         isForegroundActivity = true;
+        control.onResume();
         int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         backgroundImageView.setImageResource(GraphicsUtil.imagesOfTheHour[hourOfDay]);
     }
@@ -187,8 +187,7 @@ public class HomeScreenActivity extends Activity {
             setStatusState(StatusState.CONNECTION_ERROR);
         } else {
             currentDjTextView.setText(nowPlaying.getDjName());
-            currentTrackTextView.setText(Html.fromHtml(nowPlaying.getArtist()
-                    + "&nbsp&nbsp&nbsp<i>" + nowPlaying.getTrackTitle() + "</i>"));
+            currentTrackTextView.setText(nowPlaying.artistTrackHtml());
         }
 	}
 

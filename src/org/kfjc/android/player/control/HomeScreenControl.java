@@ -108,6 +108,12 @@ public class HomeScreenControl {
         activity.bindService(playlistServiceIntent, playlistServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
+    public void onResume() {
+        if (playlistService != null) {
+            playlistService.start();
+        }
+    }
+
     public void onStop() {
         if (!streamService.isPlaying()) {
             playlistService.stop();

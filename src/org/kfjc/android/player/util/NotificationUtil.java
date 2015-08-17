@@ -29,21 +29,12 @@ public class NotificationUtil {
         if (nowPlaying.getCouldNotFetch()) {
             cancelNowPlayNotification();
             postNotification(
-                    context.getString(R.string.app_name), "");
+                    context.getString(R.string.app_name),
+                    context.getString(R.string.empty_string));
         } else {
-            String artistTrackString = "";
-
-            // Both artist and track supplied
-            if (!nowPlaying.getArtist().isEmpty() && !nowPlaying.getTrackTitle().isEmpty()) {
-                artistTrackString = context.getString(R.string.artist_track_format,
-                        nowPlaying.getArtist(), nowPlaying.getTrackTitle());
-            } else if (nowPlaying.getArtist().isEmpty()) {          // Only track title
-                artistTrackString = nowPlaying.getTrackTitle();
-            } else {                                                // Only artist
-                artistTrackString = nowPlaying.getArtist();
-            }
-
-            postNotification(nowPlaying.getDjName(), artistTrackString);
+            postNotification(
+                    nowPlaying.getDjName(),
+                    nowPlaying.artistTrackStringNotification(context));
         }
     }
 

@@ -31,7 +31,6 @@ import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 import org.kfjc.android.player.activity.HomeScreenActivity;
 import org.kfjc.android.player.util.NotificationUtil;
 
-// TODO: Stop playlist fetcher when not playing and in background.
 public class StreamService extends Service {
 
     private static final String TAG = StreamService.class.getSimpleName();
@@ -40,8 +39,8 @@ public class StreamService extends Service {
     private static final IntentFilter becomingNoisyIntentFilter =
             new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 
-    private static final int MIN_BUFFER_MS = 2000;
-    private static final int MIN_REBUFFER_MS = 4000;
+    private static final int MIN_BUFFER_MS = 5000;
+    private static final int MIN_REBUFFER_MS = 5000;
 
     public interface MediaListener {
         void onBuffer();

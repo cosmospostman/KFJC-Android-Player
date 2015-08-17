@@ -57,6 +57,7 @@ public class PlaylistService extends Service {
 
     public void start() {
         if (!isStarted) {
+            Log.i(TAG, "Service (re)started");
             handler.postDelayed(fetchRunner, 0);
             isStarted = true;
         }
@@ -65,6 +66,7 @@ public class PlaylistService extends Service {
     public void stop() {
         Log.i(TAG, "Service stopped");
         handler.removeCallbacksAndMessages(null);
+        isStarted = false;
     }
 
     private AsyncTask<Void, Void, TrackInfo> makeFetchTask() {

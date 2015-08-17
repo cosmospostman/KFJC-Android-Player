@@ -7,6 +7,7 @@
     <string name="status_not_connected">Could not connect to KFJC :\'(</string>
     <string name="status_connecting">Connecting to KFJC...</string>
     <string name="ok">OK</string>
+    <string name="empty_string"></string>
     <string name="buffering_format"
         trabslation_description="String to show when buffering stream called (%1s)">
          	Buffering stream: %1$s</string>
