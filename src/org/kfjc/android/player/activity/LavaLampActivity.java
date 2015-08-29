@@ -56,7 +56,7 @@ public class LavaLampActivity extends Activity {
 
     private void playLava(SurfaceHolder holder) {
         Context context = getApplicationContext();
-        int lavaSrcId = context.getResources().getIdentifier("lavalava", "raw",
+        int lavaSrcId = context.getResources().getIdentifier("lavalamp", "raw",
                 context.getPackageName());
         mediaPlayer = MediaPlayer.create(context, lavaSrcId);
 

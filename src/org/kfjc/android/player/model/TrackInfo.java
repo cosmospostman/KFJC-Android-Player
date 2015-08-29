@@ -45,7 +45,7 @@ public class TrackInfo {
         this.track = "";
         this.djName = "";
     }
-	
+
 	public String getDjName() {
 		return this.djName;
 	}
