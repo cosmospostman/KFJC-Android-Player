@@ -6,6 +6,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -25,8 +26,8 @@ public class LavaLampActivity extends Activity {
 		setContentView(R.layout.activity_lavaplayer);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().setFlags(
-				WindowManager.LayoutParams.FLAG_FULLSCREEN, 
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         surfaceView = (SurfaceView) findViewById(R.id.lavaSurfaceView);
         surfaceHolder = surfaceView.getHolder();
@@ -44,6 +45,13 @@ public class LavaLampActivity extends Activity {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {}
+        });
+
+        surfaceView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
         });
     }
 

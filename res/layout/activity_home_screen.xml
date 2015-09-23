@@ -30,7 +30,7 @@
         
         <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginLeft="60dp"
             android:layout_marginRight="60dp"
@@ -40,6 +40,7 @@
 		        android:id="@+id/logo"
 		        android:layout_width="wrap_content"
 		        android:layout_height="fill_parent"
+                android:layout_centerHorizontal="true"
 		        android:src="@drawable/radiodevil"
         		tools:ignore="ContentDescription" />
                 
@@ -77,7 +78,7 @@
                 android:layout_marginRight="16dp"
                 android:src="@drawable/ic_volume_up_white_48dp"
                 android:layout_toLeftOf="@+id/playstopbutton"
-                android:layout_centerVertical="true"
+                android:layout_marginTop="8dp"
                 app:fabSize="mini"
                 app:borderWidth="0dp"
                 app:backgroundTint="@color/kfjc_mute"
