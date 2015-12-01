@@ -21,3 +21,7 @@ Throw all you can at it:
  - Interaction with other audio apps: make/take calls, play music from other apps, use spoken map directions while streaming
 
 Please report any crashes or behavior that's strange or unexpected.
+
+Build
+-----
+./gradlew build
