@@ -1,6 +1,6 @@
 KFJC-Android-Player
 ===================
-This app streams the mp3 netcast from kfjc.org, a college radio station in Los Altos Hills, California, USA. It's really just UI around the Android MediaPlayer library.
+This app streams the mp3 netcast from kfjc.org, a college radio station in Los Altos Hills, California, USA. It's really just UI around ExoPlayer.
 
 Features:
  - MP3 Streaming!
@@ -24,4 +24,6 @@ Please report any crashes or behavior that's strange or unexpected.
 
 Build
 -----
-./gradlew build
+0. export ANDROID_HOME='path/to/android/sdk'
+1. ./gradlew build
+2. find apks in build/outputs/apk/
