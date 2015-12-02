@@ -122,19 +122,13 @@ public class StreamService extends Service {
         Notification n = NotificationUtil.bufferingNotification(context);
         startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
 
-        Uri streamUri = Uri.parse(streamUrl);
-        Allocator allocator = new DefaultAllocator(BUFFER_SEGMENT_SIZE);
-        DataSource dataSource = new DefaultUriDataSource(context, "kfjc4droid");
-        Extractor extractor = new Mp3Extractor();
-        if (streamUrl.toLowerCase().contains("aac")) {
-            extractor = new AdtsExtractor();
-        }
+        boolean isAacStream = streamUrl.toLowerCase().contains("aac");
         ExtractorSampleSource sampleSource = new ExtractorSampleSource(
-                streamUri,
-                dataSource,
-                allocator,
+                Uri.parse(streamUrl),
+                new DefaultUriDataSource(context, "kfjc4droid"),
+                new DefaultAllocator(BUFFER_SEGMENT_SIZE),
                 BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE,
-                extractor);
+                isAacStream ? new AdtsExtractor() : new Mp3Extractor());
 
         MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
                 null, true, new Handler(), eventListener);
