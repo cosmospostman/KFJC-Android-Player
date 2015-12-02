@@ -19,12 +19,9 @@ import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecTrackRenderer;
 import com.google.android.exoplayer.audio.AudioTrack;
-import com.google.android.exoplayer.extractor.Extractor;
 import com.google.android.exoplayer.extractor.ExtractorSampleSource;
 import com.google.android.exoplayer.extractor.mp3.Mp3Extractor;
 import com.google.android.exoplayer.extractor.ts.AdtsExtractor;
-import com.google.android.exoplayer.upstream.Allocator;
-import com.google.android.exoplayer.upstream.DataSource;
 import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
