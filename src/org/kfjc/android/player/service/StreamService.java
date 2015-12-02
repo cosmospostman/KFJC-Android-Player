@@ -123,7 +123,7 @@ public class StreamService extends Service {
         startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
 
         Uri streamUri = Uri.parse(streamUrl);
-        Allocator allocator = new DefaultAllocator(BUFFER_SEGMENT_SIZE * 128);
+        Allocator allocator = new DefaultAllocator(BUFFER_SEGMENT_SIZE);
         DataSource dataSource = new DefaultUriDataSource(context, "kfjc4droid");
         Extractor extractor = new Mp3Extractor();
         if (streamUrl.toLowerCase().contains("aac")) {
@@ -132,9 +132,9 @@ public class StreamService extends Service {
         ExtractorSampleSource sampleSource = new ExtractorSampleSource(
                 streamUri,
                 dataSource,
-                extractor,
                 allocator,
-                BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE * 128);
+                BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE,
+                extractor);
 
         MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
                 null, true, new Handler(), eventListener);
