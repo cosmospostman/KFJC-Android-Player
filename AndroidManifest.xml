@@ -17,17 +17,29 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Kfjc">
-		
+
         <activity
-            android:name="org.kfjc.android.player.activity.HomeScreenActivity"
+            android:name="org.kfjc.android.player.activity.HomeScreenDrawerActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
+            android:theme="@style/KfjcCompat"
             android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--<activity-->
+            <!--android:name="org.kfjc.android.player.activity.HomeScreenActivity"-->
+            <!--android:label="@string/app_name"-->
+            <!--android:screenOrientation="portrait"-->
+            <!--android:launchMode="singleTop" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
         
         <activity
             android:name="org.kfjc.android.player.activity.LavaLampActivity"

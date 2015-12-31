@@ -1,17 +1,12 @@
-package org.kfjc.android.player.control;
+package org.kfjc.android.player.activity;
 
-import org.kfjc.android.player.dialog.SettingsDialog.StreamUrlPreferenceChangeHandler;
-import org.kfjc.android.player.activity.HomeScreenActivity;
-
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.os.Handler;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+
+import org.kfjc.android.player.dialog.SettingsDialog.StreamUrlPreferenceChangeHandler;
 
 public class EventHandlerFactory {
 
@@ -22,7 +17,7 @@ public class EventHandlerFactory {
 	 * done.
 	 */
 	static OnAudioFocusChangeListener onAudioFocusChange(
-			final HomeScreenControl control, final AudioManager audioManager) {
+			final HomeScreenInterface control, final AudioManager audioManager) {
 		return new OnAudioFocusChangeListener() {
 			
 			private int volumeBeforeLoss;
@@ -61,7 +56,7 @@ public class EventHandlerFactory {
      * Listen for telephone events. Stop playback if phone is in use; start it again when phone
      * is hung up.
      */
-    static PhoneStateListener onPhoneStateChange(final HomeScreenControl control) {
+    static PhoneStateListener onPhoneStateChange(final HomeScreenInterface control) {
         return new PhoneStateListener() {
             private boolean isStoppedDueToPhone = false;
             @Override
@@ -89,14 +84,13 @@ public class EventHandlerFactory {
 	 * When the user changes stream quality preference, we should restart the stream if it's
 	 * currently playing.
 	 */
-	static StreamUrlPreferenceChangeHandler onUrlPreferenceChange(
-			final HomeScreenControl control, final HomeScreenActivity activity) {
-        final Handler handler = new Handler();
-		return new StreamUrlPreferenceChangeHandler() {	
+	public static StreamUrlPreferenceChangeHandler onUrlPreferenceChange(
+            final HomeScreenInterface activity) {
+		return new StreamUrlPreferenceChangeHandler() {
 			@Override public void onStreamUrlPreferenceChange() {
-				if (control.isStreamServicePlaying()) {
-					control.stopStream();
-                    control.playStream();
+				if (activity.isStreamServicePlaying()) {
+                    activity.stopStream();
+                    activity.playStream();
 				}
 			}
 		};

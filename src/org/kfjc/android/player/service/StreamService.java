@@ -25,7 +25,7 @@ import com.google.android.exoplayer.extractor.ts.AdtsExtractor;
 import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
-import org.kfjc.android.player.activity.HomeScreenActivity;
+import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.util.NotificationUtil;
 
 public class StreamService extends Service {
@@ -90,17 +90,17 @@ public class StreamService extends Service {
         }
     }
 
-    public HomeScreenActivity.PlayerState getPlayerState() {
+    public LiveStreamFragment.PlayerState getPlayerState() {
         if (player == null) {
-            return HomeScreenActivity.PlayerState.STOP;
+            return LiveStreamFragment.PlayerState.STOP;
         }
         if (player.getPlaybackState() == ExoPlayer.STATE_BUFFERING) {
-            return HomeScreenActivity.PlayerState.BUFFER;
+            return LiveStreamFragment.PlayerState.BUFFER;
         }
         if (player.getPlaybackState() == ExoPlayer.STATE_READY) {
-            return HomeScreenActivity.PlayerState.PLAY;
+            return LiveStreamFragment.PlayerState.PLAY;
         }
-        return HomeScreenActivity.PlayerState.STOP;
+        return LiveStreamFragment.PlayerState.STOP;
     }
 
     public boolean isPlaying() {

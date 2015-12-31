@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/livestream_fragment_layout"
+    android:baselineAligned="false"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
+        android:gravity="center_vertical" >
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/radiodevil_10"
+            tools:ignore="ContentDescription" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp">
+
+        <ImageView
+            android:background="@color/kfjc_transparent_black"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            tools:ignore="ContentDescription" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/playstopbutton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginRight="16dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_play_arrow_white_48dp"
+            app:borderWidth="0dp"
+            app:backgroundTint="@color/kfjc_red_solid"
+            app:rippleColor="@color/kfjc_mute"
+            app:elevation="2dp"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/settingsButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_volume_up_white_48dp"
+            android:layout_toLeftOf="@+id/playstopbutton"
+            android:layout_marginTop="8dp"
+            app:fabSize="mini"
+            app:borderWidth="0dp"
+            app:backgroundTint="@color/kfjc_mute"
+            app:rippleColor="@color/kfjc_mute"
+            app:elevation="2dp"
+            />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/nowPlayingContainer"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/kfjc_transparent_black"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_zero_margin" >
+
+        <!-- TODO(mlj): collpase this view -->
+
+        <TextView
+            android:id="@+id/currentTrack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-thin"
+            android:textColor="#ffffff"
+            android:textSize="16sp" />
+    </LinearLayout>
+</LinearLayout>

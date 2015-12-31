@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
-import org.kfjc.android.player.activity.HomeScreenActivity;
+import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.model.TrackInfo;
 import org.kfjc.android.player.R;
@@ -48,7 +48,7 @@ public class NotificationUtil {
     public static Notification kfjcNotification(Context context, String title, String text) {
         PendingIntent kfjcPlayerIntent = PendingIntent.getActivity(
                 context, 0,
-                new Intent(context, HomeScreenActivity.class),
+                new Intent(context, HomeScreenDrawerActivity.class),
                 Notification.FLAG_ONGOING_EVENT);
 
         return new NotificationCompat.Builder(context)
@@ -58,6 +58,7 @@ public class NotificationUtil {
                 .setOngoing(true)
                 .setWhen(0)
                 .setContentIntent(kfjcPlayerIntent)
+                .setPriority(Notification.PRIORITY_HIGH)
                 .build();
     }
 

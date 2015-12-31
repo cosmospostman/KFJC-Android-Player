@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.kfjc.android.player.control.HomeScreenControl;
+import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.R;
 
@@ -78,13 +78,13 @@ public class SettingsDialog extends DialogFragment {
 		public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
 			RadioButton radioButton = (RadioButton) radioGroup.findViewById(radioGroup.getCheckedRadioButtonId());
 			String val = radioButton.getText().toString();
-			HomeScreenControl.preferenceControl.setStreamNamePreference(val);
+			HomeScreenDrawerActivity.preferenceControl.setStreamNamePreference(val);
 		}
 	};
 	
 	private void initStreamOptions() {
 		radioGroup.removeAllViews();
-		streamNames = HomeScreenControl.preferenceControl.getStreamNames();
+		streamNames = HomeScreenDrawerActivity.preferenceControl.getStreamNames();
 		for (String stream : streamNames) {
 			RadioButton button = new RadioButton(context);
 		    button.setText(stream);

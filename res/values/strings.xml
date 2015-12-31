@@ -14,5 +14,8 @@
     <string name="artist_track_format"
         trabslation_description="String combining artist (%1s) and track (%2$s)">
          	%1$s - %2$s</string>
+    <string name="navigation_drawer_open">Open navigation</string>
+    <string name="navigation_drawer_close">Close navigation</string>
+    <string name="live_stream_fragment_title">KFJC Live Stream</string>
 
 </resources>

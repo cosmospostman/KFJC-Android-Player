@@ -39,12 +39,14 @@ repositories {
 }
 
 dependencies {
+    apply plugin: 'idea'
     compile 'com.android.support:design:22.2.1'
     compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.android.support:recyclerview-v7:+'
+    compile 'com.android.support:recyclerview-v7:22.2.1'
     compile 'com.google.android.exoplayer:exoplayer:r1.5.2'
-    apply plugin: 'idea'
+    compile 'com.android.support:support-v4:22.2.1'
 }
+
 
 android {
     compileSdkVersion 22
