@@ -8,9 +8,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,10 +30,8 @@ import org.kfjc.android.player.util.UiUtil;
 public class LiveStreamFragment extends Fragment {
 
     public enum State {
-        NEW_INSTANCE,
         LOADING_STREAMS,
         CONNECTED,
-        ERROR
     }
 
     public enum PlayerState {
@@ -44,12 +40,10 @@ public class LiveStreamFragment extends Fragment {
         BUFFER
     }
 
-    private State state;
     private HomeScreenInterface homeScreen;
     private PlaylistService playlistService;
     private Intent playlistServiceIntent;
     private StreamService streamService;
-    private Snackbar snackbarConnecting;
     private GraphicsUtil graphics;
 
     private TextView currentTrackTextView;
@@ -122,6 +116,7 @@ public class LiveStreamFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        homeScreen.setActionbarTitle(getString(R.string.live_stream_fragment_title));
         graphics = new GraphicsUtil(getResources());
         View view = inflater.inflate(R.layout.fragment_livestream, container, false);
         currentTrackTextView = (TextView) view.findViewById(R.id.currentTrack);
@@ -141,35 +136,18 @@ public class LiveStreamFragment extends Fragment {
             throw new ClassCastException(activity.getClass().getSimpleName() + " must implement "
                 + HomeScreenInterface.class.getSimpleName());
         }
-
-        homeScreen.setActionbarTitle(getString(R.string.live_stream_fragment_title));
     }
 
     public void setState(State state) {
-        this.state = state;
-        if (! isAdded()) {
+        if (!isAdded()) {
             return;
         }
         switch (state) {
-            case NEW_INSTANCE:
-                break;
             case LOADING_STREAMS:
-                snackbarConnecting = Snackbar.make(
-                        getView(),
-                        getString(R.string.status_connecting),
-                        Snackbar.LENGTH_INDEFINITE);
-                snackbarConnecting.show();
                 break;
             case CONNECTED:
-                if (snackbarConnecting != null) {
-                    snackbarConnecting.dismiss();
-                }
                 playStopButton.setEnabled(true);
                 settingsButton.setEnabled(true);
-                break;
-            case ERROR:
-                //TOAST
-//                statusMessageTextView.setText(R.string.status_not_connected);
                 break;
         }
     }
@@ -233,7 +211,7 @@ public class LiveStreamFragment extends Fragment {
 
     public void updateTrackInfo(TrackInfo nowPlaying) {
         if (nowPlaying.getCouldNotFetch()) {
-            setState(State.ERROR);
+            currentTrackTextView.setText(R.string.status_playlist_unavailable);
         } else {
             homeScreen.setActionbarTitle(nowPlaying.getDjName());
             currentTrackTextView.setText(nowPlaying.artistTrackHtml());

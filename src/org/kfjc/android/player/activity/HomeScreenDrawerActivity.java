@@ -9,12 +9,15 @@ import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -34,7 +37,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private ServiceConnection streamServiceConnection;
     private Intent streamServiceIntent;
 
-
     public static PreferenceControl preferenceControl;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -47,14 +49,17 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private SettingsDialog.StreamUrlPreferenceChangeHandler streamUrlPreferenceChangeListener;
     private PhoneStateListener phoneStateListener;
 
-
     private LiveStreamFragment liveStreamFragment;
+
+    private View view;
+    private Snackbar snackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         setContentView(R.layout.activity_home_screen_drawer);
+        view = findViewById(R.id.home_screen_main_content);
 
         setupDrawer();
         setupStreamService();
@@ -99,9 +104,13 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
 
         @Override
-        public void onError(String message) {
+        public void onError(String info) {
             stopStream();
-            liveStreamFragment.setState(LiveStreamFragment.State.ERROR);
+            String message = getString(R.string.error_generic);
+            if (info.contains("HttpDataSourceException")) {
+                message = getString(R.string.error_unable_to_connect);
+            }
+            snack(message, Snackbar.LENGTH_LONG);
         }
 
         @Override
@@ -121,7 +130,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private void setupStreams() {
         new AsyncTask<Void, Void, Void>() {
             @Override protected Void doInBackground(Void... unsedParams) {
-                preferenceControl = new PreferenceControl(getApplicationContext());
+                preferenceControl = new PreferenceControl(getApplicationContext(),
+                        HomeScreenDrawerActivity.this);
                 liveStreamFragment.setState(LiveStreamFragment.State.LOADING_STREAMS);
                 return null;
             }
@@ -227,6 +237,20 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public boolean isStreamServicePlaying() {
         return false;
+    }
+
+    @Override
+    public void snack(String message, int snackbarLength) {
+        snackDone();
+        snackbar = Snackbar.make(view, message, snackbarLength);
+        snackbar.show();
+    }
+
+    @Override
+    public void snackDone() {
+        if (snackbar != null) {
+            snackbar.dismiss();
+        }
     }
 
     private int getStatusBarHeight() {

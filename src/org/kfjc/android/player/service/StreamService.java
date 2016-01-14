@@ -183,7 +183,8 @@ public class StreamService extends Service {
 
         @Override
         public void onPlayerError(ExoPlaybackException e) {
-           mediaListener.onError(e.getMessage());
+            Log.e(TAG, "ExoPlaybackException: " + e.getMessage());
+            mediaListener.onError(e.getMessage());
         }
     };
 

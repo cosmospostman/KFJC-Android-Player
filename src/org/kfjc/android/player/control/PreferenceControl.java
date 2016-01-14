@@ -2,7 +2,6 @@ package org.kfjc.android.player.control;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,27 +10,39 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.kfjc.android.player.Constants;
+import org.kfjc.android.player.R;
+import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
+import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.util.HttpUtil;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.design.widget.Snackbar;
+import android.util.Log;
 
 public class PreferenceControl {
-	
+
+	private static final String TAG = PreferenceControl.class.getSimpleName();
 	private static final String PREFERENCE_KEY = "kfjc.preferences";
 	private static final String STREAM_PREFERENCE_KEY = "kfjc.preferences.streamname";
     private static final int PREFERENCE_MODE = Context.MODE_PRIVATE;
 	
 	private static SharedPreferences preferences;
 	private static Map<String, String> streamMap = new LinkedHashMap<String, String>();
-	
-	public PreferenceControl(Context context) {
+
+	private HomeScreenInterface activity;
+
+	public PreferenceControl(Context context, HomeScreenInterface activity) {
+		this.activity = activity;
 		preferences = context.getSharedPreferences(PREFERENCE_KEY, PREFERENCE_MODE);
 		loadStreams();
 	}
 	
 	private void loadStreams() {
 		try {
+			activity.snack(
+					activity.getString(R.string.status_connecting), Snackbar.LENGTH_INDEFINITE);
 			JSONArray streams = new JSONArray(getAvailableStreams());
 			for (int i = 0; i < streams.length(); i++) {
 				JSONObject stream = streams.getJSONObject(i);
@@ -39,8 +50,10 @@ public class PreferenceControl {
 				String url = stream.getString("url");
 				streamMap.put(name, url);
 			}
+			activity.snackDone();
 		} catch (JSONException e) {
-			streamMap = new HashMap<String, String>();
+			Log.e(TAG, "Caught exception parsing streams: " + e.getMessage());
+			streamMap = new LinkedHashMap<String, String>();
 		}
 	}
 	
@@ -48,7 +61,10 @@ public class PreferenceControl {
         try {
             return HttpUtil.getUrl(Constants.AVAILABLE_STREAMS_URL);
         } catch (IOException e) {
-            return Constants.FALLBACK_STREAM_JSON;
+			activity.snack(
+					activity.getString(R.string.status_default_stream), Snackbar.LENGTH_LONG);
+			Log.e(TAG, "Using fallback stream");
+			return Constants.FALLBACK_STREAM_JSON;
         }
 	}
 	
