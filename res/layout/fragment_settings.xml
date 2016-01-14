@@ -9,27 +9,29 @@
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">      
+        android:layout_height="wrap_content">
 		<ImageView
 	        android:id="@+id/volumeIcon"
 	        android:src="@drawable/ic_volume_up_white_36dp"
-	        android:layout_width="36dp"
-	        android:layout_height="36dp"
+	        android:layout_width="24dp"
+	        android:layout_height="24dp"
 	        android:layout_alignParentLeft="true" />
 	    <SeekBar
 	        android:id="@+id/volumeSeekBar"
 	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content" 
-	    	android:layout_toRightOf="@+id/volumeIcon" />
-	    <RadioGroup
-	        android:id="@+id/streamPreferenceRadioGroup"
-	    	android:layout_width="fill_parent"
-	    	android:layout_height="wrap_content"
-	    	android:layout_below="@+id/volumeSeekBar"
-	    	android:layout_marginTop="8dp"
-	   		android:orientation="vertical">
-		</RadioGroup>
+	        android:layout_height="wrap_content"
+	    	android:layout_toRightOf="@+id/volumeIcon"
+			android:layout_centerVertical="true"/>
+	</RelativeLayout>
+
+	<RadioGroup
+		android:id="@+id/streamPreferenceRadioGroup"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/volumeSeekBar"
+		android:layout_marginTop="24dp"
+		android:orientation="vertical">
+	</RadioGroup>
         
-    </RelativeLayout>
 
 </LinearLayout>

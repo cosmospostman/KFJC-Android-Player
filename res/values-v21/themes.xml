@@ -1,22 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Kfjc" parent="android:Theme.Holo.NoActionBar">
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-
-        <item name="android:colorPrimary">@color/kfjc_red_solid</item>
-        <item name="android:colorPrimaryDark">@color/kfjc_transparent_black</item>
-        <item name="android:colorAccent">@color/kfjc_mute</item>
-    </style>
-
     <style name="KfjcCompat" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@color/kfjc_transparent_black</item>
-
-        <item name="android:colorPrimary">@color/kfjc_red_solid</item>
-        <item name="android:colorPrimaryDark">@color/kfjc_transparent_black</item>
-        <item name="android:colorAccent">@color/kfjc_mute</item>
     </style>
 
 </resources>
