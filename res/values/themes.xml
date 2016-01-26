@@ -5,6 +5,7 @@
     <color name="kfjc_mute">#2e3436</color>
     <color name="kfjc_transparent_black">#86000000</color>
     <color name="kfjc_button">#4DD0E1</color>
+    <color name="kfjc_list_selection">#E0E0E0</color>
     	    
     <style name="Kfjc" parent="Theme.AppCompat.NoActionBar">
    		<item name="android:windowBackground">@color/black</item>

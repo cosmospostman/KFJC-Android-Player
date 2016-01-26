@@ -11,6 +11,12 @@
     <string name="error_generic">Oh no! Something went wrong</string>
     <string name="error_unable_to_connect">Oh no! Can\'t connect to KFJC</string>
 
+    <string name="fragment_title_stream">KFJC Live Stream</string>
+    <string name="fragment_title_playlist">Playlists</string>
+
+    <string name="nav_livestream">Live stream</string>
+    <string name="nav_playlists">Playlists</string>
+
     <string name="ok">OK</string>
     <string name="empty_string"></string>
     <string name="buffering_format"
@@ -21,6 +27,5 @@
          	%1$s - %2$s</string>
     <string name="navigation_drawer_open">Open navigation</string>
     <string name="navigation_drawer_close">Close navigation</string>
-    <string name="live_stream_fragment_title">KFJC Live Stream</string>
 
 </resources>

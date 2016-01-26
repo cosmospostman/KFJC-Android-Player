@@ -75,52 +75,12 @@
                 android:text="KFJC Radio"/>
 
         </RelativeLayout>
-        
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp">
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_radio_black_24dp"
-                android:layout_marginLeft="16dp"
-                android:alpha="0.54"
-                android:layout_centerVertical="true" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="72dp"
-                android:textColor="#000000"
-                android:alpha="0.87"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="14sp"
-                android:text="Live stream"/>
-        </RelativeLayout>
 
-        <RelativeLayout
+        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/navlist"
             android:layout_width="match_parent"
-            android:layout_height="48dp">
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_book_black_24dp"
-                android:layout_marginLeft="16dp"
-                android:alpha="0.54"
-                android:layout_centerVertical="true" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="72dp"
-                android:textColor="#000000"
-                android:alpha="0.87"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="14sp"
-                android:text="Playlists"/>
-        </RelativeLayout>
-
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"/>
 
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

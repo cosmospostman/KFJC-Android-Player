@@ -116,7 +116,7 @@ public class LiveStreamFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        homeScreen.setActionbarTitle(getString(R.string.live_stream_fragment_title));
+        homeScreen.setActionbarTitle(getString(R.string.fragment_title_stream));
         graphics = new GraphicsUtil(getResources());
         View view = inflater.inflate(R.layout.fragment_livestream, container, false);
         currentTrackTextView = (TextView) view.findViewById(R.id.currentTrack);
@@ -186,7 +186,11 @@ public class LiveStreamFragment extends Fragment {
     }
 
     public void setState(PlayerState state) {
+        //TODO: save and restore state on pause/resume?
         playerState = state;
+        if (!this.isResumed()) {
+            return;
+        }
         switch(state) {
             case STOP:
                 graphics.bufferDevil(radioDevil, false);

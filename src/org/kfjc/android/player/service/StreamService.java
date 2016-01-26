@@ -17,6 +17,7 @@ import android.util.Log;
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
+import com.google.android.exoplayer.MediaCodecSelector;
 import com.google.android.exoplayer.MediaCodecTrackRenderer;
 import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.extractor.ExtractorSampleSource;
@@ -128,7 +129,7 @@ public class StreamService extends Service {
                 isAacStream ? new AdtsExtractor() : new Mp3Extractor());
 
         MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
-                null, true, new Handler(), eventListener);
+                MediaCodecSelector.DEFAULT);
 
         player.prepare(audioRenderer);
         player.setPlayWhenReady(true);
@@ -187,26 +188,5 @@ public class StreamService extends Service {
             mediaListener.onError(e.getMessage());
         }
     };
-
-    MediaCodecAudioTrackRenderer.EventListener eventListener =
-            new MediaCodecAudioTrackRenderer.EventListener() {
-        @Override
-        public void onDecoderInitializationError(
-                MediaCodecTrackRenderer.DecoderInitializationException e) {}
-
-        @Override
-        public void onCryptoError(MediaCodec.CryptoException e) {}
-
-        @Override
-        public void onDecoderInitialized(
-                String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {}
-
-        @Override
-        public void onAudioTrackInitializationError(AudioTrack.InitializationException e) {}
-
-        @Override
-        public void onAudioTrackWriteError(AudioTrack.WriteException e) {}
-    };
-
 
 }
