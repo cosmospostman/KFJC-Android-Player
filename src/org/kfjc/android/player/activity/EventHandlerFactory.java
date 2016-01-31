@@ -79,21 +79,4 @@ public class EventHandlerFactory {
             }
         };
     }
-	
-	/**
-	 * When the user changes stream quality preference, we should restart the stream if it's
-	 * currently playing.
-	 */
-	public static StreamUrlPreferenceChangeHandler onUrlPreferenceChange(
-            final HomeScreenInterface activity) {
-		return new StreamUrlPreferenceChangeHandler() {
-			@Override public void onStreamUrlPreferenceChange() {
-				if (activity.isStreamServicePlaying()) {
-                    activity.stopStream();
-                    activity.playStream();
-				}
-			}
-		};
-	}
-
 }

@@ -6,19 +6,15 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.media.AudioManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.Snackbar;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -28,6 +24,8 @@ import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.fragment.PlaylistFragment;
+import org.kfjc.android.player.model.TrackInfo;
+import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.GraphicsUtil;
 import org.kfjc.android.player.util.NotificationUtil;
@@ -55,6 +53,12 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private PlaylistFragment playlistFragment;
     private ListView navigationListView;
 
+    private ServiceConnection playlistServiceConnection;
+    private PlaylistService playlistService;
+    private Intent playlistServiceIntent;
+
+
+
     private View view;
     private Snackbar snackbar;
 
@@ -79,6 +83,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setContentView(R.layout.activity_home_screen_drawer);
         view = findViewById(R.id.home_screen_main_content);
 
+        setupPlaylistService();
+        streamServiceIntent = new Intent(this, StreamService.class);
+        startService(streamServiceIntent);
+
         this.liveStreamFragment = new LiveStreamFragment();
         this.playlistFragment = new PlaylistFragment();
 
@@ -86,10 +94,36 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupStreamService();
         setupListenersAndManagers();
 
-        streamServiceIntent = new Intent(this, StreamService.class);
-        startService(streamServiceIntent);
-
         loadFragment(0);
+    }
+
+    private void setupPlaylistService() {
+        if (playlistServiceConnection == null) {
+            playlistServiceConnection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    PlaylistService.PlaylistBinder binder = (PlaylistService.PlaylistBinder) service;
+                    playlistService = binder.getService();
+                    playlistService.start();
+                    playlistService.registerPlaylistCallback(new PlaylistService.PlaylistCallback() {
+                        @Override
+                        public void onTrackInfoFetched(TrackInfo trackInfo) {
+                            liveStreamFragment.updateTrackInfo(trackInfo);
+                            if (streamService != null && streamService.isPlaying()) {
+                                notificationUtil.updateNowPlayNotification(trackInfo);
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName name) {}
+            };
+        }
+
+        playlistServiceIntent = new Intent(this, PlaylistService.class);
+        startService(playlistServiceIntent);
+        this.notificationUtil = new NotificationUtil(this);
     }
 
     private void setupStreamService() {
@@ -112,11 +146,14 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     private StreamService.MediaListener mediaEventHandler = new StreamService.MediaListener() {
         @Override
-        public void onBuffer() {}
+        public void onBuffer() {
+            liveStreamFragment.setState(LiveStreamFragment.PlayerState.BUFFER);
+        }
 
         @Override
         public void onPlay() {
             liveStreamFragment.setState(LiveStreamFragment.PlayerState.PLAY);
+            notificationUtil.updateNowPlayNotification(playlistService.getLastFetchedTrackInfo());
         }
 
         @Override
@@ -143,21 +180,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         this.phoneStateListener = EventHandlerFactory.onPhoneStateChange(this);
     }
 
-    private void setupStreams() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override protected Void doInBackground(Void... unsedParams) {
-                preferenceControl = new PreferenceControl(getApplicationContext(),
-                        HomeScreenDrawerActivity.this);
-                liveStreamFragment.setState(LiveStreamFragment.State.LOADING_STREAMS);
-                return null;
-            }
-
-            @Override protected void onPostExecute(Void aVoid) {
-                liveStreamFragment.setState(LiveStreamFragment.State.CONNECTED);
-            }
-        }.execute();
-    }
-
     private void setupDrawer() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationListView = (ListView) findViewById(R.id.navlist);
@@ -169,8 +191,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         navigationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                loadFragment(position);
                 drawerLayout.closeDrawers();
+                loadFragment(position);
             }
         });
         navigationListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -199,6 +221,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.home_screen_main_fragment, liveStreamFragment)
                         .commit();
+                // streamService is null while still connecting at application launch
+                if (streamService != null) {
+                    liveStreamFragment.setState(streamService.getPlayerState());
+                }
                 break;
             case PLAYLIST:
                 getSupportFragmentManager().beginTransaction()
@@ -217,12 +243,16 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     protected void onPause() {
         super.onPause();
+        if (!isStreamServicePlaying()) {
+            playlistService.stop();
+        }
         isForegroundActivity = false;
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        bindService(playlistServiceIntent, playlistServiceConnection, Context.BIND_AUTO_CREATE);
         bindService(streamServiceIntent, streamServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -230,16 +260,22 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     protected void onStop() {
         super.onStop();
         unbindService(streamServiceConnection);
+        unbindService(playlistServiceConnection);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        setupStreams();
+        preferenceControl = new PreferenceControl(getApplicationContext(),
+                HomeScreenDrawerActivity.this);
         isForegroundActivity = true;
         int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         ImageView backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
         backgroundImageView.setImageResource(GraphicsUtil.imagesOfTheHour[hourOfDay]);
+
+        if (playlistService != null) {
+            playlistService.start();
+        }
     }
 
     @Override
@@ -260,7 +296,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN);
         streamService.play(getApplicationContext(), PreferenceControl.getUrlPreference());
-        liveStreamFragment.setState(LiveStreamFragment.PlayerState.BUFFER);
     }
 
     @Override
@@ -270,8 +305,13 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         audioManager.abandonAudioFocus(audioFocusListener);
         notificationUtil.cancelNowPlayNotification();
         if (!isForegroundActivity) {
-            liveStreamFragment.stopPlaylistService();
+            playlistService.stop();
         }
+    }
+
+    @Override
+    public void restartStream() {
+        streamService.reload(getApplicationContext(), PreferenceControl.getUrlPreference());
     }
 
     @Override
@@ -280,12 +320,13 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         notificationUtil.cancelNowPlayNotification();
         stopStream();
         stopService(streamServiceIntent);
+        stopService(playlistServiceIntent);
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
     }
 
     @Override
     public boolean isStreamServicePlaying() {
-        return false;
+        return streamService.isPlaying();
     }
 
     @Override
@@ -300,6 +341,14 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         if (snackbar != null) {
             snackbar.dismiss();
         }
+    }
+
+    @Override
+    public TrackInfo getLatestTrackInfo() {
+        if (playlistService == null) {
+            return new TrackInfo();
+        }
+        return playlistService.getLastFetchedTrackInfo();
     }
 
     private int getStatusBarHeight() {

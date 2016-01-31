@@ -1,12 +1,8 @@
 package org.kfjc.android.player.fragment;
 
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,23 +12,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.activity.EventHandlerFactory;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.activity.LavaLampActivity;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.TrackInfo;
-import org.kfjc.android.player.service.PlaylistService;
-import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.GraphicsUtil;
-import org.kfjc.android.player.util.NotificationUtil;
 import org.kfjc.android.player.util.UiUtil;
 
 public class LiveStreamFragment extends Fragment {
-
-    public enum State {
-        LOADING_STREAMS,
-        CONNECTED,
-    }
 
     public enum PlayerState {
         PLAY,
@@ -41,9 +28,6 @@ public class LiveStreamFragment extends Fragment {
     }
 
     private HomeScreenInterface homeScreen;
-    private PlaylistService playlistService;
-    private Intent playlistServiceIntent;
-    private StreamService streamService;
     private GraphicsUtil graphics;
 
     private TextView currentTrackTextView;
@@ -51,67 +35,7 @@ public class LiveStreamFragment extends Fragment {
     private FloatingActionButton settingsButton;
     private ImageView radioDevil;
 
-    private ServiceConnection playlistServiceConnection;
     private PlayerState playerState = PlayerState.STOP;
-    private NotificationUtil notificationUtil;
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (playlistServiceConnection == null) {
-            playlistServiceConnection = new ServiceConnection() {
-                @Override
-                public void onServiceConnected(ComponentName name, IBinder service) {
-                    PlaylistService.PlaylistBinder binder = (PlaylistService.PlaylistBinder) service;
-                    playlistService = binder.getService();
-                    playlistService.start();
-                    playlistService.registerPlaylistCallback(new PlaylistService.PlaylistCallback() {
-                        @Override
-                        public void onTrackInfoFetched(TrackInfo trackInfo) {
-                            updateTrackInfo(trackInfo);
-                            if (streamService != null && streamService.isPlaying()) {
-                                notificationUtil.updateNowPlayNotification(trackInfo);
-                            }
-                        }
-                    });
-                }
-
-                @Override
-                public void onServiceDisconnected(ComponentName name) {}
-            };
-        }
-
-        playlistServiceIntent = new Intent(getActivity(), PlaylistService.class);
-        getActivity().startService(playlistServiceIntent);
-        this.notificationUtil = new NotificationUtil(getActivity());
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        getActivity().bindService(playlistServiceIntent, playlistServiceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (playlistService != null) {
-            playlistService.start();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        getActivity().unbindService(playlistServiceConnection);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        getActivity().stopService(playlistServiceIntent);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -124,6 +48,9 @@ public class LiveStreamFragment extends Fragment {
         playStopButton = (FloatingActionButton) view.findViewById(R.id.playstopbutton);
         radioDevil = (ImageView) view.findViewById(R.id.logo);
         addButtonListeners();
+        updateTrackInfo(homeScreen.getLatestTrackInfo());
+        setState(playerState);
+
         return view;
     }
 
@@ -135,20 +62,6 @@ public class LiveStreamFragment extends Fragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.getClass().getSimpleName() + " must implement "
                 + HomeScreenInterface.class.getSimpleName());
-        }
-    }
-
-    public void setState(State state) {
-        if (!isAdded()) {
-            return;
-        }
-        switch (state) {
-            case LOADING_STREAMS:
-                break;
-            case CONNECTED:
-                playStopButton.setEnabled(true);
-                settingsButton.setEnabled(true);
-                break;
         }
     }
 
@@ -166,7 +79,6 @@ public class LiveStreamFragment extends Fragment {
                 }
             }
         });
-        playStopButton.setEnabled(false);
         radioDevil.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent fullscreenIntent = new Intent(getActivity(), LavaLampActivity.class);
@@ -175,7 +87,6 @@ public class LiveStreamFragment extends Fragment {
             }
         });
         radioDevil.setEnabled(false);
-        settingsButton.setEnabled(false);
         settingsButton.setOnTouchListener(UiUtil.buttonTouchListener);
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,9 +97,8 @@ public class LiveStreamFragment extends Fragment {
     }
 
     public void setState(PlayerState state) {
-        //TODO: save and restore state on pause/resume?
         playerState = state;
-        if (!this.isResumed()) {
+        if (!this.isAdded()) {
             return;
         }
         switch(state) {
@@ -203,7 +113,6 @@ public class LiveStreamFragment extends Fragment {
                 playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
                 radioDevil.setImageResource(graphics.radioDevilOn());
                 radioDevil.setEnabled(true);
-                notificationUtil.updateNowPlayNotification(playlistService.getLastFetchedTrackInfo());
                 break;
             case BUFFER:
                 graphics.bufferDevil(radioDevil, true);
@@ -214,6 +123,9 @@ public class LiveStreamFragment extends Fragment {
     }
 
     public void updateTrackInfo(TrackInfo nowPlaying) {
+        if (!isAdded()) {
+            return;
+        }
         if (nowPlaying.getCouldNotFetch()) {
             currentTrackTextView.setText(R.string.status_playlist_unavailable);
         } else {
@@ -222,14 +134,16 @@ public class LiveStreamFragment extends Fragment {
         }
     }
 
-    public void stopPlaylistService() {
-        playlistService.stop();
-    }
-
     public void showSettings() {
         SettingsDialog settingsFragment = new SettingsDialog();
         settingsFragment.setUrlPreferenceChangeHandler(
-                EventHandlerFactory.onUrlPreferenceChange(homeScreen));
+                new SettingsDialog.StreamUrlPreferenceChangeHandler() {
+            @Override public void onStreamUrlPreferenceChange() {
+                if (homeScreen.isStreamServicePlaying()) {
+                    homeScreen.restartStream();
+                }
+            }
+        });
         settingsFragment.show(getActivity().getFragmentManager(), "settings");
     }
 

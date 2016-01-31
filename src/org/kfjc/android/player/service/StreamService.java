@@ -7,10 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.media.MediaCodec;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -18,8 +16,6 @@ import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecSelector;
-import com.google.android.exoplayer.MediaCodecTrackRenderer;
-import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.extractor.ExtractorSampleSource;
 import com.google.android.exoplayer.extractor.mp3.Mp3Extractor;
 import com.google.android.exoplayer.extractor.ts.AdtsExtractor;
@@ -115,7 +111,9 @@ public class StreamService extends Service {
 	}
 
     public void play(Context context, String streamUrl) {
+        Log.i(TAG, "Playing stream " + streamUrl);
         player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
+        player.addListener(exoPlayerListener);
 
         Notification n = NotificationUtil.bufferingNotification(context);
         startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
@@ -133,21 +131,26 @@ public class StreamService extends Service {
 
         player.prepare(audioRenderer);
         player.setPlayWhenReady(true);
-        player.addListener(exoPlayerListener);
-
     }
 
 	public void stop() {
         if (player != null) {
             player.stop();
         }
-        unregisterRecievers();
+        unregisterReceivers();
         becomingNoisyReceiverRegistered = false;
         stopForeground(true);
         Log.i(TAG, "Service stopped");
 	}
 
-    private void unregisterRecievers() {
+    public void reload(Context context, String streamUrl) {
+        if (player != null) {
+            player.stop();
+        }
+        play(context, streamUrl);
+    }
+
+    private void unregisterReceivers() {
         try {
             if (becomingNoisyReceiverRegistered) {
                 unregisterReceiver(onAudioBecomingNoisyReceiver);
@@ -171,10 +174,15 @@ public class StreamService extends Service {
                 case ExoPlayer.STATE_PREPARING:
                     mediaListener.onBuffer();
                     break;
+                case ExoPlayer.STATE_BUFFERING:
+                    if (!isPlaying()) {
+                        mediaListener.onBuffer();
+                    }
+                    break;
                 case ExoPlayer.STATE_ENDED:
                 case ExoPlayer.STATE_IDLE:
                     mediaListener.onEnd();
-                    unregisterRecievers();
+                    unregisterReceivers();
                     break;
             }
         }

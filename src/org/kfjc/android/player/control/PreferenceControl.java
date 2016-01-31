@@ -1,25 +1,24 @@
 package org.kfjc.android.player.control;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.util.HttpUtil;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PreferenceControl {
 
@@ -29,14 +28,19 @@ public class PreferenceControl {
     private static final int PREFERENCE_MODE = Context.MODE_PRIVATE;
 	
 	private static SharedPreferences preferences;
-	private static Map<String, String> streamMap = new LinkedHashMap<String, String>();
+	private static Map<String, String> streamMap = new LinkedHashMap<>();
 
 	private HomeScreenInterface activity;
 
 	public PreferenceControl(Context context, HomeScreenInterface activity) {
 		this.activity = activity;
 		preferences = context.getSharedPreferences(PREFERENCE_KEY, PREFERENCE_MODE);
-		loadStreams();
+		new AsyncTask<Void, Void, Void>() {
+			@Override protected Void doInBackground(Void... unsedParams) {
+				loadStreams();
+				return null;
+			}
+		}.execute();
 	}
 	
 	private void loadStreams() {
@@ -53,7 +57,7 @@ public class PreferenceControl {
 			activity.snackDone();
 		} catch (JSONException e) {
 			Log.e(TAG, "Caught exception parsing streams: " + e.getMessage());
-			streamMap = new LinkedHashMap<String, String>();
+			streamMap = new LinkedHashMap<>();
 		}
 	}
 	
@@ -81,7 +85,7 @@ public class PreferenceControl {
     }
 	
 	public List<String> getStreamNames() {
-		return new ArrayList<String>(streamMap.keySet());
+		return new ArrayList<>(streamMap.keySet());
 	}
 	
 	public void setStreamNamePreference(String streamName) {
