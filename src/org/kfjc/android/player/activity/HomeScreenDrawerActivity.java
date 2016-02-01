@@ -57,8 +57,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private PlaylistService playlistService;
     private Intent playlistServiceIntent;
 
-
-
     private View view;
     private Snackbar snackbar;
 
@@ -261,6 +259,12 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         super.onStop();
         unbindService(streamServiceConnection);
         unbindService(playlistServiceConnection);
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Don't quit when back is pressed
+        moveTaskToBack(true);
     }
 
     @Override
