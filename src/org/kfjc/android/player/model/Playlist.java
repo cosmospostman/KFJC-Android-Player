@@ -12,6 +12,5 @@ public interface Playlist {
         String getTrack();
         String getArtist();
         String getAlbum();
-        String getLabel();
     }
 }

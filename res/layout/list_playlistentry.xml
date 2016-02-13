@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/ple_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:textColor="@color/kfjc_transparent_black"
+        android:textSize="10sp"
+        android:text="9:35p"/>
+
+    <TextView
+        android:id="@+id/ple_trackinfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-thin"
+        android:textColor="@color/black"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:textSize="14sp"
+        android:text="Prince Charming"/>
+
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:fontFamily="sans-serif-thin"-->
+        <!--android:textColor="@color/black"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:textSize="14sp"-->
+        <!--android:text="Beating of Black Wings Beneath The Water Line"/>-->
+
+</LinearLayout>
