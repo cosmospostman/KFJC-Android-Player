@@ -67,7 +67,7 @@ public class PlaylistJsonImpl implements Playlist{
             track = tryGetString(entry, 1);
             album = tryGetString(entry, 2);
             time = tryGetString(entry, 3);
-
+            time = time.replaceAll("\\sPM", "p").replaceAll("\\sAM", "a");
         }
 
         @Override

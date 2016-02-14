@@ -1,36 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/ple_time"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/ple_nonempty"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-light"
-        android:textColor="@color/kfjc_transparent_black"
-        android:textSize="10sp"
-        android:text="9:35p"/>
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/ple_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@color/kfjc_secondary_text"
+            android:textSize="10sp"/>
 
-    <TextView
-        android:id="@+id/ple_trackinfo"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/ple_trackinfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-thin"
+            android:textColor="@color/black"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/ple_empty"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-thin"
-        android:textColor="@color/black"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:textSize="14sp"
-        android:text="Prince Charming"/>
+        android:visibility="gone">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/kfjc_divider"/>
+    </FrameLayout>
 
-    <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:fontFamily="sans-serif-thin"-->
-        <!--android:textColor="@color/black"-->
-        <!--android:layout_marginStart="8dp"-->
-        <!--android:textSize="14sp"-->
-        <!--android:text="Beating of Black Wings Beneath The Water Line"/>-->
 
-</LinearLayout>
+</FrameLayout>

@@ -1,10 +1,12 @@
 package org.kfjc.android.player.fragment;
 
 import android.app.Activity;
+import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
@@ -13,6 +15,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.kfjc.android.player.Constants;
@@ -31,9 +37,8 @@ public class PlaylistFragment extends Fragment {
 
     private TextView djNameView;
     private TextView timestringView;
-    private RecyclerView playlistRecyclerView;
-    private RecyclerView.LayoutManager playlistRecyclerLayout;
-    private RecyclerView.Adapter playlistAdapter;
+    private LinearLayout playlistListView;
+    private ListAdapter playlistListAdapter;
 
     Playlist playlist;
 
@@ -56,12 +61,7 @@ public class PlaylistFragment extends Fragment {
 
         djNameView = (TextView) view.findViewById(R.id.pl_djname);
         timestringView = (TextView) view.findViewById(R.id.pl_timestring);
-        playlistRecyclerView = (RecyclerView) view.findViewById(R.id.playlist_recycler_view);
-        playlistRecyclerLayout = new LinearLayoutManager(getActivity());
-        playlistAdapter = new PlaylistAdapter();
-
-        playlistRecyclerView.setLayoutManager(playlistRecyclerLayout);
-        playlistRecyclerView.setAdapter(playlistAdapter);
+        playlistListView = (LinearLayout) view.findViewById(R.id.playlist_list_view);
 
         makeFetchTask().execute();
         return view;
@@ -84,8 +84,8 @@ public class PlaylistFragment extends Fragment {
                 playlist = fetchedPlaylist;
                 djNameView.setText(playlist.getDjName());
                 timestringView.setText(playlist.getTime());
-                playlistAdapter.notifyDataSetChanged();
-            }
+                PlaylistView.buildPlaylistLayout(getActivity(), playlistListView, fetchedPlaylist.getTrackEntries());
+             }
         };
     }
 
@@ -125,7 +125,7 @@ public class PlaylistFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            if (playlist == null) {
+            if (playlist == null || playlist.getTrackEntries() == null) {
                 return 0;
             }
             return playlist.getTrackEntries().size();
