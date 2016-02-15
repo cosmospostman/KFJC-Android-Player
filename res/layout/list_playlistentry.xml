@@ -1,47 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ple_nonempty"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:paddingRight="16dp"
+    android:paddingLeft="16dp"
+    android:paddingBottom="8dp"
+    android:paddingTop="8dp">
 
-    <LinearLayout
-        android:id="@+id/ple_nonempty"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/ple_time"
+        android:layout_column="0"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingBottom="8dp"
-        android:paddingTop="8dp"
-        android:visibility="gone">
-        <TextView
-            android:id="@+id/ple_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
-            android:textColor="@color/kfjc_secondary_text"
-            android:textSize="10sp"/>
+        android:fontFamily="sans-serif-light"
+        android:textColor="@color/kfjc_secondary_text"
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
+        android:textSize="10sp"/>
 
-        <TextView
-            android:id="@+id/ple_trackinfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-thin"
-            android:textColor="@color/black"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:textSize="14sp"/>
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/ple_empty"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/ple_trackinfo"
+        android:layout_column="1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone">
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/kfjc_divider"/>
-    </FrameLayout>
-
-
-</FrameLayout>
+        android:layout_weight="1"
+        android:fontFamily="sans-serif-thin"
+        android:textColor="@color/black"
+        android:textSize="14sp"/>
+</TableRow>

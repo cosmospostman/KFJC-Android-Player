@@ -38,7 +38,6 @@ public class PlaylistFragment extends Fragment {
     private TextView djNameView;
     private TextView timestringView;
     private LinearLayout playlistListView;
-    private ListAdapter playlistListAdapter;
 
     Playlist playlist;
 
@@ -88,48 +87,4 @@ public class PlaylistFragment extends Fragment {
              }
         };
     }
-
-    public class PlaylistItemViewHolder extends RecyclerView.ViewHolder {
-
-        private TextView timeView;
-        private TextView trackInfoView;
-        public PlaylistItemViewHolder(View itemView) {
-            super(itemView);
-            timeView = (TextView) itemView.findViewById(R.id.ple_time);
-            trackInfoView = (TextView) itemView.findViewById(R.id.ple_trackinfo);
-        }
-
-        public void bindPlaylistEntry(Playlist.PlaylistEntry entry) {
-            Spanned trackInfoSpan = Html.fromHtml(
-                    String.format("<b>%s</b> %s", entry.getArtist(), entry.getTrack()));
-            timeView.setText(entry.getTime());
-            trackInfoView.setText(trackInfoSpan);
-        }
-    }
-
-    public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistItemViewHolder> {
-
-        @Override
-        public PlaylistItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-            View view = layoutInflater.inflate(R.layout.list_playlistentry, parent, false);
-            return new PlaylistItemViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(PlaylistItemViewHolder holder, int position) {
-            int adapterPosition = holder.getAdapterPosition();
-            Playlist.PlaylistEntry entry = playlist.getTrackEntries().get(adapterPosition);
-            holder.bindPlaylistEntry(entry);
-        }
-
-        @Override
-        public int getItemCount() {
-            if (playlist == null || playlist.getTrackEntries() == null) {
-                return 0;
-            }
-            return playlist.getTrackEntries().size();
-        }
-    }
-
 }

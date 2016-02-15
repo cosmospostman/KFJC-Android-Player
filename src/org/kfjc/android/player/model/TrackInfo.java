@@ -77,7 +77,7 @@ public class TrackInfo {
      * Formatted string displayed in the main activity text view.
      */
     public android.text.Spanned artistTrackHtml() {
-        String spacer = artist.isEmpty() ? "" : "&nbsp&nbsp&nbsp<i>";
+        String spacer = artist.isEmpty() ? "" : "&nbsp&nbsp&nbsp";
         return Html.fromHtml(artist + spacer + "<i>" + track + "</i>");
     }
 

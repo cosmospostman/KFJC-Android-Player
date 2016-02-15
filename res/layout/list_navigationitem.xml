@@ -9,7 +9,6 @@
         android:id="@+id/navlistitem_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@drawable/ic_radio_black_24dp"
         android:layout_marginLeft="16dp"
         android:alpha="0.54"
         android:layout_centerVertical="true" />
@@ -23,7 +22,6 @@
         android:textColor="#000000"
         android:alpha="0.87"
         android:fontFamily="sans-serif-medium"
-        android:textSize="14sp"
-        android:text="Live stream"/>
+        android:textSize="14sp"/>
 
 </RelativeLayout>

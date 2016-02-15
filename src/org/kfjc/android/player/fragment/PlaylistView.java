@@ -25,21 +25,22 @@ public class PlaylistView {
         }
         for (Playlist.PlaylistEntry e : entries) {
             LayoutInflater inflater = activity.getLayoutInflater();
-            View holderView = inflater.inflate(R.layout.list_playlistentry, null);
-            FrameLayout emptyGroup = (FrameLayout) holderView.findViewById(R.id.ple_empty);
-            LinearLayout nonemptyGroup = (LinearLayout) holderView.findViewById(R.id.ple_nonempty);
+            View holderView;
             if (isEmptyEntry(e)) {
-                emptyGroup.setVisibility(View.VISIBLE);
+                holderView = inflater.inflate(R.layout.list_playlistempty, null);
             } else {
-                nonemptyGroup.setVisibility(View.VISIBLE);
+                holderView = inflater.inflate(R.layout.list_playlistentry, null);
                 TextView timeView = (TextView) holderView.findViewById(R.id.ple_time);
                 TextView trackInfoView = (TextView) holderView.findViewById(R.id.ple_trackinfo);
-                timeView.setText(e.getTime());
+                if (!TextUtils.isEmpty(e.getTime())) {
+                    timeView.setText(e.getTime());
+                    timeView.setVisibility(View.VISIBLE);
+                }
+                String spacer = TextUtils.isEmpty(e.getArtist()) ? "" : " &nbsp ";
                 Spanned trackInfoSpan = Html.fromHtml(
-                        String.format("<b>%s</b> %s", e.getArtist(), e.getTrack()));
+                        String.format("<b>%s</b>%s%s", e.getArtist(), spacer, e.getTrack()));
                 trackInfoView.setText(trackInfoSpan);
             }
-
             layout.addView(holderView);
         }
     }
