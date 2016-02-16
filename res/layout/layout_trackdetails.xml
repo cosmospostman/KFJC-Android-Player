@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/kfjc_white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Reconsider need for linear layout -->
+
+    <TableLayout
+        android:shrinkColumns="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TableRow
+            android:id="@+id/trackdetails_artist_row"
+            style="@style/TrackDetailsRow">
+            <TextView
+                android:id="@+id/trackdetails_artist"
+                android:layout_column="0"
+                style="@style/TrackDetailsLabel"
+                android:text="Artist"/>
+            <TextView
+                android:id="@+id/trackdetails_artist_value"
+                android:layout_column="1"
+                android:textStyle="bold"
+                style="@style/TrackDetailsValue"/>
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/trackdetails_track_row"
+            style="@style/TrackDetailsRow">
+            <TextView
+                android:id="@+id/trackdetails_track"
+                android:layout_column="0"
+                style="@style/TrackDetailsLabel"
+                android:text="Track"/>
+            <TextView
+                android:id="@+id/trackdetails_track_value"
+                android:layout_column="1"
+                style="@style/TrackDetailsValue"/>
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/trackdetails_album_row"
+            style="@style/TrackDetailsRow">
+            <TextView
+                android:id="@+id/trackdetails_album"
+                android:layout_column="0"
+                style="@style/TrackDetailsLabel"
+                android:text="Album"/>
+            <TextView
+                android:id="@+id/trackdetails_album_value"
+                android:layout_column="1"
+                style="@style/TrackDetailsValue"/>
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/trackdetails_label_row"
+            style="@style/TrackDetailsRow">
+            <TextView
+                android:id="@+id/trackdetails_label"
+                android:layout_column="0"
+                style="@style/TrackDetailsLabel"
+                android:text="Label"/>
+            <TextView
+                android:id="@+id/trackdetails_label_value"
+                android:layout_column="1"
+                style="@style/TrackDetailsValue"/>
+        </TableRow>
+
+    </TableLayout>
+
+</LinearLayout>

@@ -6,7 +6,7 @@
     <color name="kfjc_transparent_black">#86000000</color>
     <color name="kfjc_secondary_text">#56000000</color>
     <color name="kfjc_divider">#E0E0E0</color>
-    <color name="kfjc_transparent_white">#FFFFFF</color>
+    <color name="kfjc_white">#FFFFFF</color>
     <color name="kfjc_button">#4DD0E1</color>
     <color name="kfjc_list_selection">#E0E0E0</color>
     <color name="kfjc_ripple">#d73032</color>

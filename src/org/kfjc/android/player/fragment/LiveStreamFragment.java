@@ -128,7 +128,7 @@ public class LiveStreamFragment extends Fragment {
         if (!isAdded()) {
             return;
         }
-        if (playlist.hasError()) {
+        if (playlist == null || playlist.hasError()) {
             currentTrackTextView.setText(R.string.status_playlist_unavailable);
         } else {
             homeScreen.setActionbarTitle(playlist.getDjName());

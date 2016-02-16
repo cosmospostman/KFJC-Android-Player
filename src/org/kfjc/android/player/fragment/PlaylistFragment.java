@@ -1,31 +1,23 @@
 package org.kfjc.android.player.fragment;
 
 import android.app.Activity;
-import android.graphics.Paint;
-import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Html;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
+import org.kfjc.android.player.dialog.SettingsDialog;
+import org.kfjc.android.player.dialog.TrackDetailsDialog;
 import org.kfjc.android.player.model.Playlist;
-import org.kfjc.android.player.model.PlaylistJsonImpl;
-import org.kfjc.android.player.util.HttpUtil;
 
 import java.util.List;
 
@@ -68,7 +60,7 @@ public class PlaylistFragment extends Fragment {
         if (!isAdded()) {
             return;
         }
-        if (playlist.hasError()) {
+        if (playlist == null || playlist.hasError()) {
             djNameView.setText(R.string.status_playlist_unavailable);
             return;
         }
@@ -84,13 +76,13 @@ public class PlaylistFragment extends Fragment {
         return s;
     }
 
-    public static void buildPlaylistLayout(
+    private void buildPlaylistLayout(
             Activity activity, LinearLayout layout, List<Playlist.PlaylistEntry> entries) {
         layout.removeAllViews();
         if (entries == null) {
             return;
         }
-        for (Playlist.PlaylistEntry e : entries) {
+        for (final Playlist.PlaylistEntry e : entries) {
             LayoutInflater inflater = activity.getLayoutInflater();
             View holderView;
             if (isEmptyEntry(e)) {
@@ -113,9 +105,21 @@ public class PlaylistFragment extends Fragment {
                         ssb.length(),
                         SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                 trackInfoView.setText(ssb);
+
+                holderView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showTrackDetails(e);
+                    }
+                });
             }
             layout.addView(holderView);
         }
+    }
+
+    private void showTrackDetails(Playlist.PlaylistEntry entry) {
+        TrackDetailsDialog detailsDialog = TrackDetailsDialog.newInstance(entry);
+        detailsDialog.show(getActivity().getFragmentManager(), "settings");
     }
 
     private static boolean isEmptyEntry(Playlist.PlaylistEntry e) {

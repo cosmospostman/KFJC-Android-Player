@@ -110,6 +110,11 @@ public class PlaylistJsonImpl implements Playlist{
         public String getAlbum() {
             return album;
         }
+
+        @Override
+        public String getLabel() {
+            return "";
+        }
     }
 
     private static String tryGetString(JSONArray array, int index) {
