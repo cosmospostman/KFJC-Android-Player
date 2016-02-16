@@ -40,7 +40,7 @@
                         android:id="@+id/pl_djname"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-thin"
+                        android:fontFamily="sans-serif-light"
                         android:textSize="24sp"
                         android:textColor="@color/black"
                         android:text="George Foothill"/>
@@ -50,8 +50,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-light"
-                        android:textSize="11sp"
-                        android:textColor="@color/kfjc_secondary_text"/>
+                        android:textSize="14sp"
+                        android:textColor="@color/black"/>
                 </LinearLayout>
 
                 <TableLayout

@@ -1,12 +1,18 @@
 package org.kfjc.android.player.fragment;
 
 import android.app.Activity;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,9 +68,20 @@ public class PlaylistFragment extends Fragment {
         if (!isAdded()) {
             return;
         }
-        djNameView.setText(playlist.getDjName());
-        timestringView.setText(playlist.getTime());
+        if (playlist.hasError()) {
+            djNameView.setText(R.string.status_playlist_unavailable);
+            return;
+        }
+        djNameView.setText(emptyDefault(playlist.getDjName()));
+        timestringView.setText(emptyDefault(playlist.getTime()));
         buildPlaylistLayout(getActivity(), playlistListView, playlist.getTrackEntries());
+    }
+
+    private static String emptyDefault(String s) {
+        if (s == null) {
+            return "";
+        }
+        return s;
     }
 
     public static void buildPlaylistLayout(
@@ -77,19 +94,25 @@ public class PlaylistFragment extends Fragment {
             LayoutInflater inflater = activity.getLayoutInflater();
             View holderView;
             if (isEmptyEntry(e)) {
-                holderView = inflater.inflate(R.layout.list_playlistempty, null);
+                holderView = inflater.inflate(R.layout.list_playlistempty, layout, false);
             } else {
-                holderView = inflater.inflate(R.layout.list_playlistentry, null);
+                holderView = inflater.inflate(R.layout.list_playlistentry, layout, false);
                 TextView timeView = (TextView) holderView.findViewById(R.id.ple_time);
                 TextView trackInfoView = (TextView) holderView.findViewById(R.id.ple_trackinfo);
                 if (!TextUtils.isEmpty(e.getTime())) {
                     timeView.setText(e.getTime());
                     timeView.setVisibility(View.VISIBLE);
                 }
-                String spacer = TextUtils.isEmpty(e.getArtist()) ? "" : " &nbsp ";
-                Spanned trackInfoSpan = Html.fromHtml(
-                        String.format("<b>%s</b>%s%s", e.getArtist(), spacer, e.getTrack()));
-                trackInfoView.setText(trackInfoSpan);
+
+                String spacer = TextUtils.isEmpty(e.getArtist()) ? "" : "  ";
+                SpannableStringBuilder ssb = new SpannableStringBuilder(
+                        e.getArtist() + spacer + e.getTrack());
+                ssb.setSpan(
+                        new TypefaceSpan("sans-serif-thin"),
+                        e.getArtist().length(),
+                        ssb.length(),
+                        SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+                trackInfoView.setText(ssb);
             }
             layout.addView(holderView);
         }
@@ -97,7 +120,7 @@ public class PlaylistFragment extends Fragment {
 
     private static boolean isEmptyEntry(Playlist.PlaylistEntry e) {
         return TextUtils.isEmpty(e.getAlbum())
-                && TextUtils.isDigitsOnly(e.getArtist())
+                && TextUtils.isEmpty(e.getArtist())
                 && TextUtils.isEmpty(e.getTime())
                 && TextUtils.isEmpty(e.getTrack());
     }

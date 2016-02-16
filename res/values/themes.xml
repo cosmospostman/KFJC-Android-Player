@@ -10,9 +10,9 @@
     <color name="kfjc_button">#4DD0E1</color>
     <color name="kfjc_list_selection">#E0E0E0</color>
     <color name="kfjc_ripple">#d73032</color>
-    	    
-    <style name="Kfjc" parent="Theme.AppCompat.NoActionBar">
-   		<item name="android:windowBackground">@color/black</item>
+
+    <style name="KfjcCompat" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@color/black</item>
     </style>
 	
 	<style name="Kfjc.LavaActivity" parent="@android:style/Theme.NoTitleBar.Fullscreen">

@@ -15,7 +15,7 @@
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
 
-    <!-- Your normal content view -->
+    <!-- Your normal content view. 24dp paddingTop for drawing under statusbar. -->
     <LinearLayout
         android:id="@+id/home_screen_main_content"
         android:layout_width="match_parent"

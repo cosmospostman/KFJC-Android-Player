@@ -100,7 +100,9 @@ public class PlaylistService extends Service {
     }
 
     private void onTrackInfoFetched(Playlist playlist) {
-        // TODO: consider doing nothing if new playlist has error
+        if (lastFetchedPlaylist != null && playlist.hasError()) {
+            return;
+        }
         if (playlistCallback != null) {
             lastFetchedPlaylist = playlist;
             playlistCallback.onPlaylistUpdate(playlist);
