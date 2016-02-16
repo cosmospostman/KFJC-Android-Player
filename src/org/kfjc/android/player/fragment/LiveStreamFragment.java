@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +17,7 @@ import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.activity.LavaLampActivity;
 import org.kfjc.android.player.dialog.SettingsDialog;
-import org.kfjc.android.player.model.TrackInfo;
+import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.util.GraphicsUtil;
 import org.kfjc.android.player.util.UiUtil;
 
@@ -48,7 +50,7 @@ public class LiveStreamFragment extends Fragment {
         playStopButton = (FloatingActionButton) view.findViewById(R.id.playstopbutton);
         radioDevil = (ImageView) view.findViewById(R.id.logo);
         addButtonListeners();
-        updateTrackInfo(homeScreen.getLatestTrackInfo());
+        updatePlaylist(homeScreen.getLatestPlaylist());
         setState(playerState);
 
         return view;
@@ -122,16 +124,21 @@ public class LiveStreamFragment extends Fragment {
         }
     }
 
-    public void updateTrackInfo(TrackInfo nowPlaying) {
+    public void updatePlaylist(Playlist playlist) {
         if (!isAdded()) {
             return;
         }
-        if (nowPlaying.getCouldNotFetch()) {
+        if (playlist.hasError()) {
             currentTrackTextView.setText(R.string.status_playlist_unavailable);
         } else {
-            homeScreen.setActionbarTitle(nowPlaying.getDjName());
-            currentTrackTextView.setText(nowPlaying.artistTrackHtml());
+            homeScreen.setActionbarTitle(playlist.getDjName());
+            currentTrackTextView.setText(artistTrackHtml(playlist.getLastTrackEntry()));
         }
+    }
+
+    private android.text.Spanned artistTrackHtml(Playlist.PlaylistEntry e) {
+        String spacer = TextUtils.isEmpty(e.getArtist()) ? "" : "&nbsp&nbsp&nbsp";
+        return Html.fromHtml(e.getArtist() + spacer + "<i>" + e.getTrack() + "</i>");
     }
 
     public void showSettings() {

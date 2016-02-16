@@ -1,7 +1,10 @@
 package org.kfjc.android.player.model;
 
+import android.text.TextUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.kfjc.android.player.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +19,19 @@ import java.util.List;
  */
 public class PlaylistJsonImpl implements Playlist{
 
+    boolean hasError;
     String djName;
     String timeString;
     List<PlaylistEntry> entries;
 
     public PlaylistJsonImpl(String jsonPlaylistString) {
         try {
+            if (TextUtils.isEmpty(jsonPlaylistString)) {
+                hasError = true;
+                djName = "";
+                timeString = "";
+                return;
+            }
             JSONArray jsonPlaylist = new JSONArray(jsonPlaylistString);
 
             JSONArray title = jsonPlaylist.getJSONArray(0);
@@ -34,10 +44,16 @@ public class PlaylistJsonImpl implements Playlist{
                 JSONArray jsonEntry = jsonEntries.getJSONArray(i);
                 entries.add(new PlaylistEntryJsonImpl(jsonEntry));
             }
-
+            hasError = false;
         } catch (JSONException e) {
             // Fuck
+            hasError = true;
         }
+    }
+
+    @Override
+    public boolean hasError() {
+        return hasError;
     }
 
     @Override
@@ -53,6 +69,11 @@ public class PlaylistJsonImpl implements Playlist{
     @Override
     public List<PlaylistEntry> getTrackEntries() {
         return entries;
+    }
+
+    @Override
+    public PlaylistEntry getLastTrackEntry() {
+        return entries.get(entries.size() - 1);
     }
 
     public class PlaylistEntryJsonImpl implements PlaylistEntry {

@@ -1,24 +1,17 @@
 package org.kfjc.android.player.fragment;
 
 import android.app.Activity;
-import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.OrientationHelper;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import org.kfjc.android.player.Constants;
@@ -26,8 +19,9 @@ import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
-import org.kfjc.android.player.model.TrackInfo;
 import org.kfjc.android.player.util.HttpUtil;
+
+import java.util.List;
 
 public class PlaylistFragment extends Fragment {
 
@@ -38,8 +32,6 @@ public class PlaylistFragment extends Fragment {
     private TextView djNameView;
     private TextView timestringView;
     private LinearLayout playlistListView;
-
-    Playlist playlist;
 
     @Override
     public void onAttach(Activity activity) {
@@ -62,29 +54,51 @@ public class PlaylistFragment extends Fragment {
         timestringView = (TextView) view.findViewById(R.id.pl_timestring);
         playlistListView = (LinearLayout) view.findViewById(R.id.playlist_list_view);
 
-        makeFetchTask().execute();
+        updatePlaylist(homeScreen.getLatestPlaylist());
         return view;
     }
 
-    private AsyncTask<Void, Void, Playlist> makeFetchTask() {
-        return new AsyncTask<Void, Void, Playlist>() {
-            protected Playlist doInBackground(Void... unusedParams) {
-                Log.i(TAG, "Fetching playlist");
-                try {
-                    String jsonPlaylistString = HttpUtil.getUrl(Constants.PLAYLIST_URL);
-                    return new PlaylistJsonImpl(jsonPlaylistString);
-                } catch (Exception e) {
-                    Log.e(TAG, e.getMessage());
-                    return new PlaylistJsonImpl("");
-                }
-            }
+    public void updatePlaylist(Playlist playlist) {
+        if (!isAdded()) {
+            return;
+        }
+        djNameView.setText(playlist.getDjName());
+        timestringView.setText(playlist.getTime());
+        buildPlaylistLayout(getActivity(), playlistListView, playlist.getTrackEntries());
+    }
 
-            protected void onPostExecute(Playlist fetchedPlaylist) {
-                playlist = fetchedPlaylist;
-                djNameView.setText(playlist.getDjName());
-                timestringView.setText(playlist.getTime());
-                PlaylistView.buildPlaylistLayout(getActivity(), playlistListView, fetchedPlaylist.getTrackEntries());
-             }
-        };
+    public static void buildPlaylistLayout(
+            Activity activity, LinearLayout layout, List<Playlist.PlaylistEntry> entries) {
+        layout.removeAllViews();
+        if (entries == null) {
+            return;
+        }
+        for (Playlist.PlaylistEntry e : entries) {
+            LayoutInflater inflater = activity.getLayoutInflater();
+            View holderView;
+            if (isEmptyEntry(e)) {
+                holderView = inflater.inflate(R.layout.list_playlistempty, null);
+            } else {
+                holderView = inflater.inflate(R.layout.list_playlistentry, null);
+                TextView timeView = (TextView) holderView.findViewById(R.id.ple_time);
+                TextView trackInfoView = (TextView) holderView.findViewById(R.id.ple_trackinfo);
+                if (!TextUtils.isEmpty(e.getTime())) {
+                    timeView.setText(e.getTime());
+                    timeView.setVisibility(View.VISIBLE);
+                }
+                String spacer = TextUtils.isEmpty(e.getArtist()) ? "" : " &nbsp ";
+                Spanned trackInfoSpan = Html.fromHtml(
+                        String.format("<b>%s</b>%s%s", e.getArtist(), spacer, e.getTrack()));
+                trackInfoView.setText(trackInfoSpan);
+            }
+            layout.addView(holderView);
+        }
+    }
+
+    private static boolean isEmptyEntry(Playlist.PlaylistEntry e) {
+        return TextUtils.isEmpty(e.getAlbum())
+                && TextUtils.isDigitsOnly(e.getArtist())
+                && TextUtils.isEmpty(e.getTime())
+                && TextUtils.isEmpty(e.getTrack());
     }
 }

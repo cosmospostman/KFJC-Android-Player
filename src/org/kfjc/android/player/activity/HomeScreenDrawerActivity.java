@@ -24,7 +24,8 @@ import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.fragment.PlaylistFragment;
-import org.kfjc.android.player.model.TrackInfo;
+import org.kfjc.android.player.model.Playlist;
+import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.GraphicsUtil;
@@ -105,10 +106,11 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     playlistService.start();
                     playlistService.registerPlaylistCallback(new PlaylistService.PlaylistCallback() {
                         @Override
-                        public void onTrackInfoFetched(TrackInfo trackInfo) {
-                            liveStreamFragment.updateTrackInfo(trackInfo);
+                        public void onPlaylistUpdate(Playlist playlist) {
+                            liveStreamFragment.updatePlaylist(playlist);
+                            playlistFragment.updatePlaylist(playlist);
                             if (streamService != null && streamService.isPlaying()) {
-                                notificationUtil.updateNowPlayNotification(trackInfo);
+                                notificationUtil.updateNowPlayNotification(playlist);
                             }
                         }
                     });
@@ -151,7 +153,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         @Override
         public void onPlay() {
             liveStreamFragment.setState(LiveStreamFragment.PlayerState.PLAY);
-            notificationUtil.updateNowPlayNotification(playlistService.getLastFetchedTrackInfo());
+            notificationUtil.updateNowPlayNotification(playlistService.getPlaylist());
         }
 
         @Override
@@ -348,11 +350,11 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     }
 
     @Override
-    public TrackInfo getLatestTrackInfo() {
+    public Playlist getLatestPlaylist() {
         if (playlistService == null) {
-            return new TrackInfo();
+            return new PlaylistJsonImpl("");
         }
-        return playlistService.getLastFetchedTrackInfo();
+        return playlistService.getPlaylist();
     }
 
     private int getStatusBarHeight() {

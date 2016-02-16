@@ -6,10 +6,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 
 import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
 import org.kfjc.android.player.control.PreferenceControl;
-import org.kfjc.android.player.model.TrackInfo;
+import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.R;
 
 public class NotificationUtil {
@@ -25,17 +26,36 @@ public class NotificationUtil {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
-    public void updateNowPlayNotification(TrackInfo nowPlaying) {
-        if (nowPlaying.getCouldNotFetch()) {
+    public void updateNowPlayNotification(Playlist playlist) {
+        if (playlist.hasError()) {
             cancelNowPlayNotification();
             postNotification(
                     context.getString(R.string.app_name),
                     context.getString(R.string.empty_string));
         } else {
             postNotification(
-                    nowPlaying.getDjName(),
-                    nowPlaying.artistTrackStringNotification(context));
+                    playlist.getDjName(),
+                    artistTrackStringNotification(playlist.getLastTrackEntry()));
         }
+    }
+
+    private String artistTrackStringNotification(Playlist.PlaylistEntry e) {
+        String artistTrackString;
+        if (!TextUtils.isEmpty(e.getArtist()) && !TextUtils.isEmpty(e.getTrack()) ) {
+            // Both artist and track supplied
+            artistTrackString =
+                    context.getString(R.string.artist_track_format, e.getArtist(), e.getAlbum());
+        } else if (TextUtils.isEmpty(e.getArtist())) {
+            // Only track title
+            artistTrackString = e.getTrack();
+        } else if (TextUtils.isEmpty(e.getTrack())){
+            // Only artist
+            artistTrackString = e.getArtist();
+        } else {
+            // Neither artist nor track
+            artistTrackString = context.getString(R.string.empty_string);
+        }
+        return artistTrackString;
     }
 
     public static Notification bufferingNotification(Context context) {

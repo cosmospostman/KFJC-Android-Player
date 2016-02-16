@@ -1,6 +1,6 @@
 package org.kfjc.android.player.activity;
 
-import org.kfjc.android.player.model.TrackInfo;
+import org.kfjc.android.player.model.Playlist;
 
 public interface HomeScreenInterface {
     void setActionbarTitle(String title);
@@ -11,5 +11,5 @@ public interface HomeScreenInterface {
     String getString(int resId);
     void snack(String message, int duration);
     void snackDone();
-    TrackInfo getLatestTrackInfo();
+    Playlist getLatestPlaylist();
 }

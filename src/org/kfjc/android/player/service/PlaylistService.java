@@ -9,7 +9,8 @@ import android.os.IBinder;
 import android.util.Log;
 
 import org.kfjc.android.player.Constants;
-import org.kfjc.android.player.model.TrackInfo;
+import org.kfjc.android.player.model.Playlist;
+import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.util.HttpUtil;
 
 public class PlaylistService extends Service {
@@ -17,7 +18,7 @@ public class PlaylistService extends Service {
     private static final String TAG = PlaylistService.class.getSimpleName();
 
     public interface PlaylistCallback {
-        void onTrackInfoFetched(TrackInfo trackInfo);
+        void onPlaylistUpdate(Playlist playlist);
     }
 
     public class PlaylistBinder extends Binder {
@@ -27,7 +28,7 @@ public class PlaylistService extends Service {
     }
 
     private Handler handler = new Handler();
-    private TrackInfo lastFetchedTrackInfo;
+    private Playlist lastFetchedPlaylist;
     private PlaylistBinder binder = new PlaylistBinder();
     private PlaylistCallback playlistCallback;
     private boolean isStarted = false;
@@ -69,41 +70,40 @@ public class PlaylistService extends Service {
         isStarted = false;
     }
 
-    private AsyncTask<Void, Void, TrackInfo> makeFetchTask() {
-        return new AsyncTask<Void, Void, TrackInfo>() {
-            protected TrackInfo doInBackground(Void... unusedParams) {
+    private AsyncTask<Void, Void, Playlist> makeFetchTask() {
+        return new AsyncTask<Void, Void, Playlist>() {
+            protected Playlist doInBackground(Void... unusedParams) {
                 Log.i(TAG, "Fetching current track info");
                 try {
-                    return new TrackInfo(HttpUtil.getUrl(Constants.CURRENT_TRACK_URL));
+                    return new PlaylistJsonImpl(HttpUtil.getUrl(Constants.PLAYLIST_URL));
                 } catch (Exception e) {
                     Log.e(TAG, e.getMessage());
-                    return new TrackInfo();
+                    return new PlaylistJsonImpl("");
                 }
             }
 
-            protected void onPostExecute(TrackInfo nowPlaying) {
-                onTrackInfoFetched(nowPlaying);
+            protected void onPostExecute(Playlist playlist) {
+                onTrackInfoFetched(playlist);
             }
         };
     }
 
-    public TrackInfo getLastFetchedTrackInfo() {
-        return lastFetchedTrackInfo == null
-                ? new TrackInfo()
-                : lastFetchedTrackInfo;
+    public Playlist getPlaylist() {
+        return lastFetchedPlaylist;
     }
 
     public void registerPlaylistCallback(PlaylistCallback callback) {
         this.playlistCallback = callback;
-        if (lastFetchedTrackInfo != null) {
-            callback.onTrackInfoFetched(lastFetchedTrackInfo);
+        if (lastFetchedPlaylist != null) {
+            callback.onPlaylistUpdate(lastFetchedPlaylist);
         }
     }
 
-    private void onTrackInfoFetched(TrackInfo trackInfo) {
-        lastFetchedTrackInfo = trackInfo;
+    private void onTrackInfoFetched(Playlist playlist) {
+        // TODO: consider doing nothing if new playlist has error
         if (playlistCallback != null) {
-            playlistCallback.onTrackInfoFetched(trackInfo);
+            lastFetchedPlaylist = playlist;
+            playlistCallback.onPlaylistUpdate(playlist);
         }
     }
 }
