@@ -4,12 +4,15 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.SearchManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -17,6 +20,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import org.kfjc.android.player.R;
+import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.model.Playlist;
 
 public class TrackDetailsDialog extends DialogFragment {
@@ -28,6 +32,7 @@ public class TrackDetailsDialog extends DialogFragment {
     public static final String KEY_TRACK = "track";
 
     Context context;
+    HomeScreenInterface homeScreen;
 
     public static TrackDetailsDialog newInstance(Playlist.PlaylistEntry entry) {
         Bundle args = new Bundle();
@@ -49,6 +54,12 @@ public class TrackDetailsDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle bundle) {
+        try {
+            homeScreen = (HomeScreenInterface) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().getClass().getSimpleName()
+                    + " must implement " + HomeScreenInterface.class.getSimpleName());
+        }
         context = getActivity().getApplicationContext();
         if (bundle == null) {
             bundle = getArguments();
@@ -69,10 +80,11 @@ public class TrackDetailsDialog extends DialogFragment {
             setValueAndShow(view, R.id.trackdetails_label_row, R.id.trackdetails_label_value, labelString);
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                new ContextThemeWrapper(getActivity(), R.style.KfjcDialog));
         builder.setView(view)
-                .setNegativeButton("Send to", searchClicked)
-                .setPositiveButton("Search", searchClicked);
+                .setNegativeButton(R.string.dialog_copy, dialogExit)
+                .setPositiveButton(R.string.dialog_search, dialogExit);
         return builder.create();
     }
 
@@ -86,7 +98,7 @@ public class TrackDetailsDialog extends DialogFragment {
         valueView.setText(value);
     }
 
-    DialogInterface.OnClickListener searchClicked = new DialogInterface.OnClickListener() {
+    DialogInterface.OnClickListener dialogExit = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
             switch (which) {
@@ -107,7 +119,7 @@ public class TrackDetailsDialog extends DialogFragment {
         intent.setAction(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
         intent.putExtra(SearchManager.QUERY,
                 String.format("%s %s %s", artistString, trackString, albumString));
-        this.startActivity(intent);
+        tryStartActivity(intent);
     }
 
     private void sendTo() {
@@ -116,6 +128,15 @@ public class TrackDetailsDialog extends DialogFragment {
         sendIntent.putExtra(Intent.EXTRA_TEXT,
                 String.format("Heard it on KFJC: %s - %s (%s)", artistString, trackString, albumString));
         sendIntent.setType("text/plain");
-        startActivity(sendIntent);
+        tryStartActivity(sendIntent);
+    }
+
+    private void tryStartActivity(Intent intent) {
+        try {
+            startActivity(intent);
+        }
+        catch (ActivityNotFoundException e) {
+            homeScreen.snack(getString(R.string.error_activity_not_found), Snackbar.LENGTH_SHORT);
+        }
     }
 }

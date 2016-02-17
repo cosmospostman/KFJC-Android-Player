@@ -25,16 +25,17 @@
             tools:ignore="ContentDescription" />
     </RelativeLayout>
 
-    <RelativeLayout
+    <android.support.design.widget.CoordinatorLayout
         android:id="@+id/buttonContainer"
         android:layout_width="fill_parent"
         android:layout_height="60dp">
 
         <ImageView
             android:background="@color/kfjc_transparent_black"
-            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="32dp"
+            app:layout_anchor="@id/buttonContainer"
+            app:layout_anchorGravity="bottom"
             tools:ignore="ContentDescription" />
 
         <android.support.design.widget.FloatingActionButton
@@ -42,9 +43,10 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_marginRight="16dp"
-            android:layout_alignParentRight="true"
+            android:layout_marginBottom="4dp"
+            app:layout_anchor="@id/buttonContainer"
+            app:layout_anchorGravity="top|end"
             android:src="@drawable/ic_play_arrow_white_48dp"
-            app:borderWidth="0dp"
             app:backgroundTint="@color/kfjc_red_solid"
             app:rippleColor="@color/kfjc_mute"
             app:elevation="2dp"
@@ -54,17 +56,18 @@
             android:id="@+id/settingsButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginRight="88dp"
             android:src="@drawable/ic_volume_up_white_48dp"
-            android:layout_toLeftOf="@+id/playstopbutton"
+            app:layout_anchor="@id/playstopbutton"
+            app:layout_anchorGravity="center|start"
             android:layout_marginTop="8dp"
             app:fabSize="mini"
-            app:borderWidth="0dp"
             app:backgroundTint="@color/kfjc_mute"
             app:rippleColor="@color/kfjc_mute"
             app:elevation="2dp"
             />
-    </RelativeLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
 
     <LinearLayout
         android:id="@+id/nowPlayingContainer"

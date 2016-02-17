@@ -4,6 +4,9 @@
     <string name="app_name">KFJC</string>
     <string name="settings_dialog_title">Settings</string>
 
+    <string name="dialog_copy">Copy</string>
+    <string name="dialog_search">Search</string>
+
     <string name="status_connecting">Connecting to KFJC...</string>
     <string name="status_default_stream">Using default stream</string>
     <string name="status_playlist_unavailable">Playlist unavailable :\'(</string>
@@ -11,6 +14,7 @@
 
     <string name="error_generic">Oh no! Something went wrong</string>
     <string name="error_unable_to_connect">Oh no! Can\'t connect to KFJC</string>
+    <string name="error_activity_not_found">Oh no! Couldn\'t find a relevant app</string>
 
     <string name="fragment_title_stream">KFJC Live Stream</string>
     <string name="fragment_title_playlist">Playlist</string>

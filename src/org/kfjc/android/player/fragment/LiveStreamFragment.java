@@ -19,7 +19,6 @@ import org.kfjc.android.player.activity.LavaLampActivity;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.util.GraphicsUtil;
-import org.kfjc.android.player.util.UiUtil;
 
 public class LiveStreamFragment extends Fragment {
 
@@ -89,7 +88,6 @@ public class LiveStreamFragment extends Fragment {
             }
         });
         radioDevil.setEnabled(false);
-        settingsButton.setOnTouchListener(UiUtil.buttonTouchListener);
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {

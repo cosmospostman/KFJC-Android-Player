@@ -2,6 +2,7 @@
 
     <style name="AppTheme" parent="Base.AppTheme">
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="colorButtonNormal">@color/kfjc_red_solid</item>
     </style>
 
     <style name="Base.AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -10,6 +11,9 @@
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
         <item name="color">@android:color/white</item>
+    </style>
+
+    <style name="KfjcDialog" parent="@android:style/Theme.DeviceDefault.Light.Dialog">
     </style>
 
     <style name="TrackDetailsRow">
