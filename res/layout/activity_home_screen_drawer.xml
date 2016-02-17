@@ -41,46 +41,17 @@
     </LinearLayout>
 
     <!-- The navigation drawer -->
-    <LinearLayout android:id="@+id/left_drawer"
+    <android.support.design.widget.NavigationView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:orientation="vertical"
-        android:background="#eee">
+        android:id="@+id/nav_view"
+        app:headerLayout="@layout/drawer_header"
+        app:itemIconTint="@color/kfjc_icon_tint"
+        app:itemTextColor="@color/kfjc_navigation_text_color"
+        app:itemBackground="@drawable/navlist_selector"
+        android:background="@color/white"
+        app:menu="@menu/nav_menu"/>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="160dp">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/groove"/>
-
-            <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:paddingLeft="16dp"
-                android:paddingBottom="16dp"
-                android:layout_alignParentBottom="true"
-                android:textColor="@color/abc_primary_text_material_dark"
-                android:fontFamily="sans-serif-thin"
-                android:textSize="28sp"
-                android:background="@android:color/transparent"
-                android:text="KFJC Radio"/>
-
-        </RelativeLayout>
-
-        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/navlist"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"/>
-
-    </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

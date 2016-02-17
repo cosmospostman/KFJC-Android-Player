@@ -4,10 +4,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,10 +17,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
 
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
@@ -52,7 +53,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     private LiveStreamFragment liveStreamFragment;
     private PlaylistFragment playlistFragment;
-    private ListView navigationListView;
+    private NavigationView navigationView;
 
     private ServiceConnection playlistServiceConnection;
     private PlaylistService playlistService;
@@ -60,20 +61,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     private View view;
     private Snackbar snackbar;
-
-    public enum NavItem {
-        LIVESTREAM(R.drawable.ic_radio_black_24dp, R.string.nav_livestream),
-        PLAYLIST(R.drawable.ic_book_black_24dp, R.string.nav_playlists);
-        static final NavItem[] ORDER = new NavItem[] {LIVESTREAM, PLAYLIST};
-
-        int icon;
-        int label;
-
-        NavItem(int icon, int label) {
-            this.icon = icon;
-            this.label = label;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,21 +169,18 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     private void setupDrawer() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        navigationListView = (ListView) findViewById(R.id.navlist);
-        navigationListView.setVerticalFadingEdgeEnabled(true);
-
-        NavigationListAdapter adapter = new NavigationListAdapter(
-                getApplicationContext(), NavItem.ORDER);
-        navigationListView.setAdapter(adapter);
-        navigationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public boolean onNavigationItemSelected(MenuItem item) {
                 drawerLayout.closeDrawers();
-                loadFragment(position);
+                item.setChecked(true);
+                loadFragment(item.getItemId());
+                return false;
             }
         });
-        navigationListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        navigationListView.setItemChecked(0, true);
+        loadFragment(R.id.nav_livestream);
+        navigationView.setCheckedItem(R.id.nav_livestream);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.home_screen_toolbar);
         setSupportActionBar(toolbar);
@@ -212,23 +196,22 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         drawerLayout.setDrawerListener(drawerToggle);
     }
 
-    private void loadFragment(int navItemIndex) {
-        navigationListView.setSelection(navItemIndex);
-        NavItem navItem = NavItem.ORDER[navItemIndex];
-
-        switch (navItem) {
-            case LIVESTREAM:
+    private void loadFragment(int navItemId) {
+        switch (navItemId) {
+            case R.id.nav_livestream:
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.home_screen_main_fragment, liveStreamFragment)
+                        .addToBackStack(null)
                         .commit();
                 // streamService is null while still connecting at application launch
                 if (streamService != null) {
                     liveStreamFragment.setState(streamService.getPlayerState());
                 }
                 break;
-            case PLAYLIST:
+            case R.id.nav_playlist:
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.home_screen_main_fragment, playlistFragment)
+                        .addToBackStack(null)
                         .commit();
                 break;
         }
@@ -265,8 +248,14 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void onBackPressed() {
-        // Don't quit when back is pressed
-        moveTaskToBack(true);
+        // First transition was loading the first fragment.
+        // TODO: don't add first transition to stack.
+        if (getSupportFragmentManager().getBackStackEntryCount() > 1 ){
+            getSupportFragmentManager().popBackStack();
+        } else {
+            // Don't quit when back is pressed
+            moveTaskToBack(true);
+        }
     }
 
     @Override
@@ -278,10 +267,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         ImageView backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
         backgroundImageView.setImageResource(GraphicsUtil.imagesOfTheHour[hourOfDay]);
-
-        if (playlistService != null) {
-            playlistService.start();
-        }
     }
 
     @Override

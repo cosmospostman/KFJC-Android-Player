@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
     <color name="kfjc_red_solid">#d73032</color>
     <color name="kfjc_mute">#2e3436</color>
     <color name="kfjc_transparent_black">#86000000</color>
@@ -10,6 +11,8 @@
     <color name="kfjc_button">#4DD0E1</color>
     <color name="kfjc_list_selection">#E0E0E0</color>
     <color name="kfjc_ripple">#d73032</color>
+    <color name="kfjc_icon_tint">#8a000000</color>
+    <color name="kfjc_navigation_text_color">#de000000</color>
 
     <style name="KfjcCompat" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@color/black</item>

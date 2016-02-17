@@ -61,6 +61,9 @@ public class PlaylistService extends Service {
             Log.i(TAG, "Service (re)started");
             handler.postDelayed(fetchRunner, 0);
             isStarted = true;
+        } else {
+            Log.i(TAG, "Fetching track info once...");
+            makeFetchTask().execute();
         }
     }
 
