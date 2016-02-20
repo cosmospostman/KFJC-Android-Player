@@ -1,28 +1,27 @@
 package org.kfjc.android.player.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class HttpUtil {
 	
 	/**
 	 * Fetches a URL over HTTP and returns content as a String.
 	 */
-	public static String getUrl(String url) throws IOException {
-        InputStream inputStream;
+	public static String getUrl(String urlString) throws IOException {
+        URL url = new URL(urlString);
         String result = "";
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
-        inputStream = httpResponse.getEntity().getContent();
-        if (inputStream != null) {
-            result = convertInputStreamToString(inputStream);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        try {
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            result = convertInputStreamToString(in);
+        } finally {
+            urlConnection.disconnect();
         }
         return result;
     }
