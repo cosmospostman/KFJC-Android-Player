@@ -1,18 +1,24 @@
 package org.kfjc.android.player.activity;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.res.ColorStateList;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.PhoneStateListener;
@@ -36,16 +42,20 @@ import java.util.Calendar;
 
 public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeScreenInterface {
 
-    private boolean isForegroundActivity = false;
+    private static final String KEY_ACTIVE_FRAGMENT = "active-fragment";
+    private static final int KFJC_PERM_READ_PHONE_STATE = 0;
+
     private ServiceConnection streamServiceConnection;
+    private StreamService streamService;
     private Intent streamServiceIntent;
 
-    public static PreferenceControl preferenceControl;
-    private DrawerLayout drawerLayout;
-    private ActionBarDrawerToggle drawerToggle;
-    private StreamService streamService;
+    private ServiceConnection playlistServiceConnection;
+    private PlaylistService playlistService;
+    private Intent playlistServiceIntent;
 
+    public static PreferenceControl preferenceControl;
     private NotificationUtil notificationUtil;
+
     private AudioManager audioManager;
     private TelephonyManager telephonyManager;
     private AudioManager.OnAudioFocusChangeListener audioFocusListener;
@@ -54,13 +64,13 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private LiveStreamFragment liveStreamFragment;
     private PlaylistFragment playlistFragment;
     private NavigationView navigationView;
-
-    private ServiceConnection playlistServiceConnection;
-    private PlaylistService playlistService;
-    private Intent playlistServiceIntent;
-
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
     private View view;
     private Snackbar snackbar;
+
+    private boolean isForegroundActivity = false;
+    private int activeFragmentId = R.id.nav_livestream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +78,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         setContentView(R.layout.activity_home_screen_drawer);
         view = findViewById(R.id.home_screen_main_content);
+
+        if (savedInstanceState != null) {
+            activeFragmentId = savedInstanceState.getInt(KEY_ACTIVE_FRAGMENT);
+        }
 
         setupPlaylistService();
         streamServiceIntent = new Intent(this, StreamService.class);
@@ -79,8 +93,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupDrawer();
         setupStreamService();
         setupListenersAndManagers();
-
-        loadFragment(0);
     }
 
     private void setupPlaylistService() {
@@ -162,9 +174,71 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private void setupListenersAndManagers() {
         this.notificationUtil = new NotificationUtil(this);
         this.audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        this.telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+        maybeAddPhoneStateListener();
         this.audioFocusListener = EventHandlerFactory.onAudioFocusChange(this, audioManager);
-        this.phoneStateListener = EventHandlerFactory.onPhoneStateChange(this);
+    }
+
+    private void maybeAddPhoneStateListener() {
+        if (hasPhonePermission()) {
+            this.telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            this.phoneStateListener = EventHandlerFactory.onPhoneStateChange(this);
+            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+        } else {
+            requestPhonePermission();
+        }
+    }
+
+    private boolean hasPhonePermission() {
+        return ContextCompat.checkSelfPermission(
+                this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPhonePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.READ_PHONE_STATE)) {
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle(R.string.permission_phone);
+            alertDialog.setMessage(getString(R.string.permission_phone_rationale));
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok),
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            requestAndroidPhonePermissions();
+                        }
+                    });
+            alertDialog.show();
+        } else {
+            requestAndroidPhonePermissions();
+        }
+    }
+
+    private void requestAndroidPhonePermissions() {
+        ActivityCompat.requestPermissions(
+                HomeScreenDrawerActivity.this,
+                new String[]{Manifest.permission.READ_PHONE_STATE},
+                KFJC_PERM_READ_PHONE_STATE);
+    }
+
+    private boolean askPermissionsAgain = true;
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case KFJC_PERM_READ_PHONE_STATE:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Got permissions
+                    maybeAddPhoneStateListener();
+                } else {
+                    // Permission not granted
+                    if (askPermissionsAgain) {
+                        askPermissionsAgain = false;
+                        requestPhonePermission();
+                    }
+                }
+                return;
+        }
     }
 
     private void setupDrawer() {
@@ -179,8 +253,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 return false;
             }
         });
-        loadFragment(R.id.nav_livestream);
-        navigationView.setCheckedItem(R.id.nav_livestream);
+        loadFragment(activeFragmentId);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.home_screen_toolbar);
         setSupportActionBar(toolbar);
@@ -196,25 +269,31 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         drawerLayout.setDrawerListener(drawerToggle);
     }
 
+    public void setNavigationItemChecked(int navigationItemId) {
+        navigationView.setCheckedItem(navigationItemId);
+    }
+
     private void loadFragment(int navItemId) {
         switch (navItemId) {
             case R.id.nav_livestream:
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.home_screen_main_fragment, liveStreamFragment)
-                        .addToBackStack(null)
-                        .commit();
+                replaceFragment(liveStreamFragment);
                 // streamService is null while still connecting at application launch
                 if (streamService != null) {
                     liveStreamFragment.setState(streamService.getPlayerState());
                 }
                 break;
             case R.id.nav_playlist:
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.home_screen_main_fragment, playlistFragment)
-                        .addToBackStack(null)
-                        .commit();
+                replaceFragment(playlistFragment);
                 break;
         }
+        activeFragmentId = navItemId;
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.home_screen_main_fragment, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override
@@ -226,10 +305,16 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     protected void onPause() {
         super.onPause();
-        if (!isStreamServicePlaying()) {
+        if (!isStreamServicePlaying() && playlistService != null) {
             playlistService.stop();
         }
         isForegroundActivity = false;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(KEY_ACTIVE_FRAGMENT, activeFragmentId);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -248,8 +333,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void onBackPressed() {
-        // First transition was loading the first fragment.
-        // TODO: don't add first transition to stack.
+        // Don't pop back to no active fragment
         if (getSupportFragmentManager().getBackStackEntryCount() > 1 ){
             getSupportFragmentManager().popBackStack();
         } else {
@@ -312,11 +396,16 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         stopStream();
         stopService(streamServiceIntent);
         stopService(playlistServiceIntent);
-        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+        if (telephonyManager != null) {
+            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+        }
     }
 
     @Override
     public boolean isStreamServicePlaying() {
+        if (streamService == null) {
+            return false;
+        }
         return streamService.isPlaying();
     }
 
@@ -342,12 +431,4 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         return playlistService.getPlaylist();
     }
 
-    private int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
-    }
 }

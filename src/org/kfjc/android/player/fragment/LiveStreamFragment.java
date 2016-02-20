@@ -1,6 +1,7 @@
 package org.kfjc.android.player.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -42,6 +43,7 @@ public class LiveStreamFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_stream));
+        homeScreen.setNavigationItemChecked(R.id.nav_livestream);
         graphics = new GraphicsUtil(getResources());
         View view = inflater.inflate(R.layout.fragment_livestream, container, false);
         currentTrackTextView = (TextView) view.findViewById(R.id.currentTrack);
@@ -56,12 +58,12 @@ public class LiveStreamFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            homeScreen = (HomeScreenInterface) activity;
+            homeScreen = (HomeScreenInterface) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.getClass().getSimpleName() + " must implement "
+            throw new ClassCastException(context.getClass().getSimpleName() + " must implement "
                 + HomeScreenInterface.class.getSimpleName());
         }
     }

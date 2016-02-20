@@ -1,6 +1,7 @@
 package org.kfjc.android.player.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.SpannableString;
@@ -15,7 +16,6 @@ import android.widget.TextView;
 
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
-import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.dialog.TrackDetailsDialog;
 import org.kfjc.android.player.model.Playlist;
 
@@ -32,12 +32,12 @@ public class PlaylistFragment extends Fragment {
     private LinearLayout playlistListView;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            homeScreen = (HomeScreenInterface) activity;
+            homeScreen = (HomeScreenInterface) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.getClass().getSimpleName() + " must implement "
+            throw new ClassCastException(context.getClass().getSimpleName() + " must implement "
                     + HomeScreenInterface.class.getSimpleName());
         }
     }
@@ -46,6 +46,7 @@ public class PlaylistFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_playlist));
+        homeScreen.setNavigationItemChecked(R.id.nav_playlist);
         View view = inflater.inflate(R.layout.fragment_playlist, container, false);
 
         djNameView = (TextView) view.findViewById(R.id.pl_djname);

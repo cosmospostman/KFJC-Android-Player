@@ -12,4 +12,5 @@ public interface HomeScreenInterface {
     void snack(String message, int duration);
     void snackDone();
     Playlist getLatestPlaylist();
+    void setNavigationItemChecked(int navigationItemId);
 }
