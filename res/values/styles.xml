@@ -17,14 +17,13 @@
         <item name="colorPrimary">@color/kfjc_red_solid</item>
         <item name="colorPrimaryDark">@color/kfjc_transparent_black</item>
         <item name="colorAccent">@color/kfjc_red_solid</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
     <style name="TrackDetailsRow">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingRight">16dp</item>
-        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:paddingLeft">8dp</item>
         <item name="android:paddingBottom">4dp</item>
         <item name="android:paddingTop">4dp</item>
         <item name="android:visibility">gone</item>
@@ -46,7 +45,7 @@
         <item name="android:layout_weight">1</item>
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:textColor">@color/black</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
 </resources>

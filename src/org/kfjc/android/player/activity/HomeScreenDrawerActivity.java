@@ -277,6 +277,9 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         switch (navItemId) {
             case R.id.nav_livestream:
                 replaceFragment(liveStreamFragment);
+                if (playlistService != null) {
+                    liveStreamFragment.updatePlaylist(playlistService.getPlaylist());
+                }
                 // streamService is null while still connecting at application launch
                 if (streamService != null) {
                     liveStreamFragment.setState(streamService.getPlayerState());
@@ -284,6 +287,9 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 break;
             case R.id.nav_playlist:
                 replaceFragment(playlistFragment);
+                if (playlistService != null) {
+                    playlistFragment.updatePlaylist(playlistService.getPlaylist());
+                }
                 break;
         }
         activeFragmentId = navItemId;

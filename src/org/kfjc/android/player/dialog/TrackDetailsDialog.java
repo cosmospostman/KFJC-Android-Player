@@ -1,6 +1,5 @@
 package org.kfjc.android.player.dialog;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
@@ -10,8 +9,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ContextThemeWrapper;
 import android.text.TextUtils;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -80,8 +80,7 @@ public class TrackDetailsDialog extends KfjcDialog {
         builder.setView(view)
                 .setNegativeButton(R.string.dialog_copy, dialogExit)
                 .setPositiveButton(R.string.dialog_search, dialogExit);
-        AlertDialog dialog = builder.create();
-        return dialog;
+        return builder.create();
     }
 
     private void setValueAndShow(View view, int tableRowId, int tableValueId, String value) {
@@ -122,7 +121,7 @@ public class TrackDetailsDialog extends KfjcDialog {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT,
-                String.format("From KFJC: %s - %s (%s)", artistString, trackString, albumString));
+                context.getString(R.string.share_format, artistString, trackString, albumString));
         sendIntent.setType("text/plain");
         tryStartActivity(sendIntent);
     }

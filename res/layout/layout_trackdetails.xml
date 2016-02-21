@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingTop="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="0dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TableLayout
         android:shrinkColumns="1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
 
         <TableRow
             android:id="@+id/trackdetails_artist_row"
@@ -63,3 +69,4 @@
         </TableRow>
 
     </TableLayout>
+</LinearLayout>

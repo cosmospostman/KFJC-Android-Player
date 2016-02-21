@@ -39,24 +39,11 @@ public class SettingsDialog extends KfjcDialog {
 
     @Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-        themeWrapper = new ContextThemeWrapper(getActivity(), R.style.KfjcDialog);
         previousUrlPreference = PreferenceControl.getUrlPreference();
 
-		AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.KfjcDialog).create();
-        View view = View.inflate(themeWrapper, R.layout.fragment_settings, null);
+        themeWrapper = new ContextThemeWrapper(getActivity(), R.style.KfjcDialog);
+        View view = View.inflate(themeWrapper, R.layout.layout_settings, null);
 
-        dialog.setView(view);
-        dialog.setTitle(R.string.settings_dialog_title);
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.ok),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        boolean urlPreferenceChanged =
-                                !previousUrlPreference.equals(PreferenceControl.getUrlPreference());
-                        if (urlPreferenceChanged && urlPreferenceChangeHandler != null) {
-                            urlPreferenceChangeHandler.onStreamUrlPreferenceChange();
-                        }
-                    }
-                });
         spinner = (Spinner) view.findViewById(R.id.streamPreferenceSpinner);
         spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
@@ -66,11 +53,24 @@ public class SettingsDialog extends KfjcDialog {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
         initVolumeBar(view);
         initStreamOptions();
-        return dialog;
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity(), R.style.KfjcDialog);
+        dialog.setView(view);
+        dialog.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                boolean urlPreferenceChanged =
+                        !previousUrlPreference.equals(PreferenceControl.getUrlPreference());
+                if (urlPreferenceChanged && urlPreferenceChangeHandler != null) {
+                    urlPreferenceChangeHandler.onStreamUrlPreferenceChange();
+                }
+            }
+        });
+        return dialog.create();
 	}
 	
 	public void setUrlPreferenceChangeHandler(StreamUrlPreferenceChangeHandler handler) {
