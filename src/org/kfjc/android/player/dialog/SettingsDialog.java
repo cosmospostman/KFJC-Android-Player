@@ -11,11 +11,12 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ContextThemeWrapper;
 import android.view.View;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Spinner;
 
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
@@ -34,8 +35,7 @@ public class SettingsDialog extends DialogFragment {
 	private SeekBar volumeSeekbar;
     private AudioManager audioManager; 
     private List<String> streamNames;
-    private RadioGroup radioGroup;
-    private Map<String, Integer> streamNameToViewIdMap = new HashMap<String, Integer>();
+    private Spinner spinner;
     private String previousUrlPreference;
     private StreamUrlPreferenceChangeHandler urlPreferenceChangeHandler;
     private ContextThemeWrapper themeWrapper;
@@ -60,12 +60,17 @@ public class SettingsDialog extends DialogFragment {
                         }
                     }
                 });
-        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {}
-                });
-        radioGroup = (RadioGroup) view.findViewById(R.id.streamPreferenceRadioGroup);
-        radioGroup.setOnCheckedChangeListener(checkChanged);
+        spinner = (Spinner) view.findViewById(R.id.streamPreferenceSpinner);
+        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String val = (String) parent.getItemAtPosition(position);
+                HomeScreenDrawerActivity.preferenceControl.setStreamNamePreference(val);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
         initVolumeBar(view);
         initStreamOptions();
         return dialog;
@@ -74,30 +79,15 @@ public class SettingsDialog extends DialogFragment {
 	public void setUrlPreferenceChangeHandler(StreamUrlPreferenceChangeHandler handler) {
 		this.urlPreferenceChangeHandler = handler;
 	}
-	
-	OnCheckedChangeListener checkChanged = new OnCheckedChangeListener() {
-		@Override
-		public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-			RadioButton radioButton = (RadioButton) radioGroup.findViewById(radioGroup.getCheckedRadioButtonId());
-			String val = radioButton.getText().toString();
-			HomeScreenDrawerActivity.preferenceControl.setStreamNamePreference(val);
-		}
-	};
-	
+
 	private void initStreamOptions() {
-		radioGroup.removeAllViews();
 		streamNames = HomeScreenDrawerActivity.preferenceControl.getStreamNames();
-		for (String stream : streamNames) {
-			RadioButton button = new RadioButton(themeWrapper);
-		    button.setText(stream);
-		    radioGroup.addView(button);
-		    streamNameToViewIdMap.put(stream, button.getId());
-		}
-		
-		Integer selectedId = streamNameToViewIdMap.get(PreferenceControl.getStreamNamePreference());
-		if (selectedId != null) {
-			radioGroup.check(selectedId);
-		}
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(
+                themeWrapper, android.R.layout.simple_spinner_item, streamNames);
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerArrayAdapter);
+        int selectedIndex = streamNames.indexOf(PreferenceControl.getStreamNamePreference());
+        spinner.setSelection(Math.max(0, selectedIndex));
 	}
 	
 	private void initVolumeBar(View view) {

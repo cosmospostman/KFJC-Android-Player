@@ -163,7 +163,6 @@ public class StreamService extends Service {
     private ExoPlayer.Listener exoPlayerListener = new ExoPlayer.Listener() {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int state) {
-            Log.i(TAG, " " + state);
             switch (state) {
                 case ExoPlayer.STATE_READY:
                     if (playWhenReady) {
