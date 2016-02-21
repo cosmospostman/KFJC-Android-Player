@@ -151,7 +151,7 @@ public class LiveStreamFragment extends Fragment {
                 }
             }
         });
-        settingsFragment.show(getActivity().getFragmentManager(), "settings");
+        settingsFragment.show(getFragmentManager(), "settings");
     }
 
 }

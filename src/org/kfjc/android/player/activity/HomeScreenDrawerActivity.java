@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -197,7 +198,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private void requestPhonePermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.READ_PHONE_STATE)) {
-            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            AlertDialog alertDialog = new AlertDialog.Builder(this, R.style.KfjcDialog).create();
             alertDialog.setTitle(R.string.permission_phone);
             alertDialog.setMessage(getString(R.string.permission_phone_rationale));
             alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok),
@@ -253,7 +254,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 return false;
             }
         });
-        loadFragment(activeFragmentId);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.home_screen_toolbar);
         setSupportActionBar(toolbar);
@@ -267,6 +267,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
         drawerToggle.setDrawerIndicatorEnabled(true);
         drawerLayout.setDrawerListener(drawerToggle);
+        loadFragment(activeFragmentId);
     }
 
     public void setNavigationItemChecked(int navigationItemId) {

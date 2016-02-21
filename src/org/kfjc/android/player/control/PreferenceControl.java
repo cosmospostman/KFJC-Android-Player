@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -16,6 +17,7 @@ import org.kfjc.android.player.util.HttpUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,17 +73,39 @@ public class PreferenceControl {
 			return Constants.FALLBACK_STREAM_JSON;
         }
 	}
-	
+
+	private static Map.Entry<String, String> getFirstStream() {
+		Iterator<Map.Entry<String, String>> it = streamMap.entrySet().iterator();
+		if (it.hasNext()) {
+			return it.next();
+		}
+		return null;
+	}
+
 	public static String getStreamNamePreference() {
 		String pref = preferences.getString(STREAM_PREFERENCE_KEY, "");
-		if (pref == null || pref.isEmpty()) { return Constants.FALLBACK_STREAM_NAME; }
-		return pref;
+		// Stored preference still available
+		if (!TextUtils.isEmpty(pref)) {
+			if (streamMap.keySet().contains(pref)) {
+				return pref;
+			}
+		}
+		// Try first loaded stream, otherwise fallback.
+		Map.Entry<String, String> firstStream = getFirstStream();
+		return (firstStream == null) ? Constants.FALLBACK_STREAM_NAME : firstStream.getKey();
 	}
 	
 	public static String getUrlPreference() {
 		String pref = streamMap.get(getStreamNamePreference());
-        if (pref == null || pref.isEmpty()) { return Constants.FALLBACK_STREAM_URL; }
-        return pref;
+		// Stored preference still available
+		if (!TextUtils.isEmpty(pref)) {
+			if (streamMap.values().contains(pref)) {
+				return pref;
+			}
+		}
+		// Try first loaded stream, otherwise fallback.
+		Map.Entry<String, String> firstStream = getFirstStream();
+		return (firstStream == null) ? Constants.FALLBACK_STREAM_NAME : firstStream.getValue();
     }
 	
 	public List<String> getStreamNames() {

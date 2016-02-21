@@ -1,30 +1,29 @@
 package org.kfjc.android.player.dialog;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
-import org.kfjc.android.player.control.PreferenceControl;
-import org.kfjc.android.player.R;
-
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ContextThemeWrapper;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+
+import org.kfjc.android.player.R;
+import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
+import org.kfjc.android.player.control.PreferenceControl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SettingsDialog extends DialogFragment {
 	
@@ -34,39 +33,42 @@ public class SettingsDialog extends DialogFragment {
 	
 	private SeekBar volumeSeekbar;
     private AudioManager audioManager; 
-    private Context context;
     private List<String> streamNames;
     private RadioGroup radioGroup;
     private Map<String, Integer> streamNameToViewIdMap = new HashMap<String, Integer>();
     private String previousUrlPreference;
     private StreamUrlPreferenceChangeHandler urlPreferenceChangeHandler;
-	
-	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
-    	context = getActivity().getApplicationContext();
-    	previousUrlPreference = PreferenceControl.getUrlPreference();
-		
-	    LayoutInflater inflater = getActivity().getLayoutInflater();
-	    View view = inflater.inflate(R.layout.fragment_settings, new LinearLayout(context), false);
-		radioGroup = (RadioGroup) view.findViewById(R.id.streamPreferenceRadioGroup);
-		radioGroup.setOnCheckedChangeListener(checkChanged);
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-	    builder.setView(view);
-		builder.setTitle(R.string.settings_dialog_title);
-		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-	       public void onClick(DialogInterface dialog, int id) {
-	    	   boolean urlPreferenceChanged =
-	    	       !previousUrlPreference.equals(PreferenceControl.getUrlPreference());
-	    	   if (urlPreferenceChanged && urlPreferenceChangeHandler != null) {
-	    		   urlPreferenceChangeHandler.onStreamUrlPreferenceChange();
-	    	   }
-	       }
-		});
+    private ContextThemeWrapper themeWrapper;
 
-		initVolumeBar(view);
-		initStreamOptions();
-		return builder.create();
+    @Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+        themeWrapper = new ContextThemeWrapper(getActivity(), R.style.KfjcDialog);
+        previousUrlPreference = PreferenceControl.getUrlPreference();
+
+		AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.KfjcDialog).create();
+        View view = View.inflate(themeWrapper, R.layout.fragment_settings, null);
+
+        dialog.setView(view);
+        dialog.setTitle(R.string.settings_dialog_title);
+        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.ok),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        boolean urlPreferenceChanged =
+                                !previousUrlPreference.equals(PreferenceControl.getUrlPreference());
+                        if (urlPreferenceChanged && urlPreferenceChangeHandler != null) {
+                            urlPreferenceChangeHandler.onStreamUrlPreferenceChange();
+                        }
+                    }
+                });
+        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {}
+                });
+        radioGroup = (RadioGroup) view.findViewById(R.id.streamPreferenceRadioGroup);
+        radioGroup.setOnCheckedChangeListener(checkChanged);
+        initVolumeBar(view);
+        initStreamOptions();
+        return dialog;
 	}
 	
 	public void setUrlPreferenceChangeHandler(StreamUrlPreferenceChangeHandler handler) {
@@ -86,7 +88,7 @@ public class SettingsDialog extends DialogFragment {
 		radioGroup.removeAllViews();
 		streamNames = HomeScreenDrawerActivity.preferenceControl.getStreamNames();
 		for (String stream : streamNames) {
-			RadioButton button = new RadioButton(context);
+			RadioButton button = new RadioButton(themeWrapper);
 		    button.setText(stream);
 		    radioGroup.addView(button);
 		    streamNameToViewIdMap.put(stream, button.getId());

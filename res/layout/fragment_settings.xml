@@ -12,7 +12,7 @@
         android:layout_height="wrap_content">
 		<ImageView
 	        android:id="@+id/volumeIcon"
-	        android:src="@drawable/ic_volume_up_white_36dp"
+	        android:src="@drawable/ic_volume_up_black_36dp"
 	        android:layout_width="24dp"
 	        android:layout_height="24dp"
 	        android:layout_alignParentLeft="true" />
@@ -30,6 +30,7 @@
 		android:layout_height="wrap_content"
 		android:layout_below="@+id/volumeSeekBar"
 		android:layout_marginTop="24dp"
+		android:textColor="@android:color/black"
 		android:orientation="vertical">
 	</RadioGroup>
         
