@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SettingsDialog extends DialogFragment {
+public class SettingsDialog extends KfjcDialog {
 	
 	public interface StreamUrlPreferenceChangeHandler {
 		void onStreamUrlPreferenceChange();

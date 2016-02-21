@@ -44,7 +44,7 @@ public class NotificationUtil {
         if (!TextUtils.isEmpty(e.getArtist()) && !TextUtils.isEmpty(e.getTrack()) ) {
             // Both artist and track supplied
             artistTrackString =
-                    context.getString(R.string.artist_track_format, e.getArtist(), e.getAlbum());
+                    context.getString(R.string.artist_track_format, e.getArtist(), e.getTrack());
         } else if (TextUtils.isEmpty(e.getArtist())) {
             // Only track title
             artistTrackString = e.getTrack();

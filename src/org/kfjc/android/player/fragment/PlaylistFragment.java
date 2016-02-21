@@ -19,7 +19,9 @@ import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.dialog.TrackDetailsDialog;
 import org.kfjc.android.player.model.Playlist;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class PlaylistFragment extends Fragment {
 
@@ -120,7 +122,7 @@ public class PlaylistFragment extends Fragment {
 
     private void showTrackDetails(Playlist.PlaylistEntry entry) {
         TrackDetailsDialog detailsDialog = TrackDetailsDialog.newInstance(entry);
-        detailsDialog.show(getActivity().getFragmentManager(), "settings");
+        detailsDialog.show(getActivity().getSupportFragmentManager(), "settings");
     }
 
     private static boolean isEmptyEntry(Playlist.PlaylistEntry e) {

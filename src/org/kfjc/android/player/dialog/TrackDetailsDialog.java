@@ -2,7 +2,6 @@ package org.kfjc.android.player.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -13,9 +12,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.ContextThemeWrapper;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -23,7 +20,7 @@ import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.model.Playlist;
 
-public class TrackDetailsDialog extends DialogFragment {
+public class TrackDetailsDialog extends KfjcDialog {
 
     public static final String KEY_ALBUM = "album";
     public static final String KEY_ARTIST = "artist";
@@ -65,27 +62,26 @@ public class TrackDetailsDialog extends DialogFragment {
             bundle = getArguments();
         }
 
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.layout_trackdetails, new LinearLayout(context), false);
+        ContextThemeWrapper themeWrapper = new ContextThemeWrapper(getActivity(), R.style.KfjcDialog);
+        View view = View.inflate(themeWrapper, R.layout.layout_trackdetails, null);
 
         if (bundle != null) {
             artistString = bundle.getString(KEY_ARTIST);
             trackString = bundle.getString(KEY_TRACK);
             albumString = bundle.getString(KEY_ALBUM);
             labelString = bundle.getString(KEY_LABEL);
-
             setValueAndShow(view, R.id.trackdetails_artist_row, R.id.trackdetails_artist_value, artistString);
             setValueAndShow(view, R.id.trackdetails_track_row, R.id.trackdetails_track_value, trackString);
             setValueAndShow(view, R.id.trackdetails_album_row, R.id.trackdetails_album_value, albumString);
             setValueAndShow(view, R.id.trackdetails_label_row, R.id.trackdetails_label_value, labelString);
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(
-                new ContextThemeWrapper(getActivity(), R.style.KfjcDialog));
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.KfjcDialog);
         builder.setView(view)
                 .setNegativeButton(R.string.dialog_copy, dialogExit)
                 .setPositiveButton(R.string.dialog_search, dialogExit);
-        return builder.create();
+        AlertDialog dialog = builder.create();
+        return dialog;
     }
 
     private void setValueAndShow(View view, int tableRowId, int tableValueId, String value) {
@@ -118,7 +114,7 @@ public class TrackDetailsDialog extends DialogFragment {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setAction(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
         intent.putExtra(SearchManager.QUERY,
-                String.format("%s %s %s", artistString, trackString, albumString));
+                String.format("%s | %s | %s", artistString, trackString, albumString));
         tryStartActivity(intent);
     }
 
@@ -126,7 +122,7 @@ public class TrackDetailsDialog extends DialogFragment {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT,
-                String.format("Heard it on KFJC: %s - %s (%s)", artistString, trackString, albumString));
+                String.format("From KFJC: %s - %s (%s)", artistString, trackString, albumString));
         sendIntent.setType("text/plain");
         tryStartActivity(sendIntent);
     }

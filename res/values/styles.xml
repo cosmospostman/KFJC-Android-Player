@@ -17,6 +17,7 @@
         <item name="colorPrimary">@color/kfjc_red_solid</item>
         <item name="colorPrimaryDark">@color/kfjc_transparent_black</item>
         <item name="colorAccent">@color/kfjc_red_solid</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
     <style name="TrackDetailsRow">
