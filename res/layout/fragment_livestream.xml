@@ -69,7 +69,7 @@
             />
 
     </android.support.design.widget.CoordinatorLayout>
-    
+
     <TextView
         android:id="@+id/currentTrack"
         android:layout_width="match_parent"

@@ -2,11 +2,8 @@ package org.kfjc.android.player.activity;
 
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
-import android.os.Handler;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-
-import org.kfjc.android.player.dialog.SettingsDialog.StreamUrlPreferenceChangeHandler;
 
 public class EventHandlerFactory {
 

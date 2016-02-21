@@ -7,7 +7,6 @@ import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ContextThemeWrapper;
 import android.view.View;
@@ -22,9 +21,7 @@ import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
 import org.kfjc.android.player.control.PreferenceControl;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class SettingsDialog extends KfjcDialog {
 	
