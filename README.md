@@ -3,7 +3,7 @@ KFJC-Android-Player
 This app streams the mp3 netcast from kfjc.org, a college radio station in Los Altos Hills, California, USA. It's really just UI around ExoPlayer.
 
 Features:
- - MP3 Streaming!
+ - AAC and MP3 Streaming!
  - Updates current DJ/Artist/Track info from kfjc website
  - Moderately cool graphical effect during buffering
  - Fullscreen mode loops a trippy video (video not included in github repo)
@@ -27,3 +27,14 @@ Build
 0. export ANDROID_HOME='path/to/android/sdk'
 1. ./gradlew build
 2. find apks in build/outputs/apk/
+
+Changelog
+---------
+v3 (21 Feb 2016)
+ - Playlist view
+ - Drawer layout
+ - UI fixes for v16 devices
+ - Updated exoplayer
+ - Targets sdk23
+ - New Android 6 permissions
+ - HttpUrlConnection instead of Apache
