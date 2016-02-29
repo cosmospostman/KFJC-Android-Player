@@ -33,6 +33,8 @@ import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.fragment.PlaylistFragment;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
+import org.kfjc.android.player.model.Resources;
+import org.kfjc.android.player.model.ResourcesImpl;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.GraphicsUtil;
@@ -72,6 +74,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private boolean isForegroundActivity = false;
     private int activeFragmentId = R.id.nav_livestream;
 
+    private Resources resources;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +87,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             activeFragmentId = savedInstanceState.getInt(KEY_ACTIVE_FRAGMENT);
         }
 
+        resources = new ResourcesImpl();
         setupPlaylistService();
         streamServiceIntent = new Intent(this, StreamService.class);
         startService(streamServiceIntent);
@@ -437,4 +442,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         return playlistService.getPlaylist();
     }
 
+    @Override
+    public Resources getKfjcResources() {
+        return resources;
+    }
 }
