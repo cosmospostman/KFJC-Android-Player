@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -27,6 +28,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
@@ -37,7 +41,6 @@ import org.kfjc.android.player.model.Resources;
 import org.kfjc.android.player.model.ResourcesImpl;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
-import org.kfjc.android.player.util.GraphicsUtil;
 import org.kfjc.android.player.util.NotificationUtil;
 
 import java.util.Calendar;
@@ -87,7 +90,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             activeFragmentId = savedInstanceState.getInt(KEY_ACTIVE_FRAGMENT);
         }
 
-        resources = new ResourcesImpl();
+        resources = new ResourcesImpl(this);
         setupPlaylistService();
         streamServiceIntent = new Intent(this, StreamService.class);
         startService(streamServiceIntent);
@@ -359,9 +362,17 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         preferenceControl = new PreferenceControl(getApplicationContext(),
                 HomeScreenDrawerActivity.this);
         isForegroundActivity = true;
+        final ImageView backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
         int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        ImageView backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
-        backgroundImageView.setImageResource(GraphicsUtil.imagesOfTheHour[hourOfDay]);
+        Futures.addCallback(getKfjcResources().getBackgroundImage(hourOfDay), new FutureCallback<Drawable>() {
+            @Override
+            public void onSuccess(Drawable backgroundImage) {
+                backgroundImageView.setImageDrawable(backgroundImage);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {}
+        });
     }
 
     @Override

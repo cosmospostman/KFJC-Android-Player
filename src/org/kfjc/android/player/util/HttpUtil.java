@@ -1,5 +1,10 @@
 package org.kfjc.android.player.util;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,6 +29,20 @@ public class HttpUtil {
             urlConnection.disconnect();
         }
         return result;
+    }
+
+    /**
+     * Fetches a URL over HTTP and returns content as a String.
+     */
+    public static Drawable getDrawable(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        try {
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            return BitmapDrawable.createFromStream(in, "");
+        } finally {
+            urlConnection.disconnect();
+        }
     }
  
 	/**

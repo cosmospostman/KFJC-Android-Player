@@ -35,9 +35,7 @@ public class PreferenceControl {
 			@Override protected Void doInBackground(Void... unsedParams) {
 				try {
 					streamMap = activity.getKfjcResources().getStreams().get();
-				} catch (InterruptedException e) {
-					// TODO
-				} catch (ExecutionException e) {
+				} catch (InterruptedException | ExecutionException e) {
 					// TODO
 				}
 				return null;
