@@ -19,8 +19,10 @@ import org.kfjc.android.player.R;
 import org.kfjc.android.player.util.HttpUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
@@ -31,17 +33,7 @@ public class ResourcesImpl implements Resources {
     ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
     private Context context;
     private SettableFuture<Map<String, String>> streams;
-
-    private static final int[] imagesOfTheHour = new int[] {
-            R.drawable.b0, R.drawable.b0, R.drawable.b2,   // 0 1 2
-            R.drawable.b2, R.drawable.b4, R.drawable.b4,    // 3 4 5
-            R.drawable.b6, R.drawable.b6, R.drawable.b8,   // 6 7 8
-            R.drawable.b8, R.drawable.b10, R.drawable.b10,    // 9 10 11
-            R.drawable.b12, R.drawable.b12, R.drawable.b14,   // 12 13 14
-            R.drawable.b14, R.drawable.b16, R.drawable.b16,    // 15 16 17
-            R.drawable.b18, R.drawable.b18, R.drawable.b20,   // 18 19 20
-            R.drawable.b20, R.drawable.b22, R.drawable.b22     // 21 22 23
-    };
+    private List<String> backgroundsUrls;
 
     public ResourcesImpl(Context context) {
         this.context = context;
@@ -49,29 +41,38 @@ public class ResourcesImpl implements Resources {
 
         new AsyncTask<Void, Void, Void>() {
             @Override protected Void doInBackground(Void... unsedParams) {
-                loadStreams();
+                loadResources();
                 return null;
             }
         }.execute();
     }
 
-    private void loadStreams() {
+    private void loadResources() {
         try {
-            String availableStreams = HttpUtil.getUrl(Constants.AVAILABLE_STREAMS_URL);
-            JSONArray jsonStreams = new JSONArray(availableStreams);
+            String resourcesString = HttpUtil.getUrl(Constants.RESOURCES_URL);
+            JSONObject jResources = new JSONObject(resourcesString);
+
+            // Streams
+            JSONArray jStreams = jResources.getJSONArray("streams");
             Map<String, String> streamMap = new HashMap<>();
-            for (int i = 0; i < jsonStreams.length(); i++) {
-                JSONObject stream = jsonStreams.getJSONObject(i);
+            for (int i = 0; i < jStreams.length(); i++) {
+                JSONObject stream = jStreams.getJSONObject(i);
                 String name = stream.getString("name");
                 String url = stream.getString("url");
                 streamMap.put(name, url);
             }
             streams.set(streamMap);
-        } catch (JSONException e) {
+
+            // Backgrounds
+            JSONObject jDrawables = jResources.getJSONObject("drawables");
+            JSONArray jBackgrounds = jDrawables.getJSONArray("backgrounds");
+            backgroundsUrls = new ArrayList<>();
+            for (int i = 0; i < jBackgrounds.length(); i++) {
+                backgroundsUrls.add(jBackgrounds.getString(i));
+            }
+
+        } catch (JSONException | IOException e) {
             Log.e(TAG, "Caught exception parsing streams: " + e.getMessage());
-            streams.set(defaultStream());
-        } catch (IOException e) {
-            Log.e(TAG, "Caught exception getting streams: " + e.getMessage());
             streams.set(defaultStream());
         }
     };
@@ -92,8 +93,13 @@ public class ResourcesImpl implements Resources {
         return service.submit(new Callable<Drawable>() {
             @Override
             public Drawable call() throws Exception {
-//                return HttpUtil.getDrawable("http://kfjc.org/images/home_images_rotate/black_mountain.jpg");
-                return ContextCompat.getDrawable(context, imagesOfTheHour[hourOfDay]);
+                Drawable backgroundImage;
+                try {
+                    backgroundImage = HttpUtil.getDrawable(backgroundsUrls.get(hourOfDay));
+                } catch (IOException e) {
+                    backgroundImage = ContextCompat.getDrawable(context, R.drawable.default_background);
+                }
+                return backgroundImage;
             }
         });
 

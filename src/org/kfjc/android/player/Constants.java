@@ -6,7 +6,9 @@ public class Constants {
     public static final String PLAYLIST_URL = "http://kfjc.org/music/json-playlist.php"; //?i=50723
     public static final int CURRENT_TRACK_POLL_DELAY_MS = 30000;
 
+    // TODO: decommission once old clients upgrade.
     public static final String AVAILABLE_STREAMS_URL = "http://www.kfjc.org/netcast/streams.json";
+    public static final String RESOURCES_URL = "http://www.kfjc.org/api/resources.json";
     public static final String FALLBACK_STREAM_NAME = "Default stream, 128k mp3";
     public static final String FALLBACK_STREAM_URL = "http://netcast6.kfjc.org:80/";
 

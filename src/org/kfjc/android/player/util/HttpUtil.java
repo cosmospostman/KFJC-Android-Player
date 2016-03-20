@@ -37,6 +37,10 @@ public class HttpUtil {
     public static Drawable getDrawable(String urlString) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        int responseCode = urlConnection.getResponseCode();
+        if (responseCode != 200) {
+            throw new IOException(urlString + " got response code " + responseCode);
+        }
         try {
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             return BitmapDrawable.createFromStream(in, "");
