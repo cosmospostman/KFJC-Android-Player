@@ -18,7 +18,10 @@ import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.util.HttpUtil;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -34,6 +37,7 @@ public class ResourcesImpl implements Resources {
     private Context context;
     private SettableFuture<Map<String, String>> streams;
     private List<String> backgroundsUrls;
+    private String lavaUrl;
 
     public ResourcesImpl(Context context) {
         this.context = context;
@@ -68,8 +72,12 @@ public class ResourcesImpl implements Resources {
             JSONArray jBackgrounds = jDrawables.getJSONArray("backgrounds");
             backgroundsUrls = new ArrayList<>();
             for (int i = 0; i < jBackgrounds.length(); i++) {
-                backgroundsUrls.add(jBackgrounds.getString(i));
+
+//                backgroundsUrls.add(jBackgrounds.getString(i));
             }
+
+            // Lava
+            lavaUrl = jDrawables.getString("lava");
 
         } catch (JSONException | IOException e) {
             Log.e(TAG, "Caught exception parsing streams: " + e.getMessage());
@@ -93,15 +101,29 @@ public class ResourcesImpl implements Resources {
         return service.submit(new Callable<Drawable>() {
             @Override
             public Drawable call() throws Exception {
-                Drawable backgroundImage;
+                Drawable backgroundImage = ContextCompat.getDrawable(context, R.drawable.default_background);
                 try {
-                    backgroundImage = HttpUtil.getDrawable(backgroundsUrls.get(hourOfDay));
-                } catch (IOException e) {
-                    backgroundImage = ContextCompat.getDrawable(context, R.drawable.default_background);
-                }
+                    Drawable newBackgroundImage = HttpUtil.getDrawable(backgroundsUrls.get(hourOfDay));
+                    if (newBackgroundImage != null) {
+                        backgroundImage = newBackgroundImage;
+                    }
+                } catch (IOException e) {}
                 return backgroundImage;
             }
         });
+    }
 
+    @Override
+    public ListenableFuture<File> getLava() {
+        return service.submit(new Callable<File>() {
+            @Override
+            public File call() throws Exception {
+                File cacheDir = context.getCacheDir();
+                File lavaFile = new File(cacheDir, "lava.mp4");
+                HttpUtil.loadToFile(lavaUrl, lavaFile);
+
+                return lavaFile;
+            }
+        });
     }
 }

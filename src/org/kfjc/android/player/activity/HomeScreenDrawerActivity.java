@@ -41,6 +41,7 @@ import org.kfjc.android.player.model.Resources;
 import org.kfjc.android.player.model.ResourcesImpl;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
+import org.kfjc.android.player.util.HttpUtil;
 import org.kfjc.android.player.util.NotificationUtil;
 
 import java.util.Calendar;
@@ -90,6 +91,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             activeFragmentId = savedInstanceState.getInt(KEY_ACTIVE_FRAGMENT);
         }
 
+        HttpUtil.installCache(getApplicationContext());
         resources = new ResourcesImpl(this);
         setupPlaylistService();
         streamServiceIntent = new Intent(this, StreamService.class);
@@ -366,12 +368,18 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         Futures.addCallback(getKfjcResources().getBackgroundImage(hourOfDay), new FutureCallback<Drawable>() {
             @Override
-            public void onSuccess(Drawable backgroundImage) {
-                backgroundImageView.setImageDrawable(backgroundImage);
+            public void onSuccess(final Drawable backgroundImage) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        backgroundImageView.setImageDrawable(backgroundImage);
+                    }
+                });
             }
 
             @Override
-            public void onFailure(Throwable t) {}
+            public void onFailure(Throwable t) {
+            }
         });
     }
 
