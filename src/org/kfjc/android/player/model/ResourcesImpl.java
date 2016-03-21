@@ -72,8 +72,9 @@ public class ResourcesImpl implements Resources {
             JSONArray jBackgrounds = jDrawables.getJSONArray("backgrounds");
             backgroundsUrls = new ArrayList<>();
             for (int i = 0; i < jBackgrounds.length(); i++) {
-
-//                backgroundsUrls.add(jBackgrounds.getString(i));
+                if (!jBackgrounds.isNull(i)) {
+                    backgroundsUrls.add(jBackgrounds.getString(i));
+                }
             }
 
             // Lava
@@ -109,20 +110,6 @@ public class ResourcesImpl implements Resources {
                     }
                 } catch (IOException e) {}
                 return backgroundImage;
-            }
-        });
-    }
-
-    @Override
-    public ListenableFuture<File> getLava() {
-        return service.submit(new Callable<File>() {
-            @Override
-            public File call() throws Exception {
-                File cacheDir = context.getCacheDir();
-                File lavaFile = new File(cacheDir, "lava.mp4");
-                HttpUtil.loadToFile(lavaUrl, lavaFile);
-
-                return lavaFile;
             }
         });
     }

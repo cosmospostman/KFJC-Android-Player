@@ -11,5 +11,4 @@ import java.util.Map;
 public interface Resources {
     ListenableFuture<Map<String, String>> getStreams();
     ListenableFuture<Drawable> getBackgroundImage(int hourOfDay);
-    ListenableFuture<File> getLava();
 }
