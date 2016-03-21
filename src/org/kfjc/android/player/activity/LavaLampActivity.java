@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -29,6 +30,7 @@ public class LavaLampActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private ProgressBar progressBar;
     private View loadingView;
+    private DownloadTask downloadTask;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +50,7 @@ public class LavaLampActivity extends AppCompatActivity {
         surfaceHolder = surfaceView.getHolder();
         mediaPlayer = new MediaPlayer();
 
-        final DownloadTask downloadTask = new DownloadTask(LavaLampActivity.this);
+        downloadTask = new DownloadTask(LavaLampActivity.this);
         downloadTask.execute();
 
         surfaceView.setOnClickListener(new View.OnClickListener() {
@@ -62,6 +64,7 @@ public class LavaLampActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        downloadTask.cancel(true);
         mediaPlayer.stop();
         mediaPlayer.release();
     }
@@ -123,6 +126,7 @@ public class LavaLampActivity extends AppCompatActivity {
 
     private class DownloadTask extends AsyncTask<String, Integer, File> {
 
+        private final String TAG = DownloadTask.class.getSimpleName();
         private Context context;
         private PowerManager.WakeLock wakeLock;
 
@@ -131,19 +135,34 @@ public class LavaLampActivity extends AppCompatActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            // take CPU lock to prevent CPU from going off if the user
+            // presses the power button during download
+            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                    getClass().getName());
+            wakeLock.acquire();
+
+        }
+
+        @Override
         protected File doInBackground(String... unused) {
             try {
                 File cacheDir = getApplicationContext().getCacheDir();
-                File tempFile = cacheDir.createTempFile("lava", ".mp4.tmp");
-                final File lavaFile = new File(cacheDir, "lava.mp4");
-                if (lavaFile.exists()) {
+                File lavaFile = new File(cacheDir, "lava.mp4");
+                File lavaTempFile = new File(cacheDir, "lava.mp4.tmp");
+                if (lavaTempFile.exists()) {
+                    lavaTempFile.delete();
+                }
+                if (lavaFile.exists() && lavaFile.length() > 0) {
                     return lavaFile;
                 }
                 lavaFile.createNewFile();
 
                 URL url = new URL("http://www.kfjc.org/api/drawable/lavalamp.mp4");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                FileOutputStream fileOutput = new FileOutputStream(tempFile);
+                urlConnection.setUseCaches(false);
+                FileOutputStream fileOutput = new FileOutputStream(lavaTempFile);
                 int responseCode = urlConnection.getResponseCode();
                 int fileLength = urlConnection.getContentLength();
                 if (responseCode != 200) {
@@ -157,16 +176,18 @@ public class LavaLampActivity extends AppCompatActivity {
                     while ((bufferLength = bis.read(buffer)) > 0) {
                         fileOutput.write(buffer, 0, bufferLength);
                         totalLoaded += bufferLength;
-                        int progress = (int) (totalLoaded * 100 / fileLength);
+                        int progress = (totalLoaded * 100 / fileLength);
                         publishProgress(progress);
                     }
+                    lavaTempFile.renameTo(lavaFile);
+                    lavaTempFile.delete();
                 } finally {
                     fileOutput.close();
                     urlConnection.disconnect();
                 }
-                tempFile.renameTo(lavaFile);
                 return lavaFile;
-            } catch (IOException e) {
+            } catch (IOException ex) {
+                Log.e(TAG, ex.getMessage());
                 return null;
             }
         }
@@ -176,16 +197,6 @@ public class LavaLampActivity extends AppCompatActivity {
             progressBar.setIndeterminate(false);
             progressBar.setMax(100);
             progressBar.setProgress(progress[0]);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            // take CPU lock to prevent CPU from going off if the user
-            // presses the power button during download
-            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                    getClass().getName());
-            wakeLock.acquire();
         }
 
         @Override

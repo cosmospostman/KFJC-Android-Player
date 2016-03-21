@@ -27,6 +27,9 @@ public class NotificationUtil {
     }
 
     public void updateNowPlayNotification(Playlist playlist) {
+        if (playlist == null) {
+            return;
+        }
         if (playlist.hasError()) {
             cancelNowPlayNotification();
             postNotification(
