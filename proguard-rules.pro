@@ -5,3 +5,5 @@
     public static *** w(...);
     public static *** v(...);
 }
+
+-dontwarn com.google.common.***
