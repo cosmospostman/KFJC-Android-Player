@@ -38,8 +38,3 @@ v3 (21 Feb 2016)
  - Targets sdk23
  - New Android 6 permissions
  - HttpUrlConnection instead of Apache
-
- Todo
- ----
-  - Feedback: larger home screen track text
-  - Unplug headphone bug
