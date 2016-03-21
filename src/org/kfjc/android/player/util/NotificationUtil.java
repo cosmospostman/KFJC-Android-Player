@@ -65,7 +65,7 @@ public class NotificationUtil {
         return kfjcNotification(context,
                 context.getString(R.string.app_name),
                 context.getString(R.string.buffering_format,
-                        PreferenceControl.getStreamNamePreference()));
+                        PreferenceControl.getStreamPreference().name));
     }
 
     public static Notification kfjcNotification(Context context, String title, String text) {

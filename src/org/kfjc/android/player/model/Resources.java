@@ -5,10 +5,9 @@ import android.graphics.drawable.Drawable;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
-import java.io.File;
-import java.util.Map;
+import java.util.List;
 
 public interface Resources {
-    ListenableFuture<Map<String, String>> getStreams();
+    ListenableFuture<List<Stream>> getStreamsList();
     ListenableFuture<Drawable> getBackgroundImage(int hourOfDay);
 }

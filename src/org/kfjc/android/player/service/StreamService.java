@@ -23,6 +23,7 @@ import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
 import org.kfjc.android.player.fragment.LiveStreamFragment;
+import org.kfjc.android.player.model.Stream;
 import org.kfjc.android.player.util.NotificationUtil;
 
 public class StreamService extends Service {
@@ -110,7 +111,8 @@ public class StreamService extends Service {
 		this.mediaListener = listener;
 	}
 
-    public void play(Context context, String streamUrl) {
+    public void play(Context context, Stream stream) {
+        String streamUrl = stream.url;
         Log.i(TAG, "Playing stream " + streamUrl);
         player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
         player.addListener(exoPlayerListener);
@@ -144,11 +146,11 @@ public class StreamService extends Service {
         Log.i(TAG, "Service stopped");
 	}
 
-    public void reload(Context context, String streamUrl) {
+    public void reload(Context context, Stream stream) {
         if (player != null) {
             player.stop();
         }
-        play(context, streamUrl);
+        play(context, stream);
     }
 
     private void unregisterReceivers() {

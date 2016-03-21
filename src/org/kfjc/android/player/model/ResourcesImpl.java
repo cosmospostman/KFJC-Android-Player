@@ -20,8 +20,8 @@ import org.kfjc.android.player.util.HttpUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -32,13 +32,13 @@ public class ResourcesImpl implements Resources {
     private static final String TAG = ResourcesImpl.class.getSimpleName();
     ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
     private Context context;
-    private SettableFuture<Map<String, String>> streams;
+    private SettableFuture<List<Stream>> streamsList;
     private List<String> backgroundsUrls;
     private String lavaUrl;
 
     public ResourcesImpl(Context context) {
         this.context = context;
-        streams = SettableFuture.create();
+        streamsList = SettableFuture.create();
 
         new AsyncTask<Void, Void, Void>() {
             @Override protected Void doInBackground(Void... unsedParams) {
@@ -56,13 +56,16 @@ public class ResourcesImpl implements Resources {
             // Streams
             JSONArray jStreams = jResources.getJSONArray("streams");
             Map<String, String> streamMap = new HashMap<>();
+            List<Stream> streamList = new ArrayList<>();
             for (int i = 0; i < jStreams.length(); i++) {
                 JSONObject stream = jStreams.getJSONObject(i);
-                String name = stream.getString("name");
                 String url = stream.getString("url");
+                String name = stream.getString("name");
+                String description = stream.getString("desc");
+                streamList.add(new Stream(url, name, description));
                 streamMap.put(name, url);
             }
-            streams.set(streamMap);
+            streamsList.set(streamList);
 
             // Backgrounds
             JSONObject jDrawables = jResources.getJSONObject("drawables");
@@ -79,19 +82,13 @@ public class ResourcesImpl implements Resources {
 
         } catch (JSONException | IOException e) {
             Log.e(TAG, "Caught exception parsing streams: " + e.getMessage());
-            streams.set(defaultStream());
+            streamsList.set(Arrays.asList(Constants.FALLBACK_STREAM));
         }
     };
 
-    private static Map<String, String> defaultStream() {
-        Map<String, String> streamMap = new LinkedHashMap<>();
-        streamMap.put(Constants.FALLBACK_STREAM_NAME, Constants.FALLBACK_STREAM_URL);
-        return streamMap;
-    }
-
     @Override
-    public ListenableFuture<Map<String, String>> getStreams() {
-        return streams;
+    public SettableFuture<List<Stream>> getStreamsList() {
+        return streamsList;
     }
 
     @Override

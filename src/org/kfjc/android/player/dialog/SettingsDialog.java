@@ -20,7 +20,9 @@ import android.widget.Spinner;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
 import org.kfjc.android.player.control.PreferenceControl;
+import org.kfjc.android.player.model.Stream;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SettingsDialog extends KfjcDialog {
@@ -31,15 +33,14 @@ public class SettingsDialog extends KfjcDialog {
 	
 	private SeekBar volumeSeekbar;
     private AudioManager audioManager; 
-    private List<String> streamNames;
     private Spinner spinner;
-    private String previousUrlPreference;
+    private Stream previousPreference;
     private StreamUrlPreferenceChangeHandler urlPreferenceChangeHandler;
     private ContextThemeWrapper themeWrapper;
 
     @Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-        previousUrlPreference = PreferenceControl.getUrlPreference();
+        previousPreference = PreferenceControl.getStreamPreference();
 
         themeWrapper = new ContextThemeWrapper(getActivity(), R.style.KfjcDialog);
         View view = View.inflate(themeWrapper, R.layout.layout_settings, null);
@@ -48,8 +49,12 @@ public class SettingsDialog extends KfjcDialog {
         spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String val = (String) parent.getItemAtPosition(position);
-                HomeScreenDrawerActivity.preferenceControl.setStreamNamePreference(val);
+                String streamName = (String) parent.getItemAtPosition(position);
+                for (Stream s : HomeScreenDrawerActivity.preferenceControl.getStreams()) {
+                    if (s.name.equals(streamName)) {
+                        HomeScreenDrawerActivity.preferenceControl.setStreamPreference(s);
+                    }
+                }
             }
 
             @Override
@@ -64,7 +69,7 @@ public class SettingsDialog extends KfjcDialog {
         dialog.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 boolean urlPreferenceChanged =
-                        !previousUrlPreference.equals(PreferenceControl.getUrlPreference());
+                        !previousPreference.equals(PreferenceControl.getStreamPreference());
                 if (urlPreferenceChanged && urlPreferenceChangeHandler != null) {
                     urlPreferenceChangeHandler.onStreamUrlPreferenceChange();
                 }
@@ -78,12 +83,17 @@ public class SettingsDialog extends KfjcDialog {
 	}
 
 	private void initStreamOptions() {
-		streamNames = HomeScreenDrawerActivity.preferenceControl.getStreamNames();
+        List<String> streamUrls = new ArrayList<>();
+        List<String> streamNames = new ArrayList<>();
+        for (Stream s : HomeScreenDrawerActivity.preferenceControl.getStreams()) {
+            streamUrls.add(s.url);
+            streamNames.add(s.name);
+        }
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(
                 themeWrapper, android.R.layout.simple_spinner_item, streamNames);
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerArrayAdapter);
-        int selectedIndex = streamNames.indexOf(PreferenceControl.getStreamNamePreference());
+        int selectedIndex = streamUrls.indexOf(PreferenceControl.getStreamPreference().url);
         spinner.setSelection(Math.max(0, selectedIndex));
 	}
 	

@@ -400,7 +400,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 audioFocusListener,
                 AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN);
-        streamService.play(getApplicationContext(), PreferenceControl.getUrlPreference());
+        streamService.play(getApplicationContext(), PreferenceControl.getStreamPreference());
     }
 
     @Override
@@ -416,7 +416,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void restartStream() {
-        streamService.reload(getApplicationContext(), PreferenceControl.getUrlPreference());
+        streamService.reload(getApplicationContext(), PreferenceControl.getStreamPreference());
     }
 
     @Override

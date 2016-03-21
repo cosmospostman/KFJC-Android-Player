@@ -23,11 +23,47 @@
 	    	android:layout_toRightOf="@+id/volumeIcon"
 			android:layout_centerVertical="true"/>
 	</RelativeLayout>
-	
-	<Spinner
-		android:id="@+id/streamPreferenceSpinner"
+
+	<View
+		android:layout_width="match_parent"
 		android:layout_marginTop="16dp"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"></Spinner>
+		android:layout_height="0.5dp"
+		android:background="@color/kfjc_divider"/>
+
+	<RelativeLayout
+		android:layout_marginTop="16dp"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_centerVertical="true"
+			android:text="Quality"/>
+		<Spinner
+			android:id="@+id/streamPreferenceSpinner"
+			android:layout_alignParentRight="true"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+	</RelativeLayout>
+
+	<RelativeLayout
+		android:layout_marginTop="8dp"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_centerVertical="true"
+			android:text="Hourly backgrounds"/>
+		<Switch
+			android:id="@+id/backgroundToggle"
+			android:layout_alignParentRight="true"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+	</RelativeLayout>
+
+
 
 </LinearLayout>
