@@ -7,16 +7,18 @@
 
     <RelativeLayout
         android:id="@+id/lavaLoadingView"
+        android:visibility="gone"
         android:orientation="vertical"
         android:gravity="center_vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <TextView
+            android:id="@+id/lavaLoadingText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="Loading Lava..."/>
+            android:text="Downloading Lava..."/>
 
         <ProgressBar
             android:id="@+id/lavaLoadingProgress"

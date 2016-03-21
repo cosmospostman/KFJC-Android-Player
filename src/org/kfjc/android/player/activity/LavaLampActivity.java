@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.kfjc.android.player.R;
 
@@ -25,12 +26,14 @@ import java.net.URL;
 
 public class LavaLampActivity extends AppCompatActivity {
 
+    private MediaPlayer mediaPlayer;
+    private DownloadTask downloadTask;
+
     private SurfaceView surfaceView;
     private SurfaceHolder surfaceHolder;
-    private MediaPlayer mediaPlayer;
     private ProgressBar progressBar;
+    private TextView lavaLoadingText;
     private View loadingView;
-    private DownloadTask downloadTask;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,12 +49,8 @@ public class LavaLampActivity extends AppCompatActivity {
         surfaceView = (SurfaceView) findViewById(R.id.lavaSurfaceView);
         loadingView = findViewById(R.id.lavaLoadingView);
         progressBar = (ProgressBar) findViewById(R.id.lavaLoadingProgress);
-
+        lavaLoadingText = (TextView) findViewById(R.id.lavaLoadingText);
         surfaceHolder = surfaceView.getHolder();
-        mediaPlayer = new MediaPlayer();
-
-        downloadTask = new DownloadTask(LavaLampActivity.this);
-        downloadTask.execute();
 
         surfaceView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,28 +64,55 @@ public class LavaLampActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         downloadTask.cancel(true);
-        mediaPlayer.stop();
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+        }
         mediaPlayer.release();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isPlaying = false;
+        mediaPlayer = new MediaPlayer();
+        downloadTask = new DownloadTask(LavaLampActivity.this);
+        downloadTask.execute();
+    }
+
+    private boolean isPlaying = false;
+
+    private void play(File lavaFile, SurfaceHolder holder) {
+        if (isPlaying) {
+            return;
+        }
+        isPlaying = true;
+        try {
+            mediaPlayer.setDataSource(lavaFile.getCanonicalPath());
+            mediaPlayer.setDisplay(holder);
+            mediaPlayer.setLooping(true);
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+            setVideoSize();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean surfaceHolderCreated = false;
 
     private void playLava(final File lavaFile) {
         loadingView.setVisibility(View.GONE);
         surfaceView.setVisibility(View.VISIBLE);
+
+        if (surfaceHolderCreated) {
+            play(lavaFile, surfaceHolder);
+        }
+
         surfaceHolder.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                Context context = getApplicationContext();
-
-                try {
-                    mediaPlayer.setDataSource(lavaFile.getCanonicalPath());
-                    mediaPlayer.setDisplay(holder);
-                    mediaPlayer.setLooping(true);
-                    mediaPlayer.prepare();
-                    mediaPlayer.start();
-                    setVideoSize();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                play(lavaFile, holder);
+                surfaceHolderCreated = true;
             }
 
             @Override
@@ -100,7 +126,6 @@ public class LavaLampActivity extends AppCompatActivity {
     }
 
     private void setVideoSize() {
-
         // // Get the dimensions of the video
         int videoWidth = mediaPlayer.getVideoWidth();
         int videoHeight = mediaPlayer.getVideoHeight();
@@ -139,10 +164,8 @@ public class LavaLampActivity extends AppCompatActivity {
             // take CPU lock to prevent CPU from going off if the user
             // presses the power button during download
             PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                    getClass().getName());
+            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getClass().getName());
             wakeLock.acquire();
-
         }
 
         @Override
@@ -177,7 +200,7 @@ public class LavaLampActivity extends AppCompatActivity {
                         fileOutput.write(buffer, 0, bufferLength);
                         totalLoaded += bufferLength;
                         int progress = (totalLoaded * 100 / fileLength);
-                        publishProgress(progress);
+                        publishProgress(progress, fileLength);
                     }
                     lavaTempFile.renameTo(lavaFile);
                     lavaTempFile.delete();
@@ -197,12 +220,17 @@ public class LavaLampActivity extends AppCompatActivity {
             progressBar.setIndeterminate(false);
             progressBar.setMax(100);
             progressBar.setProgress(progress[0]);
+            double fileLengthMb = progress[1] / (1024*1024);
+            loadingView.setVisibility(View.VISIBLE);
+            lavaLoadingText.setText(context.getString(R.string.lava_download_format, fileLengthMb));
         }
 
         @Override
         protected void onPostExecute(File result) {
             wakeLock.release();
-            playLava(result);
+            if (result != null) {
+                playLava(result);
+            }
         }
     }
 	

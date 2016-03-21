@@ -18,10 +18,7 @@ import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.util.HttpUtil;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

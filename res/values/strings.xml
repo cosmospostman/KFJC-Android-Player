@@ -18,14 +18,17 @@
     <string name="fragment_title_stream">KFJC Live Stream</string>
     <string name="fragment_title_playlist">Playlist</string>
 
+    <string name="lava_download">Downloading Lava...</string>
+    <string name="lava_download_format">Downloading Lava (%1$sMB)...</string>
+
     <string name="nav_livestream">Live stream</string>
     <string name="nav_playlists">Playlist</string>
     <string name="navigation_drawer_open">Open navigation</string>
     <string name="navigation_drawer_close">Close navigation</string>
 
     <string name="permission_phone">Phone permissions</string>
-    <string name="permission_phone_rationale">Let KFJC detect phone calls, or it will
-        keep making noise when your phone is in use. We promise not to snoop.</string>
+    <string name="permission_phone_rationale">KFJC only uses phone permissions to automatically
+        stop playback when your phone is in use. We don\'t snoop!</string>
 
     <string name="ok">OK</string>
     <string name="empty_string"></string>
