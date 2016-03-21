@@ -136,6 +136,7 @@ public class StreamService extends Service {
 	public void stop() {
         if (player != null) {
             player.stop();
+            mediaListener.onEnd();
         }
         unregisterReceivers();
         becomingNoisyReceiverRegistered = false;
