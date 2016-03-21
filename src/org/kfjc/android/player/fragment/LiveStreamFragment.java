@@ -136,7 +136,7 @@ public class LiveStreamFragment extends Fragment {
     }
 
     private android.text.Spanned artistTrackHtml(Playlist.PlaylistEntry e) {
-        String spacer = TextUtils.isEmpty(e.getArtist()) ? "" : "&nbsp&nbsp&nbsp";
+        String spacer = TextUtils.isEmpty(e.getArtist()) ? "" : "<br>";
         return Html.fromHtml(e.getArtist() + spacer + "<i>" + e.getTrack() + "</i>");
     }
 

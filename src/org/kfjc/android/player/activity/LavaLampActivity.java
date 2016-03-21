@@ -228,7 +228,9 @@ public class LavaLampActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(File result) {
             wakeLock.release();
-            if (result != null) {
+            if (result == null) {
+                onBackPressed();
+            } else {
                 playLava(result);
             }
         }
