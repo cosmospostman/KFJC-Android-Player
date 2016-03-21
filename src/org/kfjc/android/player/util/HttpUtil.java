@@ -65,30 +65,6 @@ public class HttpUtil {
             urlConnection.disconnect();
         }
     }
-
-    /**
-     * Fetches a URL over HTTP and returns an InputStream to the content.
-     */
-    public static void loadToFile(String urlString, File lavaFile) throws IOException {
-        URL url = new URL(urlString);
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        FileOutputStream fileOutput = new FileOutputStream(lavaFile);
-        int responseCode = urlConnection.getResponseCode();
-        if (responseCode != 200) {
-            throw new IOException(urlString + " got response code " + responseCode);
-        }
-        try {
-            BufferedInputStream bis = new BufferedInputStream(urlConnection.getInputStream());
-            byte[] buffer = new byte[1024];
-            int bufferLength = 0;
-            while ((bufferLength = bis.read(buffer)) > 0 ) {
-                fileOutput.write(buffer, 0, bufferLength);
-            }
-        } finally {
-            fileOutput.close();
-            urlConnection.disconnect();
-        }
-    }
  
 	/**
 	 * Reads an InputStream until it's dry and returns streamed contents as a String.
