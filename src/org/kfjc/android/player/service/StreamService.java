@@ -126,6 +126,7 @@ public class StreamService extends Service {
                 new DefaultUriDataSource(context, "kfjc4droid"),
                 new DefaultAllocator(BUFFER_SEGMENT_SIZE),
                 BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE,
+                5,
                 isAacStream ? new AdtsExtractor() : new Mp3Extractor());
 
         MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
