@@ -1,29 +1,19 @@
 package org.kfjc.android.player.util;
 
-import org.kfjc.android.player.R;
-
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
+import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.os.Handler;
 import android.widget.ImageView;
 
 public class GraphicsUtil {
 
     private Handler handler = new Handler();
-    private Resources resources;
     private Runnable runner;
-    private Drawable[] grayRadioDevils;
 
-    public GraphicsUtil(Resources res) {
+    public GraphicsUtil() {
         this.handler = new Handler();
-        this.resources = res;
-        this.grayRadioDevils = new Drawable[] {
-                resources.getDrawable(R.drawable.radiodevil_10),
-                resources.getDrawable(R.drawable.radiodevil_25),
-                resources.getDrawable(R.drawable.radiodevil_40),
-                resources.getDrawable(R.drawable.radiodevil_55),
-                resources.getDrawable(R.drawable.radiodevil_70),
-                resources.getDrawable(R.drawable.radiodevil_85) };
     }
 
     /**
@@ -32,26 +22,24 @@ public class GraphicsUtil {
 	 */
 	class BufferImageRunner implements Runnable {
 		ImageView bufferImageView;
-		
 		public BufferImageRunner(ImageView imageView) {
 			this.bufferImageView = imageView;
 		}
 		
 		@Override
 		public void run() {
-			Double radioDevilIndex = Math.random() * grayRadioDevils.length;
 			Double delayTimeMs = 20 + Math.random() * 30;
-			bufferImageView.setImageDrawable(grayRadioDevils[radioDevilIndex.intValue()]);
+			bufferImageView.setColorFilter(getMatrix((float)Math.random(), (float)Math.random()));
 			handler.postDelayed(this, delayTimeMs.intValue());
 		}
 	}
 
-	public int radioDevilOff() {
-		return R.drawable.radiodevil_10;
+	public void radioDevilOff(ImageView imageView) {
+		imageView.setColorFilter(getMatrix(0.2f, 0.3f));
 	}
-	
-	public int radioDevilOn() {
-		return R.drawable.radiodevil;
+
+	public void radioDevilOn(ImageView imageView) {
+		imageView.setColorFilter(new ColorFilter());
 	}
 
 	public void bufferDevil(ImageView view, boolean isBuffering) {
@@ -61,6 +49,22 @@ public class GraphicsUtil {
 		} else {
 			handler.removeCallbacks(this.runner);
 		}
+	}
+
+	private ColorMatrixColorFilter getMatrix(float b, float alpha) {
+		int neg = Math.random() > 0.5 ? -1 : 1;
+		ColorMatrix matrix = new ColorMatrix();
+		matrix.setSaturation(0);
+		float[] mat = new float[]
+				{
+						1,0,0,0,neg*255*b,
+						0,1,0,0,neg*255*b,
+						0,0,1,0,neg*255*b,
+						0,0,0,alpha,0
+				};
+		matrix.postConcat(new ColorMatrix(mat));
+
+		return new ColorMatrixColorFilter(matrix);
 	}
 
 }

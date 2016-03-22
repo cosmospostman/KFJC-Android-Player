@@ -43,7 +43,7 @@ public class LiveStreamFragment extends Fragment {
                              Bundle savedInstanceState) {
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_stream));
         homeScreen.setNavigationItemChecked(R.id.nav_livestream);
-        graphics = new GraphicsUtil(getResources());
+        graphics = new GraphicsUtil();
         View view = inflater.inflate(R.layout.fragment_livestream, container, false);
         currentTrackTextView = (TextView) view.findViewById(R.id.currentTrack);
         settingsButton = (FloatingActionButton) view.findViewById(R.id.settingsButton);
@@ -106,13 +106,13 @@ public class LiveStreamFragment extends Fragment {
             case STOP:
                 graphics.bufferDevil(radioDevil, false);
                 playStopButton.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-                radioDevil.setImageResource(graphics.radioDevilOff());
+                graphics.radioDevilOff(radioDevil);
                 radioDevil.setEnabled(false);
                 break;
             case PLAY:
                 graphics.bufferDevil(radioDevil, false);
                 playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
-                radioDevil.setImageResource(graphics.radioDevilOn());
+                graphics.radioDevilOn(radioDevil);
                 radioDevil.setEnabled(true);
                 break;
             case BUFFER:

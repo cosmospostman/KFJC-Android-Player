@@ -38,3 +38,8 @@ v3 (21 Feb 2016)
  - Targets sdk23
  - New Android 6 permissions
  - HttpUrlConnection instead of Apache
+
+v3+ (WIP)
+ - Backgrounds and lava.mp4 optionally downloaded on demand (smaller APK)
+ - Headphone unplugged bug fix
+ - Stream preferences now have descriptions
