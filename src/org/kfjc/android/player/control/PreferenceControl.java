@@ -17,6 +17,7 @@ public class PreferenceControl {
 	private static final String PREFERENCE_KEY = "kfjc.preferences";
 	private static final String STREAM_PREFERENCE_KEY = "kfjc.preferences.streamname";
 	private static final String STREAM_URL_PREFERENCE_KEY = "kfjc.preferences.streamUrl";
+	private static final String ENABLE_BACKGROUNDS_KEY = "kfjc.preferences.enableBackgrounds";
     private static final int PREFERENCE_MODE = Context.MODE_PRIVATE;
 	
 	private static SharedPreferences preferences;
@@ -38,6 +39,16 @@ public class PreferenceControl {
 
 	public static List<Stream> getStreams() {
 		return streams;
+	}
+
+	public static boolean areBackgroundsEnabled() {
+		return preferences.getBoolean(ENABLE_BACKGROUNDS_KEY, true);
+	}
+
+	public static void setEnableBackgrounds(boolean enabled) {
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putBoolean(ENABLE_BACKGROUNDS_KEY, enabled);
+		editor.commit();
 	}
 	
 	public static Stream getStreamPreference() {

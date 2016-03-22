@@ -364,23 +364,33 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         preferenceControl = new PreferenceControl(getApplicationContext(),
                 HomeScreenDrawerActivity.this);
         isForegroundActivity = true;
-        final ImageView backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
-        int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        Futures.addCallback(getKfjcResources().getBackgroundImage(hourOfDay), new FutureCallback<Drawable>() {
-            @Override
-            public void onSuccess(final Drawable backgroundImage) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        backgroundImageView.setImageDrawable(backgroundImage);
-                    }
-                });
-            }
+        updateBackground();
+    }
 
-            @Override
-            public void onFailure(Throwable t) {
-            }
-        });
+    @Override
+    public void updateBackground() {
+        final ImageView backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
+        if (!preferenceControl.areBackgroundsEnabled()) {
+            backgroundImageView.setVisibility(View.GONE);
+        } else {
+            backgroundImageView.setVisibility(View.VISIBLE);
+            int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+            Futures.addCallback(getKfjcResources().getBackgroundImage(hourOfDay), new FutureCallback<Drawable>() {
+                @Override
+                public void onSuccess(final Drawable backgroundImage) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            backgroundImageView.setImageDrawable(backgroundImage);
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                }
+            });
+        }
     }
 
     @Override

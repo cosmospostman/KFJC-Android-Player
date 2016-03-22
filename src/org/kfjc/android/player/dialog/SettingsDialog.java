@@ -1,5 +1,6 @@
 package org.kfjc.android.player.dialog;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,12 +14,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
+import android.widget.Switch;
 
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
+import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.model.Stream;
 
@@ -34,9 +38,11 @@ public class SettingsDialog extends KfjcDialog {
 	private SeekBar volumeSeekbar;
     private AudioManager audioManager; 
     private Spinner spinner;
+    private Switch backgroundSwitch;
     private Stream previousPreference;
     private StreamUrlPreferenceChangeHandler urlPreferenceChangeHandler;
     private ContextThemeWrapper themeWrapper;
+    private HomeScreenInterface home;
 
     @Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -61,6 +67,16 @@ public class SettingsDialog extends KfjcDialog {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+        backgroundSwitch = (Switch) view.findViewById(R.id.backgroundSwitch);
+        backgroundSwitch.setChecked(HomeScreenDrawerActivity.preferenceControl.areBackgroundsEnabled());
+        backgroundSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                HomeScreenDrawerActivity.preferenceControl.setEnableBackgrounds(isChecked);
+                home.updateBackground();
+            }
+        });
+
         initVolumeBar(view);
         initStreamOptions();
 
@@ -77,8 +93,18 @@ public class SettingsDialog extends KfjcDialog {
         });
         return dialog.create();
 	}
-	
-	public void setUrlPreferenceChangeHandler(StreamUrlPreferenceChangeHandler handler) {
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (! (activity instanceof HomeScreenInterface)) {
+            throw new IllegalStateException(
+                    "Can only attach to " + HomeScreenInterface.class.getSimpleName());
+        }
+        this.home = (HomeScreenInterface) activity;
+    }
+
+    public void setUrlPreferenceChangeHandler(StreamUrlPreferenceChangeHandler handler) {
 		this.urlPreferenceChangeHandler = handler;
 	}
 

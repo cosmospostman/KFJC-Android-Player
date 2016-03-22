@@ -15,4 +15,5 @@ public interface HomeScreenInterface {
     Playlist getLatestPlaylist();
     void setNavigationItemChecked(int navigationItemId);
     Resources getKfjcResources();
+    void updateBackground();
 }

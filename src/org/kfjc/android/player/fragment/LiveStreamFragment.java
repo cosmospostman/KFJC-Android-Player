@@ -16,6 +16,7 @@ import android.widget.TextView;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.activity.LavaLampActivity;
+import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.util.GraphicsUtil;
@@ -83,6 +84,9 @@ public class LiveStreamFragment extends Fragment {
         });
         radioDevil.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if (!PreferenceControl.areBackgroundsEnabled()) {
+                    return;
+                }
                 Intent fullscreenIntent = new Intent(getActivity(), LavaLampActivity.class);
                 fullscreenIntent.setAction("org.kfjc.android.player.FULLSCREEN");
                 startActivity(fullscreenIntent);

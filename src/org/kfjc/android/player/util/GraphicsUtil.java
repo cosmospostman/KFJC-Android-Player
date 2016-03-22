@@ -35,7 +35,7 @@ public class GraphicsUtil {
 	}
 
 	public void radioDevilOff(ImageView imageView) {
-		imageView.setColorFilter(getMatrix(0.2f, 0.3f));
+		imageView.setColorFilter(getMatrix(0.2f, 0.2f));
 	}
 
 	public void radioDevilOn(ImageView imageView) {

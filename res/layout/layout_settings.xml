@@ -58,7 +58,7 @@
 			android:layout_centerVertical="true"
 			android:text="Hourly backgrounds"/>
 		<Switch
-			android:id="@+id/backgroundToggle"
+			android:id="@+id/backgroundSwitch"
 			android:layout_alignParentRight="true"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"/>
