@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
@@ -19,6 +21,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
@@ -26,17 +29,16 @@ import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.model.Stream;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SettingsDialog extends KfjcDialog {
-	
-	public interface StreamUrlPreferenceChangeHandler {
-		void onStreamUrlPreferenceChange();
-	}
-	
-	private SeekBar volumeSeekbar;
-    private AudioManager audioManager; 
+
+    public interface StreamUrlPreferenceChangeHandler {
+        void onStreamUrlPreferenceChange();
+    }
+
+    private SeekBar volumeSeekbar;
+    private AudioManager audioManager;
     private Spinner spinner;
     private Switch backgroundSwitch;
     private Stream previousPreference;
@@ -45,7 +47,7 @@ public class SettingsDialog extends KfjcDialog {
     private HomeScreenInterface home;
 
     @Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
         previousPreference = PreferenceControl.getStreamPreference();
 
         themeWrapper = new ContextThemeWrapper(getActivity(), R.style.KfjcDialog);
@@ -55,12 +57,8 @@ public class SettingsDialog extends KfjcDialog {
         spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String streamName = (String) parent.getItemAtPosition(position);
-                for (Stream s : HomeScreenDrawerActivity.preferenceControl.getStreams()) {
-                    if (s.name.equals(streamName)) {
-                        HomeScreenDrawerActivity.preferenceControl.setStreamPreference(s);
-                    }
-                }
+                Stream stream = (Stream) parent.getItemAtPosition(position);
+                HomeScreenDrawerActivity.preferenceControl.setStreamPreference(stream);
             }
 
             @Override
@@ -92,12 +90,12 @@ public class SettingsDialog extends KfjcDialog {
             }
         });
         return dialog.create();
-	}
+    }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (! (activity instanceof HomeScreenInterface)) {
+        if (!(activity instanceof HomeScreenInterface)) {
             throw new IllegalStateException(
                     "Can only attach to " + HomeScreenInterface.class.getSimpleName());
         }
@@ -105,51 +103,82 @@ public class SettingsDialog extends KfjcDialog {
     }
 
     public void setUrlPreferenceChangeHandler(StreamUrlPreferenceChangeHandler handler) {
-		this.urlPreferenceChangeHandler = handler;
-	}
+        this.urlPreferenceChangeHandler = handler;
+    }
 
-	private void initStreamOptions() {
-        List<String> streamUrls = new ArrayList<>();
-        List<String> streamNames = new ArrayList<>();
-        for (Stream s : HomeScreenDrawerActivity.preferenceControl.getStreams()) {
-            streamUrls.add(s.url);
-            streamNames.add(s.name);
-        }
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(
-                themeWrapper, android.R.layout.simple_spinner_item, streamNames);
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinnerArrayAdapter);
-        int selectedIndex = streamUrls.indexOf(PreferenceControl.getStreamPreference().url);
+    private void initStreamOptions() {
+        List<Stream> streams = HomeScreenDrawerActivity.preferenceControl.getStreams();
+        StreamAdapter streamAdapter = new StreamAdapter(
+                themeWrapper, android.R.layout.simple_spinner_item, streams);
+        spinner.setAdapter(streamAdapter);
+        int selectedIndex = streams.indexOf(PreferenceControl.getStreamPreference());
         spinner.setSelection(Math.max(0, selectedIndex));
-	}
-	
-	private void initVolumeBar(View view) {
-		volumeSeekbar = (SeekBar) view.findViewById(R.id.volumeSeekBar);
+    }
+
+    private void initVolumeBar(View view) {
+        volumeSeekbar = (SeekBar) view.findViewById(R.id.volumeSeekBar);
         audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         volumeSeekbar.setMax(audioManager
                 .getStreamMaxVolume(AudioManager.STREAM_MUSIC));
         volumeSeekbar.setProgress(audioManager
                 .getStreamVolume(AudioManager.STREAM_MUSIC));
         volumeSeekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-            @Override public void onStopTrackingTouch(SeekBar arg0) {}
-            @Override public void onStartTrackingTouch(SeekBar arg0) {}
-            @Override public void onProgressChanged(
-            		SeekBar arg0, int progress, boolean arg2) {
+            @Override
+            public void onStopTrackingTouch(SeekBar arg0) {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar arg0) {
+            }
+
+            @Override
+            public void onProgressChanged(
+                    SeekBar arg0, int progress, boolean arg2) {
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
             }
         });
-        
-        ContentObserver mSettingsContentObserver =
-    		new ContentObserver(new Handler()){
-        		@Override
-        		public void onChange(boolean selfChange) {
-        			int volumeLevel = audioManager
-        	                .getStreamVolume(AudioManager.STREAM_MUSIC);
-        			volumeSeekbar.setProgress(volumeLevel);
-        		}
-        	};
-        getActivity().getContentResolver().registerContentObserver(
-        		android.provider.Settings.System.CONTENT_URI, true, mSettingsContentObserver);
-	}
 
+        ContentObserver mSettingsContentObserver =
+                new ContentObserver(new Handler()) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        int volumeLevel = audioManager
+                                .getStreamVolume(AudioManager.STREAM_MUSIC);
+                        volumeSeekbar.setProgress(volumeLevel);
+                    }
+                };
+        getActivity().getContentResolver().registerContentObserver(
+                android.provider.Settings.System.CONTENT_URI, true, mSettingsContentObserver);
+    }
+
+    private class StreamAdapter extends ArrayAdapter<Stream> {
+        private List<Stream> streams;
+        private Context context;
+        public StreamAdapter(Context context, int resource, List<Stream> streams) {
+            super(context, resource, streams);
+            this.context = context;
+            this.streams = streams;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = LayoutInflater.from(context).inflate(
+                    android.R.layout.simple_spinner_item, parent, false);
+            TextView streamName = (TextView) view.findViewById(android.R.id.text1);
+            streamName.setText(streams.get(position).name);
+            return view;
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            View view = LayoutInflater.from(context).inflate(
+                    android.R.layout.simple_list_item_2, parent, false);
+            TextView streamName = (TextView) view.findViewById(android.R.id.text1);
+            TextView streamDesc = (TextView) view.findViewById(android.R.id.text2);
+            streamName.setText(streams.get(position).name);
+            streamDesc.setText(streams.get(position).description);
+            streamDesc.setTextColor(R.color.kfjc_secondary_text);
+            return view;
+        }
+    }
 }

@@ -39,7 +39,7 @@
 			android:layout_height="wrap_content"
 			android:layout_alignParentLeft="true"
 			android:layout_centerVertical="true"
-			android:text="Quality"/>
+			android:text="@string/setting_audioquality"/>
 		<Spinner
 			android:id="@+id/streamPreferenceSpinner"
 			android:layout_alignParentRight="true"
@@ -56,7 +56,7 @@
 			android:layout_height="wrap_content"
 			android:layout_alignParentLeft="true"
 			android:layout_centerVertical="true"
-			android:text="Hourly backgrounds"/>
+			android:text="@string/setting_backgrounds"/>
 		<Switch
 			android:id="@+id/backgroundSwitch"
 			android:layout_alignParentRight="true"
