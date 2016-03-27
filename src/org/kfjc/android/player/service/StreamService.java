@@ -30,7 +30,7 @@ public class StreamService extends Service {
 
     private static final String TAG = StreamService.class.getSimpleName();
     private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
-    private static final int BUFFER_SEGMENT_COUNT = 160;
+    private static final int BUFFER_SEGMENT_COUNT = 256;
     private static final IntentFilter becomingNoisyIntentFilter =
             new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 

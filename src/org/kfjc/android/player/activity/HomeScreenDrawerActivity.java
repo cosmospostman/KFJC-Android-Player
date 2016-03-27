@@ -94,16 +94,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
         HttpUtil.installCache(getApplicationContext());
         resources = new ResourcesImpl(this);
-        new AsyncTask<Void, Void, Void>() {
-            @Override protected Void doInBackground(Void... unsedParams) {
-                resources.loadResources();
-                return null;
-            }
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                updateBackground();
-            }
-        }.execute();
+        loadResources();
 
         setupPlaylistService();
         streamServiceIntent = new Intent(this, StreamService.class);
@@ -115,6 +106,19 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupDrawer();
         setupStreamService();
         setupListenersAndManagers();
+    }
+
+    private void loadResources() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override protected Void doInBackground(Void... unsedParams) {
+                resources.loadResources();
+                return null;
+            }
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                updateBackground();
+            }
+        }.execute();
     }
 
     private void setupPlaylistService() {
@@ -373,6 +377,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     protected void onResume() {
         super.onResume();
+        loadResources();
         preferenceControl = new PreferenceControl(getApplicationContext(),
                 HomeScreenDrawerActivity.this);
         isForegroundActivity = true;
@@ -385,6 +390,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         if (!preferenceControl.areBackgroundsEnabled()) {
             backgroundImageView.setVisibility(View.GONE);
         } else {
+            backgroundImageView.setVisibility(View.VISIBLE);
             int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
             Futures.addCallback(getKfjcResources().getBackgroundImage(hourOfDay), new FutureCallback<Drawable>() {
                 @Override
