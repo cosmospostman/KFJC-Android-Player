@@ -27,8 +27,6 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.ImageView;
 
 import com.google.common.util.concurrent.FutureCallback;

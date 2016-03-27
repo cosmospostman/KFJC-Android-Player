@@ -68,6 +68,12 @@ public class LiveStreamFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        graphics.bufferDevil(radioDevil, false);
+    }
+
     private void addButtonListeners() {
         playStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
