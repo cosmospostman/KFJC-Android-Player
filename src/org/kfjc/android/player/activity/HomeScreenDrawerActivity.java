@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.NavigationView;
@@ -26,6 +27,8 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -93,6 +96,17 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
         HttpUtil.installCache(getApplicationContext());
         resources = new ResourcesImpl(this);
+        new AsyncTask<Void, Void, Void>() {
+            @Override protected Void doInBackground(Void... unsedParams) {
+                resources.loadResources();
+                return null;
+            }
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                updateBackground();
+            }
+        }.execute();
+
         setupPlaylistService();
         streamServiceIntent = new Intent(this, StreamService.class);
         startService(streamServiceIntent);
@@ -373,7 +387,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         if (!preferenceControl.areBackgroundsEnabled()) {
             backgroundImageView.setVisibility(View.GONE);
         } else {
-            backgroundImageView.setVisibility(View.VISIBLE);
             int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
             Futures.addCallback(getKfjcResources().getBackgroundImage(hourOfDay), new FutureCallback<Drawable>() {
                 @Override
@@ -381,7 +394,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            backgroundImageView.setImageDrawable(backgroundImage);
+                        backgroundImageView.setImageDrawable(backgroundImage);
                         }
                     });
                 }

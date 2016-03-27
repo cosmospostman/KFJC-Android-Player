@@ -39,16 +39,10 @@ public class ResourcesImpl implements Resources {
     public ResourcesImpl(Context context) {
         this.context = context;
         streamsList = SettableFuture.create();
-
-        new AsyncTask<Void, Void, Void>() {
-            @Override protected Void doInBackground(Void... unsedParams) {
-                loadResources();
-                return null;
-            }
-        }.execute();
     }
 
-    private void loadResources() {
+    @Override
+    public void loadResources() {
         try {
             String resourcesString = HttpUtil.getUrl(Constants.RESOURCES_URL);
             JSONObject jResources = new JSONObject(resourcesString);

@@ -11,4 +11,10 @@ public class KfjcDialog extends DialogFragment {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        dismiss();
+    }
 }

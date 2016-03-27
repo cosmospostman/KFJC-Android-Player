@@ -36,6 +36,7 @@ public class HttpUtil {
         URL url = new URL(urlString);
         String result = "";
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setUseCaches(false);
         try {
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             result = convertInputStreamToString(in);
