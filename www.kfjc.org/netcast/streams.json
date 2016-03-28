@@ -1,0 +1,3 @@
+[ { name:'High/192k AAC', url:'http://aac.kfjc.org:80/' },
+  { name:'High/128k mp3', url:'http://netcast.kfjc.org:80/' },
+  { name:'Low/40k mp3', url:'http://netcast.kfjc.org:8974/' } ]

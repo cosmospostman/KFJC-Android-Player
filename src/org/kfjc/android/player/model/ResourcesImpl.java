@@ -56,7 +56,14 @@ public class ResourcesImpl implements Resources {
                 String url = stream.getString("url");
                 String name = stream.getString("name");
                 String description = stream.getString("desc");
-                streamList.add(new Stream(url, name, description));
+                String formatString = stream.getString("format");
+                Stream.Format format = Stream.Format.NONE;
+                if (formatString.toLowerCase().equals("aac")) {
+                    format = Stream.Format.AAC;
+                } else if (formatString.toLowerCase().equals("mp3")) {
+                    format = Stream.Format.MP3;
+                }
+                streamList.add(new Stream(url, name, description, format));
                 streamMap.put(name, url);
             }
             streamsList.set(streamList);

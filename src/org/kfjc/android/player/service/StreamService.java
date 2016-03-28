@@ -16,12 +16,14 @@ import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecSelector;
+import com.google.android.exoplayer.extractor.Extractor;
 import com.google.android.exoplayer.extractor.ExtractorSampleSource;
 import com.google.android.exoplayer.extractor.mp3.Mp3Extractor;
 import com.google.android.exoplayer.extractor.ts.AdtsExtractor;
 import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
+import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.model.Stream;
 import org.kfjc.android.player.util.NotificationUtil;
@@ -120,14 +122,22 @@ public class StreamService extends Service {
         Notification n = NotificationUtil.bufferingNotification(context);
         startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
 
-        boolean isAacStream = streamUrl.toLowerCase().contains("aac");
+        Extractor extractor = null;
+        switch (stream.format) {
+            case AAC:
+                extractor = new AdtsExtractor();
+                break;
+            case MP3:
+                extractor = new Mp3Extractor();
+                break;
+        }
         ExtractorSampleSource sampleSource = new ExtractorSampleSource(
                 Uri.parse(streamUrl),
-                new DefaultUriDataSource(context, "kfjc4droid"),
+                new DefaultUriDataSource(context, Constants.USER_AGENT),
                 new DefaultAllocator(BUFFER_SEGMENT_SIZE),
                 BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE,
                 5,
-                isAacStream ? new AdtsExtractor() : new Mp3Extractor());
+                extractor);
 
         MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
                 MediaCodecSelector.DEFAULT);

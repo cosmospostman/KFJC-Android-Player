@@ -9,8 +9,9 @@ public class Constants {
 
     public static final String PLAYLIST_URL = "http://kfjc.org/music/json-playlist.php"; //?i=50723
     public static final int CURRENT_TRACK_POLL_DELAY_MS = 30000;
+    public static final String USER_AGENT = "kfjc4droid-v4";
 
     public static final String RESOURCES_URL = "http://www.kfjc.org/api/resources.json";
     public static final Stream FALLBACK_STREAM =
-            new Stream("http://netcast6.kfjc.org:80/", "Default", "128k mp3");
+            new Stream("http://netcast6.kfjc.org:80/", "Default", "128k mp3", Stream.Format.MP3);
 }
