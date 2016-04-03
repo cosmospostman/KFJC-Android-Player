@@ -389,9 +389,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     public void updateBackground() {
         final ImageView backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
         if (!preferenceControl.areBackgroundsEnabled()) {
-            backgroundImageView.setVisibility(View.GONE);
+            backgroundImageView.setImageDrawable(getDrawable(R.drawable.bg_default));
         } else {
-            backgroundImageView.setVisibility(View.VISIBLE);
             int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
             Futures.addCallback(getKfjcResources().getBackgroundImage(hourOfDay), new FutureCallback<Drawable>() {
                 @Override

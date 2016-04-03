@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface Resources {
     void loadResources();
-
     ListenableFuture<List<Stream>> getStreamsList();
     ListenableFuture<Drawable> getBackgroundImage(int hourOfDay);
 }

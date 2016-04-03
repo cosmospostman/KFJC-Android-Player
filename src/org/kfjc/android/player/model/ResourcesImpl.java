@@ -106,14 +106,13 @@ public class ResourcesImpl implements Resources {
         return service.submit(new Callable<Drawable>() {
             @Override
             public Drawable call() throws Exception {
-                Drawable backgroundImage = ContextCompat.getDrawable(context, R.drawable.default_background);
                 try {
                     Drawable newBackgroundImage = HttpUtil.getDrawable(backgroundsUrls.get(hourOfDay));
                     if (newBackgroundImage != null) {
-                        backgroundImage = newBackgroundImage;
+                        return newBackgroundImage;
                     }
                 } catch (IOException e) {}
-                return backgroundImage;
+                return ContextCompat.getDrawable(context, R.drawable.bg_default);
             }
         });
     }
