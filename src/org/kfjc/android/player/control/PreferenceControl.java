@@ -18,13 +18,19 @@ public class PreferenceControl {
 	private static final String STREAM_PREFERENCE_KEY = "kfjc.preferences.streamname";
 	private static final String STREAM_URL_PREFERENCE_KEY = "kfjc.preferences.streamUrl";
 	private static final String ENABLE_BACKGROUNDS_KEY = "kfjc.preferences.enableBackgrounds";
+	private static final String CACHED_RESOURCES_KEY = "kfjc.preferences.cachedResources";
     private static final int PREFERENCE_MODE = Context.MODE_PRIVATE;
 	
 	private static SharedPreferences preferences;
 	private static List<Stream> streams;
+	private HomeScreenInterface activity;
 
 	public PreferenceControl(Context context, final HomeScreenInterface activity) {
+		this.activity = activity;
 		preferences = context.getSharedPreferences(PREFERENCE_KEY, PREFERENCE_MODE);
+	}
+
+	public void updateStreams() {
 		new AsyncTask<Void, Void, Void>() {
 			@Override protected Void doInBackground(Void... unsedParams) {
 				try {
@@ -50,9 +56,23 @@ public class PreferenceControl {
 		editor.putBoolean(ENABLE_BACKGROUNDS_KEY, enabled);
 		editor.commit();
 	}
+
+	public static String getCachedResources() {
+		return preferences.getString(CACHED_RESOURCES_KEY, "");
+	}
+
+	public static void setCachedResources(String resourceString) {
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putString(CACHED_RESOURCES_KEY, resourceString);
+		editor.commit();
+	}
 	
 	public static Stream getStreamPreference() {
 		String urlPref = preferences.getString(STREAM_URL_PREFERENCE_KEY, "");
+		// TODO: block on streams being non-null or maybe set streams to fallback initailly?
+		if (streams == null) {
+			return Constants.FALLBACK_STREAM;
+		}
 		// Stored URL preference matches a loaded stream
 		for (Stream s : streams) {
 			if (s.url.equals(urlPref)) {

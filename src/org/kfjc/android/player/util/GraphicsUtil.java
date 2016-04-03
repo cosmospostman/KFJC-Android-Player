@@ -1,7 +1,5 @@
 package org.kfjc.android.player.util;
 
-import android.content.res.Resources;
-import android.graphics.ColorFilter;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.os.Handler;
@@ -39,7 +37,7 @@ public class GraphicsUtil {
 	}
 
 	public void radioDevilOn(ImageView imageView) {
-		imageView.setColorFilter(new ColorFilter());
+		imageView.clearColorFilter();
 	}
 
 	public void bufferDevil(ImageView view, boolean isBuffering) {

@@ -1,6 +1,5 @@
 package org.kfjc.android.player.model;
 
-
 import android.graphics.drawable.Drawable;
 
 import com.google.common.util.concurrent.ListenableFuture;

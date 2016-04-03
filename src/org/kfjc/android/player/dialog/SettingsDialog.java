@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +41,7 @@ public class SettingsDialog extends KfjcDialog {
     private SeekBar volumeSeekbar;
     private AudioManager audioManager;
     private Spinner spinner;
-    private Switch backgroundSwitch;
+    private SwitchCompat backgroundSwitch;
     private Stream previousPreference;
     private StreamUrlPreferenceChangeHandler urlPreferenceChangeHandler;
     private ContextThemeWrapper themeWrapper;
@@ -65,7 +66,7 @@ public class SettingsDialog extends KfjcDialog {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        backgroundSwitch = (Switch) view.findViewById(R.id.backgroundSwitch);
+        backgroundSwitch = (SwitchCompat) view.findViewById(R.id.backgroundSwitch);
         backgroundSwitch.setChecked(HomeScreenDrawerActivity.preferenceControl.areBackgroundsEnabled());
         backgroundSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

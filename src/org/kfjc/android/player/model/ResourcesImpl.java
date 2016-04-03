@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
+import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.util.HttpUtil;
 
 import java.io.IOException;
@@ -45,7 +46,16 @@ public class ResourcesImpl implements Resources {
     public void loadResources() {
         try {
             String resourcesString = HttpUtil.getUrl(Constants.RESOURCES_URL);
-            JSONObject jResources = new JSONObject(resourcesString);
+            PreferenceControl.setCachedResources(resourcesString);
+            parseResourceString(resourcesString);
+        } catch (IOException e) {
+            parseResourceString(PreferenceControl.getCachedResources());
+        }
+    }
+
+    private void parseResourceString(String resources) {
+        try {
+            JSONObject jResources = new JSONObject(resources);
 
             // Streams
             JSONArray jStreams = jResources.getJSONArray("streams");
@@ -80,12 +90,11 @@ public class ResourcesImpl implements Resources {
 
             // Lava
             lavaUrl = jDrawables.getString("lava");
-
-        } catch (JSONException | IOException e) {
+        } catch (JSONException e) {
             Log.e(TAG, "Caught exception parsing streams: " + e.getMessage());
             streamsList.set(Arrays.asList(Constants.FALLBACK_STREAM));
         }
-    };
+    }
 
     @Override
     public SettableFuture<List<Stream>> getStreamsList() {

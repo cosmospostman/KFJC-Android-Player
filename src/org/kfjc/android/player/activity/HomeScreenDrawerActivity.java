@@ -92,6 +92,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             activeFragmentId = savedInstanceState.getInt(KEY_ACTIVE_FRAGMENT);
         }
 
+        preferenceControl = new PreferenceControl(getApplicationContext(),
+                HomeScreenDrawerActivity.this);
         HttpUtil.installCache(getApplicationContext());
         resources = new ResourcesImpl(this);
         loadResources();
@@ -378,8 +380,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     protected void onResume() {
         super.onResume();
         loadResources();
-        preferenceControl = new PreferenceControl(getApplicationContext(),
-                HomeScreenDrawerActivity.this);
+        preferenceControl.updateStreams();
         isForegroundActivity = true;
         updateBackground();
     }
