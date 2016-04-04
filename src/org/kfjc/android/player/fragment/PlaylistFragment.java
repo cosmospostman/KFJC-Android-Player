@@ -86,7 +86,7 @@ public class PlaylistFragment extends Fragment {
         for (final Playlist.PlaylistEntry e : entries) {
             LayoutInflater inflater = activity.getLayoutInflater();
             View holderView;
-            if (isEmptyEntry(e)) {
+            if (e.isEmpty()) {
                 holderView = inflater.inflate(R.layout.list_playlistempty, layout, false);
             } else {
                 holderView = inflater.inflate(R.layout.list_playlistentry, layout, false);
@@ -121,12 +121,5 @@ public class PlaylistFragment extends Fragment {
     private void showTrackDetails(Playlist.PlaylistEntry entry) {
         TrackDetailsDialog detailsDialog = TrackDetailsDialog.newInstance(entry);
         detailsDialog.show(getActivity().getSupportFragmentManager(), "settings");
-    }
-
-    private static boolean isEmptyEntry(Playlist.PlaylistEntry e) {
-        return TextUtils.isEmpty(e.getAlbum())
-                && TextUtils.isEmpty(e.getArtist())
-                && TextUtils.isEmpty(e.getTime())
-                && TextUtils.isEmpty(e.getTrack());
     }
 }

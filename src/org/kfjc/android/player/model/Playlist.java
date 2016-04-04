@@ -10,6 +10,7 @@ public interface Playlist {
     List<PlaylistEntry> getTrackEntries();
 
     interface PlaylistEntry {
+        boolean isEmpty();
         String getTime();
         String getTrack();
         String getArtist();

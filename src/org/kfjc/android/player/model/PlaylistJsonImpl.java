@@ -2,6 +2,8 @@ package org.kfjc.android.player.model;
 
 import android.text.TextUtils;
 
+import com.google.common.base.Strings;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.kfjc.android.player.R;
@@ -73,11 +75,16 @@ public class PlaylistJsonImpl implements Playlist{
 
     @Override
     public PlaylistEntry getLastTrackEntry() {
-        return entries.get(entries.size() - 1);
+        for (int i = entries.size() - 1; i >= 0; i--) {
+            PlaylistEntry entry = entries.get(i);
+            if (!entry.isEmpty()) {
+                return entry;
+            }
+        }
+        return new PlaylistEntryJsonImpl(null);
     }
 
     public class PlaylistEntryJsonImpl implements PlaylistEntry {
-
         String artist;
         String track;
         String album;
@@ -114,6 +121,14 @@ public class PlaylistJsonImpl implements Playlist{
         @Override
         public String getLabel() {
             return "";
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return Strings.isNullOrEmpty(time)
+                    && Strings.isNullOrEmpty(artist)
+                    && Strings.isNullOrEmpty(album)
+                    && Strings.isNullOrEmpty(track);
         }
     }
 
