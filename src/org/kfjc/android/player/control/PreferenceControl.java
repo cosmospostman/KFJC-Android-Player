@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
 import org.kfjc.android.player.Constants;
+import org.kfjc.android.player.KfjcApplication;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.model.Stream;
 
@@ -23,18 +24,18 @@ public class PreferenceControl {
 	
 	private static SharedPreferences preferences;
 	private static List<Stream> streams;
-	private HomeScreenInterface activity;
+	private static KfjcApplication app;
 
-	public PreferenceControl(Context context, final HomeScreenInterface activity) {
-		this.activity = activity;
-		preferences = context.getSharedPreferences(PREFERENCE_KEY, PREFERENCE_MODE);
+	public static void init(final KfjcApplication kfjcApp) {
+		app = kfjcApp;
+		preferences = app.getSharedPreferences(PREFERENCE_KEY, PREFERENCE_MODE);
 	}
 
-	public void updateStreams() {
+	public static void updateStreams() {
 		new AsyncTask<Void, Void, Void>() {
 			@Override protected Void doInBackground(Void... unsedParams) {
 				try {
-					streams = activity.getKfjcResources().getStreamsList().get();
+					streams = app.getKfjcResources().getStreamsList().get();
 				} catch (InterruptedException | ExecutionException e) {
 					// TODO
 				}
@@ -87,7 +88,7 @@ public class PreferenceControl {
 		return Constants.FALLBACK_STREAM;
     }
 	
-	public void setStreamPreference(Stream stream) {
+	public static void setStreamPreference(Stream stream) {
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putString(STREAM_URL_PREFERENCE_KEY, stream.url);
 		editor.commit();

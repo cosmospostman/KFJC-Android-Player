@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.NavigationView;
@@ -32,14 +31,13 @@ import android.widget.ImageView;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 
+import org.kfjc.android.player.KfjcApplication;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.fragment.PlaylistFragment;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
-import org.kfjc.android.player.model.Resources;
-import org.kfjc.android.player.model.ResourcesImpl;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.HttpUtil;
@@ -52,6 +50,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private static final String KEY_ACTIVE_FRAGMENT = "active-fragment";
     private static final int KFJC_PERM_READ_PHONE_STATE = 0;
 
+    private KfjcApplication application;
+
     private ServiceConnection streamServiceConnection;
     private StreamService streamService;
     private Intent streamServiceIntent;
@@ -60,7 +60,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private PlaylistService playlistService;
     private Intent playlistServiceIntent;
 
-    public static PreferenceControl preferenceControl;
     private NotificationUtil notificationUtil;
 
     private AudioManager audioManager;
@@ -79,23 +78,19 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private boolean isForegroundActivity = false;
     private int activeFragmentId = R.id.nav_livestream;
 
-    private Resources resources;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         setContentView(R.layout.activity_home_screen_drawer);
         view = findViewById(R.id.home_screen_main_content);
+        application = (KfjcApplication) getApplicationContext();
 
         if (savedInstanceState != null) {
             activeFragmentId = savedInstanceState.getInt(KEY_ACTIVE_FRAGMENT);
         }
 
-        preferenceControl = new PreferenceControl(getApplicationContext(),
-                HomeScreenDrawerActivity.this);
         HttpUtil.installCache(getApplicationContext());
-        resources = new ResourcesImpl(this);
         loadResources();
 
         setupPlaylistService();
@@ -111,16 +106,12 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     }
 
     private void loadResources() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override protected Void doInBackground(Void... unsedParams) {
-                resources.loadResources();
-                return null;
-            }
+        application.loadResources(new KfjcApplication.ResourcesLoadedHandler() {
             @Override
-            protected void onPostExecute(Void aVoid) {
+            public void onResourcesLoaded() {
                 updateBackground();
             }
-        }.execute();
+        });
     }
 
     private void setupPlaylistService() {
@@ -380,7 +371,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     protected void onResume() {
         super.onResume();
         loadResources();
-        preferenceControl.updateStreams();
+        PreferenceControl.updateStreams();
         isForegroundActivity = true;
         updateBackground();
     }
@@ -388,11 +379,12 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void updateBackground() {
         final ImageView backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
-        if (!preferenceControl.areBackgroundsEnabled()) {
-            backgroundImageView.setImageDrawable(getDrawable(R.drawable.bg_default));
+        if (!PreferenceControl.areBackgroundsEnabled()) {
+            backgroundImageView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.bg_default));
         } else {
             int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-            Futures.addCallback(getKfjcResources().getBackgroundImage(hourOfDay), new FutureCallback<Drawable>() {
+            Futures.addCallback(application.getKfjcResources().getBackgroundImage(hourOfDay),
+                    new FutureCallback<Drawable>() {
                 @Override
                 public void onSuccess(final Drawable backgroundImage) {
                     runOnUiThread(new Runnable() {
@@ -486,10 +478,5 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             return new PlaylistJsonImpl("");
         }
         return playlistService.getPlaylist();
-    }
-
-    @Override
-    public Resources getKfjcResources() {
-        return resources;
     }
 }

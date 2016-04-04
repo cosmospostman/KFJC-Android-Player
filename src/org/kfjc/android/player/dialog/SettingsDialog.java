@@ -8,6 +8,7 @@ import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
@@ -21,11 +22,9 @@ import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.model.Stream;
@@ -59,7 +58,7 @@ public class SettingsDialog extends KfjcDialog {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Stream stream = (Stream) parent.getItemAtPosition(position);
-                HomeScreenDrawerActivity.preferenceControl.setStreamPreference(stream);
+                PreferenceControl.setStreamPreference(stream);
             }
 
             @Override
@@ -67,11 +66,11 @@ public class SettingsDialog extends KfjcDialog {
             }
         });
         backgroundSwitch = (SwitchCompat) view.findViewById(R.id.backgroundSwitch);
-        backgroundSwitch.setChecked(HomeScreenDrawerActivity.preferenceControl.areBackgroundsEnabled());
+        backgroundSwitch.setChecked(PreferenceControl.areBackgroundsEnabled());
         backgroundSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                HomeScreenDrawerActivity.preferenceControl.setEnableBackgrounds(isChecked);
+                PreferenceControl.setEnableBackgrounds(isChecked);
                 home.updateBackground();
             }
         });
@@ -108,7 +107,7 @@ public class SettingsDialog extends KfjcDialog {
     }
 
     private void initStreamOptions() {
-        List<Stream> streams = HomeScreenDrawerActivity.preferenceControl.getStreams();
+        List<Stream> streams = PreferenceControl.getStreams();
         StreamAdapter streamAdapter = new StreamAdapter(
                 themeWrapper, android.R.layout.simple_spinner_item, streams);
         spinner.setAdapter(streamAdapter);
@@ -178,7 +177,7 @@ public class SettingsDialog extends KfjcDialog {
             TextView streamDesc = (TextView) view.findViewById(android.R.id.text2);
             streamName.setText(streams.get(position).name);
             streamDesc.setText(streams.get(position).description);
-            streamDesc.setTextColor(R.color.kfjc_secondary_text);
+            streamDesc.setTextColor(ContextCompat.getColor(context, R.color.kfjc_secondary_text));
             return view;
         }
     }

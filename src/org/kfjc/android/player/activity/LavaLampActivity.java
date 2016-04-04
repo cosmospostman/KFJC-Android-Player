@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.kfjc.android.player.R;
+import org.kfjc.android.player.model.Resources;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -28,6 +29,7 @@ public class LavaLampActivity extends AppCompatActivity {
 
     private MediaPlayer mediaPlayer;
     private DownloadTask downloadTask;
+    private boolean surfaceHolderCreated = false;
 
     private SurfaceView surfaceView;
     private SurfaceHolder surfaceHolder;
@@ -98,8 +100,6 @@ public class LavaLampActivity extends AppCompatActivity {
         }
     }
 
-    private boolean surfaceHolderCreated = false;
-
     private void playLava(final File lavaFile) {
         loadingView.setVisibility(View.GONE);
         surfaceView.setVisibility(View.VISIBLE);
@@ -150,7 +150,6 @@ public class LavaLampActivity extends AppCompatActivity {
     }
 
     private class DownloadTask extends AsyncTask<String, Integer, File> {
-
         private final String TAG = DownloadTask.class.getSimpleName();
         private Context context;
         private PowerManager.WakeLock wakeLock;
@@ -181,6 +180,8 @@ public class LavaLampActivity extends AppCompatActivity {
                     return lavaFile;
                 }
                 lavaFile.createNewFile();
+
+
 
                 URL url = new URL("http://www.kfjc.org/api/drawable/lavalamp.mp4");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -235,5 +236,4 @@ public class LavaLampActivity extends AppCompatActivity {
             }
         }
     }
-	
 }
