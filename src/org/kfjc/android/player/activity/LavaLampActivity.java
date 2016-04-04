@@ -15,8 +15,9 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.kfjc.android.player.KfjcApplication;
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.model.Resources;
+import org.kfjc.android.player.control.PreferenceControl;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -24,9 +25,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 public class LavaLampActivity extends AppCompatActivity {
 
+    private KfjcApplication app;
     private MediaPlayer mediaPlayer;
     private DownloadTask downloadTask;
     private boolean surfaceHolderCreated = false;
@@ -41,6 +44,7 @@ public class LavaLampActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+        app = (KfjcApplication) getApplication();
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
         setContentView(R.layout.activity_lavaplayer);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -170,20 +174,27 @@ public class LavaLampActivity extends AppCompatActivity {
         @Override
         protected File doInBackground(String... unused) {
             try {
+                String lavaUrlPreference = PreferenceControl.getLavaUrl();
+                String lavaUrl = app.getKfjcResources().getLavaUrl().get();
+
                 File cacheDir = getApplicationContext().getCacheDir();
                 File lavaFile = new File(cacheDir, "lava.mp4");
                 File lavaTempFile = new File(cacheDir, "lava.mp4.tmp");
                 if (lavaTempFile.exists()) {
                     lavaTempFile.delete();
                 }
+                if (!lavaUrl.equals(lavaUrlPreference)) {
+                    PreferenceControl.setLavaUrl(lavaUrl);
+                    if (lavaFile.exists()) {
+                        lavaFile.delete();
+                    }
+                }
                 if (lavaFile.exists() && lavaFile.length() > 0) {
                     return lavaFile;
                 }
                 lavaFile.createNewFile();
 
-
-
-                URL url = new URL("http://www.kfjc.org/api/drawable/lavalamp.mp4");
+                URL url = new URL(lavaUrl);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setUseCaches(false);
                 FileOutputStream fileOutput = new FileOutputStream(lavaTempFile);
@@ -210,7 +221,7 @@ public class LavaLampActivity extends AppCompatActivity {
                     urlConnection.disconnect();
                 }
                 return lavaFile;
-            } catch (IOException ex) {
+            } catch (IOException | InterruptedException | ExecutionException ex) {
                 Log.e(TAG, ex.getMessage());
                 return null;
             }

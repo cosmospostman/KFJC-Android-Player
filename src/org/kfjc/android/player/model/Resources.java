@@ -10,4 +10,5 @@ public interface Resources {
     void loadResources();
     ListenableFuture<List<Stream>> getStreamsList();
     ListenableFuture<Drawable> getBackgroundImage(int hourOfDay);
+    ListenableFuture<String> getLavaUrl();
 }

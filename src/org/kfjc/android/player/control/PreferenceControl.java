@@ -20,6 +20,7 @@ public class PreferenceControl {
 	private static final String STREAM_URL_PREFERENCE_KEY = "kfjc.preferences.streamUrl";
 	private static final String ENABLE_BACKGROUNDS_KEY = "kfjc.preferences.enableBackgrounds";
 	private static final String CACHED_RESOURCES_KEY = "kfjc.preferences.cachedResources";
+	private static final String LAVA_URL_KEY = "kfjc.preferences.lavaUrl";
     private static final int PREFERENCE_MODE = Context.MODE_PRIVATE;
 	
 	private static SharedPreferences preferences;
@@ -55,6 +56,16 @@ public class PreferenceControl {
 	public static void setEnableBackgrounds(boolean enabled) {
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putBoolean(ENABLE_BACKGROUNDS_KEY, enabled);
+		editor.commit();
+	}
+
+	public static String getLavaUrl() {
+		return preferences.getString(LAVA_URL_KEY, "");
+	}
+
+	public static void setLavaUrl(String resourceString) {
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putString(LAVA_URL_KEY, resourceString);
 		editor.commit();
 	}
 

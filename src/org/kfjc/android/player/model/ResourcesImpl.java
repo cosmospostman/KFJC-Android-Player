@@ -35,11 +35,12 @@ public class ResourcesImpl implements Resources {
     private Context context;
     private SettableFuture<List<Stream>> streamsList;
     private List<String> backgroundsUrls;
-    private String lavaUrl;
+    private SettableFuture<String> lavaUrl;
 
     public ResourcesImpl(Context context) {
         this.context = context;
         streamsList = SettableFuture.create();
+        lavaUrl = SettableFuture.create();
     }
 
     @Override
@@ -89,7 +90,7 @@ public class ResourcesImpl implements Resources {
             }
 
             // Lava
-            lavaUrl = jDrawables.getString("lava");
+            lavaUrl.set(jDrawables.getString("lava"));
         } catch (JSONException e) {
             Log.e(TAG, "Caught exception parsing streams: " + e.getMessage());
             streamsList.set(Arrays.asList(Constants.FALLBACK_STREAM));
@@ -115,5 +116,10 @@ public class ResourcesImpl implements Resources {
                 return ContextCompat.getDrawable(context, R.drawable.bg_default);
             }
         });
+    }
+
+    @Override
+    public SettableFuture<String> getLavaUrl() {
+        return lavaUrl;
     }
 }
