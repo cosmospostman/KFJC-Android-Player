@@ -30,6 +30,15 @@ Build
 
 Changelog
 ---------
+v5 (9 April 2016)
+ - Fix embarrassing NPE when playlist is empty (occurs at start of new shift)
+
+v4 (3 April 2016)
+ - Backgrounds and lava.mp4 optionally downloaded on demand (smaller APK)
+ - Buffering effect rendered live (no more multiple logo resources)
+ - Stream preferences now have descriptions
+ - Headphone unplugged bug fix
+
 v3 (21 Feb 2016)
  - Playlist view
  - Drawer layout
@@ -38,8 +47,3 @@ v3 (21 Feb 2016)
  - Targets sdk23
  - New Android 6 permissions
  - HttpUrlConnection instead of Apache
-
-v3+ (WIP)
- - Backgrounds and lava.mp4 optionally downloaded on demand (smaller APK)
- - Headphone unplugged bug fix
- - Stream preferences now have descriptions

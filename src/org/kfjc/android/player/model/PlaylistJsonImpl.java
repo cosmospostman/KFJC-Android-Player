@@ -133,6 +133,9 @@ public class PlaylistJsonImpl implements Playlist{
     }
 
     private static String tryGetString(JSONArray array, int index) {
+        if (array == null) {
+            return "";
+        }
         try {
             return array.getString(index);
         } catch (JSONException e) {
