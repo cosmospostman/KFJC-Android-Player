@@ -36,6 +36,7 @@ import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.fragment.PlaylistFragment;
+import org.kfjc.android.player.fragment.PodcastFragment;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.service.PlaylistService;
@@ -69,6 +70,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     private LiveStreamFragment liveStreamFragment;
     private PlaylistFragment playlistFragment;
+    private PodcastFragment podcastFragment;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -76,7 +78,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private Snackbar snackbar;
 
     private boolean isForegroundActivity = false;
-    private int activeFragmentId = R.id.nav_livestream;
+    private int activeFragmentId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +101,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
         this.liveStreamFragment = new LiveStreamFragment();
         this.playlistFragment = new PlaylistFragment();
+        this.podcastFragment = new PodcastFragment();
 
         setupDrawer();
         setupStreamService();
@@ -285,11 +288,26 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
         drawerToggle.setDrawerIndicatorEnabled(true);
         drawerLayout.setDrawerListener(drawerToggle);
-        loadFragment(activeFragmentId);
+        loadOrdinalFragment(activeFragmentId);
     }
 
     public void setNavigationItemChecked(int navigationItemId) {
         navigationView.setCheckedItem(navigationItemId);
+    }
+
+    private void loadOrdinalFragment(int fragmentPosition) {
+        switch (fragmentPosition) {
+            case 0:
+                loadFragment(R.id.nav_livestream);
+                break;
+            case 1:
+                loadFragment(R.id.nav_playlist);
+                break;
+            case 2:
+                loadFragment(R.id.nav_podcast);
+                break;
+        }
+        activeFragmentId = fragmentPosition;
     }
 
     private void loadFragment(int navItemId) {
@@ -310,8 +328,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     playlistFragment.updatePlaylist(playlistService.getPlaylist());
                 }
                 break;
+            case R.id.nav_podcast:
+                replaceFragment(podcastFragment);
+                break;
         }
-        activeFragmentId = navItemId;
     }
 
     private void replaceFragment(Fragment fragment) {

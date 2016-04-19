@@ -17,12 +17,14 @@
 
     <string name="fragment_title_stream">KFJC Live Stream</string>
     <string name="fragment_title_playlist">Playlist</string>
+    <string name="fragment_title_podcast">Podcasts</string>
 
     <string name="lava_download">Downloading Lava...</string>
     <string name="lava_download_format">Downloading Lava (%1$sMB)...</string>
 
     <string name="nav_livestream">Live stream</string>
     <string name="nav_playlists">Playlist</string>
+    <string name="nav_podcast">Podcasts</string>
     <string name="navigation_drawer_open">Open navigation</string>
     <string name="navigation_drawer_close">Close navigation</string>
 
