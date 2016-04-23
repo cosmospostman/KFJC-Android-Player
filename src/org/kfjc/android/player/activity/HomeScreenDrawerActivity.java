@@ -217,9 +217,9 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.READ_PHONE_STATE)) {
             AlertDialog alertDialog = new AlertDialog.Builder(this, R.style.KfjcDialog).create();
-            alertDialog.setTitle(R.string.permission_phone);
+            alertDialog.setTitle(R.string.permission_phone_title);
             alertDialog.setMessage(getString(R.string.permission_phone_rationale));
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok),
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(android.R.string.ok),
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();

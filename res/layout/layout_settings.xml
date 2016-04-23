@@ -39,7 +39,7 @@
 			android:layout_height="wrap_content"
 			android:layout_alignParentLeft="true"
 			android:layout_centerVertical="true"
-			android:text="@string/setting_audioquality"/>
+			android:text="@string/setting_audio_quality"/>
 		<Spinner
 			android:id="@+id/streamPreferenceSpinner"
 			android:layout_alignParentRight="true"

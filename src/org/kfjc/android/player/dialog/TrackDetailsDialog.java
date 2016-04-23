@@ -78,8 +78,8 @@ public class TrackDetailsDialog extends KfjcDialog {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.KfjcDialog);
         builder.setView(view)
-                .setNegativeButton(R.string.dialog_copy, dialogExit)
-                .setPositiveButton(R.string.dialog_search, dialogExit);
+                .setNegativeButton(android.R.string.copy, dialogExit)
+                .setPositiveButton(android.R.string.search_go, dialogExit);
         return builder.create();
     }
 
@@ -121,7 +121,7 @@ public class TrackDetailsDialog extends KfjcDialog {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT,
-                context.getString(R.string.share_format, artistString, trackString, albumString));
+                context.getString(R.string.format_share_track_details, artistString, trackString, albumString));
         sendIntent.setType("text/plain");
         tryStartActivity(sendIntent);
     }
