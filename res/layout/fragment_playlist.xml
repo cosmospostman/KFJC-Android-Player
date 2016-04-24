@@ -43,7 +43,7 @@
                         android:fontFamily="sans-serif-light"
                         android:textSize="24sp"
                         android:textColor="@color/black"
-                        android:text="George Foothill"/>
+                        android:text="@string/default_dj_name"/>
 
                     <TextView
                         android:id="@+id/pl_timestring"

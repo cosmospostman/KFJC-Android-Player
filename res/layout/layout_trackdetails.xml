@@ -18,7 +18,7 @@
                 android:id="@+id/trackdetails_artist"
                 android:layout_column="0"
                 style="@style/TrackDetailsLabel"
-                android:text="Artist"/>
+                android:text="@string/trackdetails_artist"/>
             <TextView
                 android:id="@+id/trackdetails_artist_value"
                 android:layout_column="1"
@@ -33,7 +33,7 @@
                 android:id="@+id/trackdetails_track"
                 android:layout_column="0"
                 style="@style/TrackDetailsLabel"
-                android:text="Track"/>
+                android:text="@string/trackdetails_track"/>
             <TextView
                 android:id="@+id/trackdetails_track_value"
                 android:layout_column="1"
@@ -47,7 +47,7 @@
                 android:id="@+id/trackdetails_album"
                 android:layout_column="0"
                 style="@style/TrackDetailsLabel"
-                android:text="Album"/>
+                android:text="@string/trackdetails_album"/>
             <TextView
                 android:id="@+id/trackdetails_album_value"
                 android:layout_column="1"
@@ -61,7 +61,7 @@
                 android:id="@+id/trackdetails_label"
                 android:layout_column="0"
                 style="@style/TrackDetailsLabel"
-                android:text="Label"/>
+                android:text="@string/trackdetails_label"/>
             <TextView
                 android:id="@+id/trackdetails_label_value"
                 android:layout_column="1"

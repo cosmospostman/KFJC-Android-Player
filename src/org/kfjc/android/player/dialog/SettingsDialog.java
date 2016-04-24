@@ -80,7 +80,7 @@ public class SettingsDialog extends KfjcDialog {
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity(), R.style.KfjcDialog);
         dialog.setView(view);
-        dialog.setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
+        dialog.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 boolean urlPreferenceChanged =
                         !previousPreference.equals(PreferenceControl.getStreamPreference());

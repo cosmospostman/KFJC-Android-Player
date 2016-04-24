@@ -43,6 +43,11 @@
     <string name="status_lava_download">Downloading Lava...</string>
     <string name="status_lava_download_format">Downloading Lava (%1$sMB)...</string>
 
+    <string name="trackdetails_album">Album</string>
+    <string name="trackdetails_artist">Artist</string>
+    <string name="trackdetails_label">Label</string>
+    <string name="trackdetails_track">Track</string>
+
     <string name="format_buffering"
             translation_description="String to show when buffering stream called (%1s)">
          	Buffering stream: %1$s</string>
