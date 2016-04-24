@@ -24,6 +24,10 @@
     <string name="fragment_title_playlist"
             translation_description="UI title for the playlist screen">
             Playlist</string>
+    <string name="fragment_title_podcast"
+        translation_description="UI title for the podcast screen">
+            Podcasts</string>
+
 
     <string name="nav_item_livestream">Live stream</string>
     <string name="nav_item_playlists">Playlist</string>
