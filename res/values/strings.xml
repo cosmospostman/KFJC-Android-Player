@@ -1,16 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KFJC</string>
+    <string name="app_name">
+            KFJC</string>
 
-    <string name="default_dj_name">George Foothill</string>
+    <string name="default_dj_name"
+            translation_description="DJ name to show if nobody is signed into spidey">
+            George Foothill</string>
 
-    <string name="empty_string"></string>
-    <string name="error_generic">Something went wrong</string>
-    <string name="error_unable_to_connect">Can\'t connect to KFJC</string>
-    <string name="error_activity_not_found">Couldn\'t find a relevant app</string>
+    <string name="empty_string"
+            translation_description="No need to translate nothingness">
+            </string>
 
-    <string name="fragment_title_stream">KFJC Live Stream</string>
-    <string name="fragment_title_playlist">Playlist</string>
+    <string name="error_generic">
+            Something went wrong</string>
+    <string name="error_unable_to_connect">
+            Can\'t connect to KFJC</string>
+    <string name="error_activity_not_found">
+            Couldn\'t find a relevant app</string>
+
+    <string name="fragment_title_stream"
+            translation_description="UI title for the live stream screen">
+            KFJC Live Stream</string>
+    <string name="fragment_title_playlist"
+            translation_description="UI title for the playlist screen">
+            Playlist</string>
 
     <string name="nav_item_livestream">Live stream</string>
     <string name="nav_item_playlists">Playlist</string>
@@ -31,10 +44,10 @@
     <string name="status_lava_download_format">Downloading Lava (%1$sMB)...</string>
 
     <string name="format_buffering"
-        translation_description="String to show when buffering stream called (%1s)">
+            translation_description="String to show when buffering stream called (%1s)">
          	Buffering stream: %1$s</string>
     <string name="format_artist_track"
-        translation_description="String combining artist (%1s) and track (%2$s)">
+            translation_description="String combining artist (%1s) and track (%2$s)">
          	%1$s - %2$s</string>
     <string name="format_share_track_details"
         translation_description="String for sharing, combining artist (%1s), track (%2$s) and album (%3$s)">
