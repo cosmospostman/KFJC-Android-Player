@@ -21,6 +21,6 @@
         android:fontFamily="sans-serif-thin"
         android:textSize="28sp"
         android:background="@android:color/transparent"
-        android:text="@+id/navigation_drawer_title"/>
+        android:text="@string/navigation_drawer_title"/>
 
 </RelativeLayout>
