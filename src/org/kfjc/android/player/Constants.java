@@ -12,6 +12,7 @@ public class Constants {
     public static final String USER_AGENT = "kfjc4droid-v4";
 
     public static final String RESOURCES_URL = "http://www.kfjc.org/api/resources.json";
+    public static final String ARCHIVES_URL = "http://kfjc.org/api/archives.php";
     public static final Stream FALLBACK_STREAM =
             new Stream("http://netcast6.kfjc.org:80/", "Default", "128k mp3", Stream.Format.MP3);
 }
