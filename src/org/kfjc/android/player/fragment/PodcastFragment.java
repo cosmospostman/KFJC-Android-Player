@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
@@ -21,7 +20,6 @@ import org.kfjc.android.player.model.BroadcastHourJsonImpl;
 import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.util.HttpUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 

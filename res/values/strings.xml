@@ -28,13 +28,15 @@
         translation_description="UI title for the podcast screen">
             Podcasts</string>
 
+    <string name="lava_download">Downloading Lava...</string>
+    <string name="lava_download_format">Downloading Lava (%1$sMB)...</string>
 
-    <string name="nav_item_livestream">Live stream</string>
-    <string name="nav_item_playlists">Playlist</string>
-    <string name="navigation_drawer_title">KFJC Radio</string>
+    <string name="nav_livestream">Live stream</string>
+    <string name="nav_playlists">Playlist</string>
     <string name="nav_podcast">Podcasts</string>
     <string name="navigation_drawer_open">Open navigation</string>
     <string name="navigation_drawer_close">Close navigation</string>
+    <string name="navigation_drawer_title">KFJC Radio</string>
 
     <string name="permission_phone_title">Phone permissions</string>
     <string name="permission_phone_rationale">KFJC only uses phone permissions to automatically
