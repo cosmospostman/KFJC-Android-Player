@@ -78,7 +78,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private Snackbar snackbar;
 
     private boolean isForegroundActivity = false;
-    private int activeFragmentId = 0;
+    private int activeFragmentId = R.id.nav_livestream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -288,30 +288,16 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
         drawerToggle.setDrawerIndicatorEnabled(true);
         drawerLayout.setDrawerListener(drawerToggle);
-        loadOrdinalFragment(activeFragmentId);
+        loadFragment(activeFragmentId);
     }
 
     public void setNavigationItemChecked(int navigationItemId) {
         navigationView.setCheckedItem(navigationItemId);
     }
 
-    private void loadOrdinalFragment(int fragmentPosition) {
-        switch (fragmentPosition) {
-            case 0:
-                loadFragment(R.id.nav_livestream);
-                break;
-            case 1:
-                loadFragment(R.id.nav_playlist);
-                break;
-            case 2:
-                loadFragment(R.id.nav_podcast);
-                break;
-        }
-        activeFragmentId = fragmentPosition;
-    }
-
-    private void loadFragment(int navItemId) {
-        switch (navItemId) {
+    private void loadFragment(int fragmentId) {
+        activeFragmentId = fragmentId;
+        switch (fragmentId) {
             case R.id.nav_livestream:
                 replaceFragment(liveStreamFragment);
                 if (playlistService != null) {

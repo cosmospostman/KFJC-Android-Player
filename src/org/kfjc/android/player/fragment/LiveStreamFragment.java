@@ -42,8 +42,6 @@ public class LiveStreamFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        homeScreen.setActionbarTitle(getString(R.string.fragment_title_stream));
-        homeScreen.setNavigationItemChecked(R.id.nav_livestream);
         graphics = new GraphicsUtil();
         View view = inflater.inflate(R.layout.fragment_livestream, container, false);
         currentTrackTextView = (TextView) view.findViewById(R.id.currentTrack);
@@ -66,6 +64,13 @@ public class LiveStreamFragment extends Fragment {
             throw new ClassCastException(context.getClass().getSimpleName() + " must implement "
                 + HomeScreenInterface.class.getSimpleName());
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        homeScreen.setActionbarTitle(getString(R.string.fragment_title_stream));
+        homeScreen.setNavigationItemChecked(R.id.nav_livestream);
     }
 
     @Override

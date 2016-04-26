@@ -45,8 +45,6 @@ public class PlaylistFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        homeScreen.setActionbarTitle(getString(R.string.fragment_title_playlist));
-        homeScreen.setNavigationItemChecked(R.id.nav_playlist);
         View view = inflater.inflate(R.layout.fragment_playlist, container, false);
 
         djNameView = (TextView) view.findViewById(R.id.pl_djname);
@@ -55,6 +53,13 @@ public class PlaylistFragment extends Fragment {
 
         updatePlaylist(homeScreen.getLatestPlaylist());
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        homeScreen.setActionbarTitle(getString(R.string.fragment_title_playlist));
+        homeScreen.setNavigationItemChecked(R.id.nav_playlist);
     }
 
     public void updatePlaylist(Playlist playlist) {

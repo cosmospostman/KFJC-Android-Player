@@ -33,4 +33,11 @@ public class PodcastFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_podcast, container, false);
         return view;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
+        homeScreen.setNavigationItemChecked(R.id.nav_podcast);
+    }
 }

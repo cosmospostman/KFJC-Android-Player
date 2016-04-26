@@ -1,13 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:layout_gravity="top"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ScrollView
+        android:background="@color/white"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- TODO: abstract styles -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/kfjc_secondary_text"
+                android:fontFamily="sans-serif-light"
+                android:textSize="14sp"
+                android:textAllCaps="true"
+                android:text="Fresh from the airwaves"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/kfjc_divider"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/kfjc_secondary_text"
+                android:textAllCaps="true"
+                android:fontFamily="sans-serif-light"
+                android:textSize="14sp"
+                android:text="Saved"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/kfjc_divider"/>
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Podcasts Yo!"/>
 
-</ScrollView>
+</LinearLayout>
