@@ -4,7 +4,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import java.util.List;
 public class PodcastFragment extends Fragment {
 
     private HomeScreenInterface homeScreen;
+    private RecyclerView recentShowsView;
 
     @Override
     public void onAttach(Context context) {
@@ -44,6 +46,9 @@ public class PodcastFragment extends Fragment {
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
         homeScreen.setNavigationItemChecked(R.id.nav_podcast);
         View view = inflater.inflate(R.layout.fragment_podcast, container, false);
+        recentShowsView = (RecyclerView) view.findViewById(R.id.podcastRecyclerView);
+        recentShowsView.setLayoutManager(
+                new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         return view;
     }
 
@@ -73,9 +78,8 @@ public class PodcastFragment extends Fragment {
 
         @Override
         protected void onPostExecute(List<BroadcastShow> broadcastShows) {
-            for (BroadcastShow show : broadcastShows) {
-                Log.i("podcast", show.getPlaylistId() + " " + show.getAirName());
-            }
+            PodcastRecyclerAdapter adapter = new PodcastRecyclerAdapter(broadcastShows);
+            recentShowsView.setAdapter(adapter);
         }
     }
 }

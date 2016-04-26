@@ -28,10 +28,10 @@
                 android:textAllCaps="true"
                 android:text="Fresh from the airwaves"/>
 
-            <View
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/podcastRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="@color/kfjc_divider"/>
+                android:layout_height="150dp" />
 
             <TextView
                 android:layout_width="wrap_content"
