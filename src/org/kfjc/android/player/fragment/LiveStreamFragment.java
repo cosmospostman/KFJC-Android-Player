@@ -43,6 +43,7 @@ public class LiveStreamFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         graphics = new GraphicsUtil();
+        homeScreen.setActionbarTitle(getString(R.string.fragment_title_stream));
         View view = inflater.inflate(R.layout.fragment_livestream, container, false);
         currentTrackTextView = (TextView) view.findViewById(R.id.currentTrack);
         settingsButton = (FloatingActionButton) view.findViewById(R.id.settingsButton);
@@ -69,7 +70,6 @@ public class LiveStreamFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        homeScreen.setActionbarTitle(getString(R.string.fragment_title_stream));
         homeScreen.setNavigationItemChecked(R.id.nav_livestream);
     }
 
