@@ -1,9 +1,9 @@
 package org.kfjc.android.player.fragment;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -125,6 +125,6 @@ public class PlaylistFragment extends Fragment {
 
     private void showTrackDetails(Playlist.PlaylistEntry entry) {
         TrackDetailsDialog detailsDialog = TrackDetailsDialog.newInstance(entry);
-        detailsDialog.show(getActivity().getSupportFragmentManager(), "settings");
+        detailsDialog.show(getActivity().getFragmentManager(), "settings");
     }
 }

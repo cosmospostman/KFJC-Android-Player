@@ -1,12 +1,11 @@
 package org.kfjc.android.player.fragment;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +63,13 @@ public class PodcastFragment extends Fragment implements PodcastViewHolder.Podca
 
     @Override
     public void onClick(BroadcastShow show) {
-        Log.i("CLICK", show.getAirName());
+
+        getActivity().getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.animator.podcast_fadein, R.animator.podcast_fadeout)
+                .replace(R.id.home_screen_main_fragment, new PodcastPlayerFragment())
+                .addToBackStack(null)
+                .commit();
+
     }
 
     private class GetArchivesTask extends AsyncTask<Void, Void, List<BroadcastShow>> {
