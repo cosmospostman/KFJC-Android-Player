@@ -17,6 +17,9 @@ public class BroadcastArchive {
 
     public void addHour(BroadcastHour hour) {
         String id = hour.getPlaylistId();
+        if (id.equals("0")) {
+            return;
+        }
         BroadcastShow show = shows.get(id);
         if (show == null) {
             show = new BroadcastShow(hour);
@@ -27,6 +30,6 @@ public class BroadcastArchive {
     }
 
     public List<BroadcastShow> getShows() {
-        return Lists.newArrayList(shows.values());
+        return Lists.reverse(Lists.newArrayList(shows.values()));
     }
 }

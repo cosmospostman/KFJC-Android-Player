@@ -13,16 +13,19 @@ import java.util.List;
 public class PodcastRecyclerAdapter extends RecyclerView.Adapter<PodcastViewHolder> {
 
     private List<BroadcastShow> shows;
+    private PodcastViewHolder.PodcastClickDelegate clickDelegate;
 
-    public PodcastRecyclerAdapter(List<BroadcastShow> shows) {
+    public PodcastRecyclerAdapter(List<BroadcastShow> shows,
+                                  PodcastViewHolder.PodcastClickDelegate clickDelegate) {
         this.shows = shows;
+        this.clickDelegate = clickDelegate;
     }
 
     @Override
     public PodcastViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recycler_podcast, null, false);
-        PodcastViewHolder viewHolder = new PodcastViewHolder(view);
+        PodcastViewHolder viewHolder = new PodcastViewHolder(view, clickDelegate);
         return viewHolder;
     }
 

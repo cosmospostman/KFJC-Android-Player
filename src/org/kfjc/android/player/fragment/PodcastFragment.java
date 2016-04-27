@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,7 @@ import org.kfjc.android.player.util.HttpUtil;
 import java.io.IOException;
 import java.util.List;
 
-public class PodcastFragment extends Fragment {
+public class PodcastFragment extends Fragment implements PodcastViewHolder.PodcastClickDelegate {
 
     private HomeScreenInterface homeScreen;
     private RecyclerView recentShowsView;
@@ -61,6 +62,11 @@ public class PodcastFragment extends Fragment {
         new GetArchivesTask().execute();
     }
 
+    @Override
+    public void onClick(BroadcastShow show) {
+        Log.i("CLICK", show.getAirName());
+    }
+
     private class GetArchivesTask extends AsyncTask<Void, Void, List<BroadcastShow>> {
         @Override
         protected List<BroadcastShow> doInBackground(Void... params) {
@@ -78,7 +84,8 @@ public class PodcastFragment extends Fragment {
 
         @Override
         protected void onPostExecute(List<BroadcastShow> broadcastShows) {
-            PodcastRecyclerAdapter adapter = new PodcastRecyclerAdapter(broadcastShows);
+            PodcastRecyclerAdapter adapter =
+                    new PodcastRecyclerAdapter(broadcastShows, PodcastFragment.this);
             recentShowsView.setAdapter(adapter);
         }
     }
