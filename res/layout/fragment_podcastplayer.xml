@@ -34,7 +34,6 @@
             android:layout_marginBottom="4dp"
             app:layout_anchor="@id/buttonContainer"
             app:layout_anchorGravity="top|end"
-            android:src="@drawable/ic_play_arrow_white_48dp"
             app:backgroundTint="@color/kfjc_red_solid"
             app:rippleColor="@color/kfjc_mute"
             app:elevation="2dp"

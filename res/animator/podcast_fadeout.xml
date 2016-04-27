@@ -9,7 +9,7 @@
     <objectAnimator
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:interpolator="@android:interpolator/decelerate_cubic"
-        android:propertyName="translationX"
+        android:propertyName="translationY"
         android:valueType="floatType"
         android:valueFrom="0"
         android:valueTo="-100"

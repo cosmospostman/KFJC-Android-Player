@@ -310,6 +310,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 break;
             case R.id.nav_playlist:
                 replaceFragment(playlistFragment);
+                drawerToggle.syncState();
                 if (playlistService != null) {
                     playlistFragment.updatePlaylist(playlistService.getPlaylist());
                 }
