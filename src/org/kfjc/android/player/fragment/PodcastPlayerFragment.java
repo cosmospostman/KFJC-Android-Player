@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.model.BroadcastShow;
+import org.kfjc.android.player.util.ExternalStorageUtil;
 
 public class PodcastPlayerFragment extends Fragment {
 
@@ -46,10 +47,21 @@ public class PodcastPlayerFragment extends Fragment {
                         .commit();
             }
         });
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onFabClicked();
+            }
+        });
+
         fab.setImageResource(R.drawable.ic_file_download_white_48dp);
         airName.setText(show.getAirName());
         dateTime.setText(show.getStartDateTime());
         podcastDetails.setText(show.getUrls().size() + " hour show, 258Mb download.");
         return view;
+    }
+
+    private void onFabClicked() {
+        ExternalStorageUtil.createShowDir(show);
     }
 }
