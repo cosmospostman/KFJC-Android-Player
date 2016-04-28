@@ -63,9 +63,8 @@ public class PodcastFragment extends Fragment implements PodcastViewHolder.Podca
 
     @Override
     public void onClick(BroadcastShow show) {
-
         getActivity().getFragmentManager().beginTransaction()
-                .setCustomAnimations(R.animator.podcast_fadein, R.animator.podcast_fadeout)
+                .setCustomAnimations(R.animator.fade_in_up, R.animator.fade_out_up)
                 .replace(R.id.home_screen_main_fragment, new PodcastPlayerFragment())
                 .addToBackStack(null)
                 .commit();

@@ -7,10 +7,52 @@
     android:layout_width="fill_parent"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/pullDownButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/ic_expand_more_white_48dp"
+            app:layout_anchor="@id/buttonWell"
+            app:layout_anchorGravity="top|end"
+            app:fabSize="mini"
+            app:backgroundTint="@color/kfjc_transparent_black"
+            app:rippleColor="@color/kfjc_transparent_black"
+            app:elevation="0dp"
+        />
+
+        <TextView
+            android:id="@+id/airName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/kfjc_transparent_black"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#ffffff"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            android:padding="4dp"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/podcastDateTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/kfjc_transparent_black"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#ffffff"
+            android:layout_marginLeft="16dp"
+            android:padding="4dp"
+            android:text="6am Thursday April 14th, 2016"
+            android:textSize="14sp" />
+
+    </LinearLayout>
 
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/buttonContainer"
@@ -39,35 +81,7 @@
             app:elevation="2dp"
             />
 
-        <!--<android.support.design.widget.FloatingActionButton-->
-            <!--android:id="@+id/settingsButton"-->
-            <!--android:layout_width="40dp"-->
-            <!--android:layout_height="40dp"-->
-            <!--android:layout_marginRight="88dp"-->
-            <!--android:layout_marginTop="-20dp"-->
-            <!--android:src="@drawable/ic_volume_up_white_48dp"-->
-            <!--app:layout_anchor="@id/buttonWell"-->
-            <!--app:layout_anchorGravity="top|end"-->
-            <!--app:fabSize="mini"-->
-            <!--app:backgroundTint="@color/kfjc_mute"-->
-            <!--app:rippleColor="@color/kfjc_mute"-->
-            <!--app:elevation="2dp"-->
-            <!--/>-->
-
     </android.support.design.widget.CoordinatorLayout>
-
-    <TextView
-        android:id="@+id/airName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/kfjc_transparent_black"
-        android:fontFamily="sans-serif-light"
-        android:textColor="#ffffff"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingBottom="4dp"
-        android:paddingTop="0dp"
-        android:textSize="24sp" />
 
     <TextView
         android:id="@+id/podcastDetails"
