@@ -71,13 +71,14 @@
             android:fontFamily="sans-serif-light"
             android:textColor="#ffffff"
             android:padding="4dp"
-            android:textSize="18sp" />
+            android:textSize="14sp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             app:backgroundTint="@color/kfjc_red_solid"
             app:rippleColor="@color/kfjc_mute"
             app:elevation="2dp"/>

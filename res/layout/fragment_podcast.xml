@@ -26,7 +26,7 @@
                 android:fontFamily="sans-serif-light"
                 android:textSize="14sp"
                 android:textAllCaps="true"
-                android:text="Fresh from the airwaves"/>
+                android:text="Hot (off the) air"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/podcastRecyclerView"

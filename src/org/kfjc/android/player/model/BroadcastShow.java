@@ -47,7 +47,7 @@ public class BroadcastShow implements Parcelable {
         return startDateTime;
     }
 
-    List<String> getUrls() {
+    public List<String> getUrls() {
         return urls;
     }
 
