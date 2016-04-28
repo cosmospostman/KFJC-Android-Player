@@ -54,45 +54,34 @@
 
     </LinearLayout>
 
-    <android.support.design.widget.CoordinatorLayout
+    <RelativeLayout
         android:id="@+id/buttonContainer"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="60dp">
+        android:layout_height="92dp"
+        android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/buttonWell"
+        <TextView
+            android:id="@+id/podcastDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:background="@color/kfjc_transparent_black"
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            app:layout_anchor="@id/buttonContainer"
-            app:layout_anchorGravity="bottom"
-            tools:ignore="ContentDescription" />
+            android:fontFamily="sans-serif-light"
+            android:textColor="#ffffff"
+            android:padding="4dp"
+            android:textSize="18sp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="4dp"
-            app:layout_anchor="@id/buttonContainer"
-            app:layout_anchorGravity="top|end"
+            android:layout_alignParentEnd="true"
             app:backgroundTint="@color/kfjc_red_solid"
             app:rippleColor="@color/kfjc_mute"
-            app:elevation="2dp"
-            />
+            app:elevation="2dp"/>
 
-    </android.support.design.widget.CoordinatorLayout>
+    </RelativeLayout>
 
-    <TextView
-        android:id="@+id/podcastDetails"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/kfjc_transparent_black"
-        android:fontFamily="sans-serif-light"
-        android:textColor="#ffffff"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingBottom="16dp"
-        android:paddingTop="0dp"
-        android:textSize="18sp" />
 </LinearLayout>
