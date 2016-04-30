@@ -133,7 +133,7 @@ public class PodcastPlayerFragment extends Fragment {
             File downloadFile = new File(podcastDir, filename);
             if (! (downloadFile.exists() && downloadFile.length() > 0)) {
                 DownloadManager.Request req = new DownloadManager.Request(uri)
-                        .setTitle(show.getAirName() + ", part " + i + " of " + show.getUrls().size())
+                        .setTitle(show.getAirName() + ", part " + (i + 1) + " of " + show.getUrls().size())
                         .setDescription("KFJC Podcast" )
                         .setDestinationUri(Uri.fromFile(downloadFile));
                 downloadManager.enqueue(req);
