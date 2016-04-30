@@ -1,7 +1,9 @@
 package org.kfjc.android.player.fragment;
 
+import android.app.DownloadManager;
 import android.app.Fragment;
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -28,6 +30,7 @@ public class PodcastPlayerFragment extends Fragment {
     public static final String BROADCAST_SHOW_KEY = "broadcastShowKey";
 
     private BroadcastShow show;
+    private DownloadManager downloadManager;
 
     private HomeScreenInterface homeScreen;
     private FloatingActionButton pullDownFab;
@@ -45,6 +48,7 @@ public class PodcastPlayerFragment extends Fragment {
             throw new ClassCastException(context.getClass().getSimpleName() + " must implement "
                     + HomeScreenInterface.class.getSimpleName());
         }
+        downloadManager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
     }
 
     @Override
@@ -122,6 +126,18 @@ public class PodcastPlayerFragment extends Fragment {
             String playlistUrl = Constants.PLAYLIST_URL + "?i=" + show.getPlaylistId();
             Playlist playlist = new PlaylistJsonImpl(HttpUtil.getUrl(playlistUrl));
             ExternalStorageUtil.createShowDir(show, playlist);
+        }
+        for (int i = 0; i < show.getUrls().size(); i++) {
+            Uri uri = Uri.parse(show.getUrls().get(i));
+            String filename = uri.getLastPathSegment();
+            File downloadFile = new File(podcastDir, filename);
+            if (! (downloadFile.exists() && downloadFile.length() > 0)) {
+                DownloadManager.Request req = new DownloadManager.Request(uri)
+                        .setTitle(show.getAirName() + ", part " + i + " of " + show.getUrls().size())
+                        .setDescription("KFJC Podcast" )
+                        .setDestinationUri(Uri.fromFile(downloadFile));
+                downloadManager.enqueue(req);
+            }
         }
     }
 }
