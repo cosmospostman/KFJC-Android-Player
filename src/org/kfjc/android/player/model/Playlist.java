@@ -8,6 +8,7 @@ public interface Playlist {
     String getTime();
     PlaylistEntry getLastTrackEntry();
     List<PlaylistEntry> getTrackEntries();
+    String toJsonString();
 
     interface PlaylistEntry {
         boolean isEmpty();

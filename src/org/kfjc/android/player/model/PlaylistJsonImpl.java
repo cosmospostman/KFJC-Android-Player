@@ -19,12 +19,13 @@ import java.util.List;
  *  by the date/time of the show, and the second item is an array of [Artist,Title,Album,TimePlayed]
  *  arrays.
  */
-public class PlaylistJsonImpl implements Playlist{
+public class PlaylistJsonImpl implements Playlist {
 
     boolean hasError;
     String djName;
     String timeString;
     List<PlaylistEntry> entries;
+    String jsonString;
 
     public PlaylistJsonImpl(String jsonPlaylistString) {
         try {
@@ -47,10 +48,15 @@ public class PlaylistJsonImpl implements Playlist{
                 entries.add(new PlaylistEntryJsonImpl(jsonEntry));
             }
             hasError = false;
+            this.jsonString = jsonPlaylistString;
         } catch (JSONException e) {
             // Fuck
             hasError = true;
         }
+    }
+
+    public String toJsonString() {
+        return jsonString;
     }
 
     @Override

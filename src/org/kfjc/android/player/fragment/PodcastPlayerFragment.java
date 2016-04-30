@@ -2,17 +2,26 @@ package org.kfjc.android.player.fragment;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.model.BroadcastShow;
+import org.kfjc.android.player.model.Playlist;
+import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.util.ExternalStorageUtil;
+import org.kfjc.android.player.util.HttpUtil;
+
+import java.io.File;
+import java.io.IOException;
 
 public class PodcastPlayerFragment extends Fragment {
 
@@ -75,6 +84,12 @@ public class PodcastPlayerFragment extends Fragment {
         return view;
     }
 
+    private void checkState() {
+        if (! ExternalStorageUtil.getPodcastDir(show.getPlaylistId()).exists()) {
+            // Show preview and download state
+        }
+    }
+
     private void onFabClicked() {
         homeScreen.requestExternalWritePermission();
     }
@@ -83,6 +98,30 @@ public class PodcastPlayerFragment extends Fragment {
         if (!wasGranted) {
             return;
         }
-        ExternalStorageUtil.createShowDir(show);
+        makeEnsureDownloadTask().execute();
+    }
+
+    private AsyncTask<Void, Void, Void> makeEnsureDownloadTask() {
+        return new AsyncTask<Void, Void, Void>() {
+            protected Void doInBackground(Void... unusedParams) {
+                try {
+                    ensureDownloaded();
+                } catch (IOException e) {}
+                return null;
+            }
+        };
+    }
+
+    private void ensureDownloaded() throws IOException {
+        File podcastDir = ExternalStorageUtil.getPodcastDir(show.getPlaylistId());
+        File podcastPlaylist = ExternalStorageUtil.getPlaylistFile(show.getPlaylistId());
+        boolean podcastDirExists = podcastDir.exists();
+        boolean podcastPlaylistExistsAndNotEmpty =
+                podcastPlaylist.exists() && podcastPlaylist.length() > 0;
+        if (! (podcastDirExists && podcastPlaylistExistsAndNotEmpty)) {
+            String playlistUrl = Constants.PLAYLIST_URL + "?i=" + show.getPlaylistId();
+            Playlist playlist = new PlaylistJsonImpl(HttpUtil.getUrl(playlistUrl));
+            ExternalStorageUtil.createShowDir(show, playlist);
+        }
     }
 }

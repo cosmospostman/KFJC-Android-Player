@@ -38,7 +38,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginLeft="16dp"
             android:padding="4dp"
-            android:textSize="24sp" />
+            android:textSize="28sp" />
 
         <TextView
             android:id="@+id/podcastDateTime"
@@ -50,7 +50,7 @@
             android:layout_marginLeft="16dp"
             android:padding="4dp"
             android:text="6am Thursday April 14th, 2016"
-            android:textSize="14sp" />
+            android:textSize="18sp" />
 
     </LinearLayout>
 
@@ -71,7 +71,7 @@
             android:fontFamily="sans-serif-light"
             android:textColor="#ffffff"
             android:padding="4dp"
-            android:textSize="14sp" />
+            android:textSize="18sp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
