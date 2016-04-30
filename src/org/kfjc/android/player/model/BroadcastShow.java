@@ -19,14 +19,14 @@ public class BroadcastShow implements Parcelable {
 
     private final String playlistId;
     private final String airName;
-    private final String startDateTime;
+    private final long timestamp;
     private final List<String> urls;
 
     BroadcastShow(BroadcastHour hour) {
         urls = new ArrayList<>();
         this.playlistId = hour.getPlaylistId();
         this.airName = hour.getAirName();
-        this.startDateTime = "6am Thursday April 24th 2016";
+        this.timestamp = 0L;
         urls.add(hour.getUrl());
     }
 
@@ -35,12 +35,12 @@ public class BroadcastShow implements Parcelable {
         urls = new ArrayList<>();
         String playlistId = "";
         String airName = "";
-        String startDateTime = "";
+        long timestamp = 0L;
         try {
             JSONObject in = new JSONObject(jsonString);
             playlistId = in.getString(KEY_PLAYLIST_ID);
             airName = in.getString(KEY_AIRNAME);
-            startDateTime = in.getString(KEY_STARTTIME);
+            timestamp = in.getLong(KEY_STARTTIME);
             JSONArray inUrls = in.getJSONArray(KEY_URLS);
             for (int i = 0; i < inUrls.length(); i++) {
                 urls.add(inUrls.getString(i));
@@ -49,14 +49,14 @@ public class BroadcastShow implements Parcelable {
         } catch (JSONException e) {}
         this.playlistId = playlistId;
         this.airName = airName;
-        this.startDateTime = startDateTime;
+        this.timestamp = timestamp;
     }
 
     public BroadcastShow(Parcel in) {
         urls = new ArrayList<>();
         playlistId = in.readString();
         airName = in.readString();
-        startDateTime = in.readString();
+        timestamp = in.readLong();
         in.readStringList(urls);
     }
 
@@ -75,8 +75,8 @@ public class BroadcastShow implements Parcelable {
         return airName;
     }
 
-    public String getStartDateTime() {
-        return startDateTime;
+    public Long getTimestamp() {
+        return timestamp;
     }
 
     public List<String> getUrls() {
@@ -88,7 +88,7 @@ public class BroadcastShow implements Parcelable {
         try {
             out.put(KEY_PLAYLIST_ID, playlistId);
             out.put(KEY_AIRNAME, airName);
-            out.put(KEY_STARTTIME, startDateTime);
+            out.put(KEY_STARTTIME, timestamp);
             JSONArray urls = new JSONArray(this.urls);
             out.put(KEY_URLS, urls);
         } catch (JSONException e) {}
@@ -104,7 +104,7 @@ public class BroadcastShow implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(playlistId);
         dest.writeString(airName);
-        dest.writeString(startDateTime);
+        dest.writeLong(timestamp);
         dest.writeStringList(urls);
     }
 

@@ -1,6 +1,7 @@
 package org.kfjc.android.player.fragment;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.kfjc.android.player.R;
+import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 
@@ -18,11 +20,23 @@ public class PodcastPlayerFragment extends Fragment {
 
     private BroadcastShow show;
 
+    private HomeScreenInterface homeScreen;
     private FloatingActionButton pullDownFab;
     private FloatingActionButton fab;
     private TextView airName;
     private TextView dateTime;
     private TextView podcastDetails;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            homeScreen = (HomeScreenInterface) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.getClass().getSimpleName() + " must implement "
+                    + HomeScreenInterface.class.getSimpleName());
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,12 +70,19 @@ public class PodcastPlayerFragment extends Fragment {
 
         fab.setImageResource(R.drawable.ic_file_download_white_48dp);
         airName.setText(show.getAirName());
-        dateTime.setText(show.getStartDateTime());
+        dateTime.setText(""+show.getTimestamp());
         podcastDetails.setText(show.getUrls().size() + " hour show, 258Mb download.");
         return view;
     }
 
     private void onFabClicked() {
+        homeScreen.requestExternalWritePermission();
+    }
+
+    public void onWritePermissionResult(boolean wasGranted) {
+        if (!wasGranted) {
+            return;
+        }
         ExternalStorageUtil.createShowDir(show);
     }
 }

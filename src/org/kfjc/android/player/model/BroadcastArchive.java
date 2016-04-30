@@ -17,7 +17,7 @@ public class BroadcastArchive {
 
     public void addHour(BroadcastHour hour) {
         String id = hour.getPlaylistId();
-        if (id.equals("0")) {
+        if (id == null || id.equals("0")) {
             return;
         }
         BroadcastShow show = shows.get(id);

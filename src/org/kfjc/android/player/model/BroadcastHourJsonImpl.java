@@ -14,15 +14,14 @@ import org.json.JSONObject;
 public class BroadcastHourJsonImpl implements BroadcastHour  {
 
     private String airName;
-    private String showDate;
-    private int startHour;
+    private long  timestamp;
     private String url;
     private String playlistId;
 
     public BroadcastHourJsonImpl(JSONObject jsonHour) {
         try {
             airName = jsonHour.getString("air_name");
-            startHour = jsonHour.getInt("start_hour");
+            timestamp = jsonHour.getLong("start_time");
             url = jsonHour.getString("url");
             playlistId = jsonHour.getString("playlist_num");
         } catch (JSONException e) {}
@@ -34,8 +33,8 @@ public class BroadcastHourJsonImpl implements BroadcastHour  {
     }
 
     @Override
-    public int getStartHour() {
-        return startHour;
+    public long getTimestamp() {
+        return timestamp;
     }
 
     @Override

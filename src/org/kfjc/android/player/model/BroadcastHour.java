@@ -9,7 +9,7 @@ package org.kfjc.android.player.model;
  */
 public interface BroadcastHour {
     String getAirName();
-    int getStartHour();
+    long getTimestamp();
     String getUrl();
     String getPlaylistId();
 }

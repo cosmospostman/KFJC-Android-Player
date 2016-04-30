@@ -63,15 +63,7 @@ public class PodcastFragment extends Fragment implements PodcastViewHolder.Podca
 
     @Override
     public void onClick(BroadcastShow show) {
-        PodcastPlayerFragment fragment = new PodcastPlayerFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(PodcastPlayerFragment.BROADCAST_SHOW_KEY, show);
-        fragment.setArguments(bundle);
-        getActivity().getFragmentManager().beginTransaction()
-                .setCustomAnimations(R.animator.fade_in_up, R.animator.fade_out_up)
-                .replace(R.id.home_screen_main_fragment, fragment)
-                .addToBackStack(null)
-                .commit();
+        homeScreen.loadPodcastPlayer(show);
     }
 
     private class GetArchivesTask extends AsyncTask<Void, Void, List<BroadcastShow>> {

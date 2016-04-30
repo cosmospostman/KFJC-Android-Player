@@ -1,5 +1,6 @@
 package org.kfjc.android.player.activity;
 
+import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.Resources;
 
@@ -15,4 +16,6 @@ public interface HomeScreenInterface {
     Playlist getLatestPlaylist();
     void setNavigationItemChecked(int navigationItemId);
     void updateBackground();
+    void requestExternalWritePermission();
+    void loadPodcastPlayer(BroadcastShow show);
 }

@@ -37,6 +37,8 @@ import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.fragment.PlaylistFragment;
 import org.kfjc.android.player.fragment.PodcastFragment;
+import org.kfjc.android.player.fragment.PodcastPlayerFragment;
+import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.service.PlaylistService;
@@ -50,6 +52,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     private static final String KEY_ACTIVE_FRAGMENT = "active-fragment";
     private static final int KFJC_PERM_READ_PHONE_STATE = 0;
+    private static final int KFJC_PERM_WRITE_EXTERNAL = 1;
 
     private KfjcApplication application;
 
@@ -71,6 +74,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private LiveStreamFragment liveStreamFragment;
     private PlaylistFragment playlistFragment;
     private PodcastFragment podcastFragment;
+    private PodcastPlayerFragment podcastPlayerFragment;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -102,6 +106,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         this.liveStreamFragment = new LiveStreamFragment();
         this.playlistFragment = new PlaylistFragment();
         this.podcastFragment = new PodcastFragment();
+        this.podcastPlayerFragment = new PodcastPlayerFragment();
 
         setupDrawer();
         setupStreamService();
@@ -216,6 +221,20 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
     }
 
+    private boolean hasWritePermission() {
+        return ContextCompat.checkSelfPermission(
+                this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void requestExternalWritePermission() {
+        if (!hasWritePermission()) {
+            requestAndroidWritePermissions();
+        } else {
+            onWritePermissionGranted(true);
+        }
+    }
+
     private void requestPhonePermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.READ_PHONE_STATE)) {
@@ -242,6 +261,13 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 KFJC_PERM_READ_PHONE_STATE);
     }
 
+    private void requestAndroidWritePermissions() {
+        ActivityCompat.requestPermissions(
+                HomeScreenDrawerActivity.this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                KFJC_PERM_WRITE_EXTERNAL);
+    }
+
     private boolean askPermissionsAgain = true;
     @Override
     public void onRequestPermissionsResult(
@@ -260,6 +286,19 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     }
                 }
                 return;
+            case KFJC_PERM_WRITE_EXTERNAL:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    onWritePermissionGranted(true);
+                } else {
+                    onWritePermissionGranted(false);
+                }
+        }
+    }
+
+    private void onWritePermissionGranted(boolean wasGranted) {
+        if (podcastPlayerFragment != null) {
+            podcastPlayerFragment.onWritePermissionResult(wasGranted);
         }
     }
 
@@ -318,7 +357,25 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             case R.id.nav_podcast:
                 replaceFragment(podcastFragment);
                 break;
+            case R.id.nav_podcast_player:
+                loadPodcastPlayer(null);
+                break;
         }
+    }
+
+    @Override
+    public void loadPodcastPlayer(BroadcastShow show) {
+        podcastPlayerFragment = new PodcastPlayerFragment();
+        if (show != null) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(PodcastPlayerFragment.BROADCAST_SHOW_KEY, show);
+            podcastPlayerFragment.setArguments(bundle);
+        }
+        getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.animator.fade_in_up, R.animator.fade_out_up)
+                .replace(R.id.home_screen_main_fragment, podcastPlayerFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     private void replaceFragment(Fragment fragment) {
