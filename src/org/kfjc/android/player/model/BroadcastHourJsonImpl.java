@@ -14,7 +14,7 @@ import org.json.JSONObject;
 public class BroadcastHourJsonImpl implements BroadcastHour  {
 
     private String airName;
-    private long  timestamp;
+    private long timestamp;
     private String url;
     private String playlistId;
 

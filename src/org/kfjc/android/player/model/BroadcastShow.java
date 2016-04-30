@@ -7,8 +7,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class BroadcastShow implements Parcelable {
 
@@ -19,14 +22,14 @@ public class BroadcastShow implements Parcelable {
 
     private final String playlistId;
     private final String airName;
-    private final long timestamp;
+    private long timestamp;
     private final List<String> urls;
 
     BroadcastShow(BroadcastHour hour) {
         urls = new ArrayList<>();
         this.playlistId = hour.getPlaylistId();
         this.airName = hour.getAirName();
-        this.timestamp = 0L;
+        this.timestamp = hour.getTimestamp();
         urls.add(hour.getUrl());
     }
 
@@ -64,6 +67,8 @@ public class BroadcastShow implements Parcelable {
         if (!hour.getPlaylistId().equals(playlistId)) {
             return;
         }
+        // Use earliest timestamp as start of show.
+        timestamp = Math.min(timestamp, hour.getTimestamp());
         urls.add(hour.getUrl());
     }
 
@@ -77,6 +82,18 @@ public class BroadcastShow implements Parcelable {
 
     public Long getTimestamp() {
         return timestamp;
+    }
+
+    public String getTimestampString() {
+        SimpleDateFormat df = new SimpleDateFormat("ha, EEEE d MMMM yyyy");
+        df.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+        return df.format(new Date(roundUpHour(timestamp) * 1000));
+    }
+
+    private static long roundUpHour(long timestampSec) {
+        long remainder = timestampSec % 3600;
+        long timeToAdd = 3600 - remainder;
+        return timestampSec + timeToAdd;
     }
 
     public List<String> getUrls() {

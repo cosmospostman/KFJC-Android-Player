@@ -70,7 +70,7 @@ public class PodcastPlayerFragment extends Fragment {
 
         fab.setImageResource(R.drawable.ic_file_download_white_48dp);
         airName.setText(show.getAirName());
-        dateTime.setText(""+show.getTimestamp());
+        dateTime.setText(show.getTimestampString());
         podcastDetails.setText(show.getUrls().size() + " hour show, 258Mb download.");
         return view;
     }
