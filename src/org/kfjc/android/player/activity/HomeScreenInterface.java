@@ -17,5 +17,6 @@ public interface HomeScreenInterface {
     void setNavigationItemChecked(int navigationItemId);
     void updateBackground();
     void requestExternalWritePermission();
-    void loadPodcastPlayer(BroadcastShow show);
+    void loadPodcastPlayer(BroadcastShow show, boolean animate);
+    void registerDownload(long downloadId, BroadcastShow show);
 }

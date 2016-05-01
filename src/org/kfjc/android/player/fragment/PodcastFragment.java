@@ -63,7 +63,7 @@ public class PodcastFragment extends Fragment implements PodcastViewHolder.Podca
 
     @Override
     public void onClick(BroadcastShow show) {
-        homeScreen.loadPodcastPlayer(show);
+        homeScreen.loadPodcastPlayer(show, true);
     }
 
     private class GetArchivesTask extends AsyncTask<Void, Void, List<BroadcastShow>> {

@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +54,7 @@ public class PodcastPlayerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Bundle bundle = getArguments();
         show = bundle.getParcelable(BROADCAST_SHOW_KEY);
-
+        homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
         View view = inflater.inflate(R.layout.fragment_podcastplayer, container, false);
 
         pullDownFab = (FloatingActionButton) view.findViewById(R.id.pullDownButton);
@@ -136,7 +135,8 @@ public class PodcastPlayerFragment extends Fragment {
                         .setTitle(show.getAirName() + ", part " + (i + 1) + " of " + show.getUrls().size())
                         .setDescription("KFJC Podcast" )
                         .setDestinationUri(Uri.fromFile(downloadFile));
-                downloadManager.enqueue(req);
+                long referenceId = downloadManager.enqueue(req);
+                homeScreen.registerDownload(referenceId, show);
             }
         }
     }

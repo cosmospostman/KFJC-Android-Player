@@ -2,6 +2,8 @@ package org.kfjc.android.player.activity;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,8 +49,13 @@ import org.kfjc.android.player.util.HttpUtil;
 import org.kfjc.android.player.util.NotificationUtil;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeScreenInterface {
+
+    public static final String INTENT_DOWNLOAD_CLICKED = "downloadClicked";
+    public static final String INTENT_DOWNLOAD_IDS = "downloadIds";
 
     private static final String KEY_ACTIVE_FRAGMENT = "active-fragment";
     private static final int KFJC_PERM_READ_PHONE_STATE = 0;
@@ -70,6 +77,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private TelephonyManager telephonyManager;
     private AudioManager.OnAudioFocusChangeListener audioFocusListener;
     private PhoneStateListener phoneStateListener;
+    private BroadcastReceiver downloadClickedReceiver;
 
     private LiveStreamFragment liveStreamFragment;
     private PlaylistFragment playlistFragment;
@@ -80,6 +88,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private ActionBarDrawerToggle drawerToggle;
     private View view;
     private Snackbar snackbar;
+    private Map<Long, BroadcastShow> activeDownloads;
 
     private boolean isForegroundActivity = false;
     private int activeFragmentId = R.id.nav_livestream;
@@ -102,6 +111,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupPlaylistService();
         streamServiceIntent = new Intent(this, StreamService.class);
         startService(streamServiceIntent);
+        activeDownloads = new HashMap<>();
 
         this.liveStreamFragment = new LiveStreamFragment();
         this.playlistFragment = new PlaylistFragment();
@@ -358,24 +368,26 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 replaceFragment(podcastFragment);
                 break;
             case R.id.nav_podcast_player:
-                loadPodcastPlayer(null);
+                loadPodcastPlayer(null, true);
                 break;
         }
     }
 
     @Override
-    public void loadPodcastPlayer(BroadcastShow show) {
+    public void loadPodcastPlayer(BroadcastShow show, boolean animate) {
         podcastPlayerFragment = new PodcastPlayerFragment();
         if (show != null) {
             Bundle bundle = new Bundle();
             bundle.putParcelable(PodcastPlayerFragment.BROADCAST_SHOW_KEY, show);
             podcastPlayerFragment.setArguments(bundle);
         }
-        getFragmentManager().beginTransaction()
-                .setCustomAnimations(R.animator.fade_in_up, R.animator.fade_out_up)
-                .replace(R.id.home_screen_main_fragment, podcastPlayerFragment)
-                .addToBackStack(null)
-                .commit();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (animate) {
+            ft.setCustomAnimations(R.animator.fade_in_up, R.animator.fade_out_up);
+        }
+        ft.replace(R.id.home_screen_main_fragment, podcastPlayerFragment)
+            .addToBackStack(null)
+            .commit();
     }
 
     private void replaceFragment(Fragment fragment) {
@@ -431,6 +443,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
     }
 
+    public void registerDownload(long downloadId, BroadcastShow show) {
+        activeDownloads.put(downloadId, show);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -438,6 +454,18 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         PreferenceControl.updateStreams();
         isForegroundActivity = true;
         updateBackground();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        long[] downloadIds = intent.getLongArrayExtra(INTENT_DOWNLOAD_IDS);
+        if (downloadIds != null && downloadIds.length > 0) {
+            for (long id : downloadIds) {
+                if (activeDownloads.containsKey(id)) {
+                    loadPodcastPlayer(activeDownloads.get(id), false);
+                }
+            }
+        }
     }
 
     @Override
