@@ -52,8 +52,6 @@ public class PodcastPlayerFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Bundle bundle = getArguments();
-        show = bundle.getParcelable(BROADCAST_SHOW_KEY);
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
         View view = inflater.inflate(R.layout.fragment_podcastplayer, container, false);
 
@@ -80,9 +78,14 @@ public class PodcastPlayerFragment extends Fragment {
             }
         });
 
-        airName.setText(show.getAirName());
-        dateTime.setText(show.getTimestampString());
-        checkState();
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            show = bundle.getParcelable(BROADCAST_SHOW_KEY);
+            airName.setText(show.getAirName());
+            dateTime.setText(show.getTimestampString());
+            checkState();
+        }
+
         return view;
     }
 

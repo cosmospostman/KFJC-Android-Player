@@ -6,6 +6,7 @@
     <color name="kfjc_red_muted">#88d73032</color>
     <color name="kfjc_mute">#2e3436</color>
     <color name="kfjc_transparent_black">#86000000</color>
+    <color name="kfjc_transparent_black_light">#6a3b3b3b</color>
     <color name="kfjc_secondary_text">#56000000</color>
     <color name="kfjc_divider">#E0E0E0</color>
     <color name="kfjc_white">#FFFFFF</color>

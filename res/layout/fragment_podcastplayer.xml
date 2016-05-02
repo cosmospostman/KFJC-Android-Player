@@ -52,6 +52,26 @@
             android:text="6am Thursday April 14th, 2016"
             android:textSize="18sp" />
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp">
+
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/playlistButton"
+                android:backgroundTint="@color/kfjc_transparent_black_light"
+                android:text="Playlist"/>
+
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/kfjc_transparent_black_light"
+                android:layout_toRightOf="@+id/playlistButton"
+                android:text="Delete"/>
+        </RelativeLayout>
+
     </LinearLayout>
 
     <RelativeLayout
