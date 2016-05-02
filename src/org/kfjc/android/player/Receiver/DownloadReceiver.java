@@ -11,7 +11,8 @@ public class DownloadReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent startIntent = new Intent(context, HomeScreenDrawerActivity.class);
-        startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startIntent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         startIntent.putExtra(HomeScreenDrawerActivity.INTENT_DOWNLOAD_IDS,
                 intent.getLongArrayExtra(DownloadManager.EXTRA_NOTIFICATION_CLICK_DOWNLOAD_IDS));
         context.startActivity(startIntent);

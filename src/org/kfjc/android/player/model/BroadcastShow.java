@@ -24,6 +24,7 @@ public class BroadcastShow implements Parcelable {
     private final String airName;
     private long timestamp;
     private final List<String> urls;
+    private boolean hasError;
 
     BroadcastShow(BroadcastHour hour) {
         urls = new ArrayList<>();
@@ -48,8 +49,10 @@ public class BroadcastShow implements Parcelable {
             for (int i = 0; i < inUrls.length(); i++) {
                 urls.add(inUrls.getString(i));
             }
-
-        } catch (JSONException e) {}
+            hasError = false;
+        } catch (JSONException e) {
+            hasError = true;
+        }
         this.playlistId = playlistId;
         this.airName = airName;
         this.timestamp = timestamp;
@@ -82,6 +85,10 @@ public class BroadcastShow implements Parcelable {
 
     public Long getTimestamp() {
         return timestamp;
+    }
+
+    public boolean hasError() {
+        return hasError;
     }
 
     public String getTimestampString() {

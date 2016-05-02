@@ -7,8 +7,12 @@ import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
 
 public class ExternalStorageUtil {
 
@@ -57,10 +61,13 @@ public class ExternalStorageUtil {
         }
     }
 
-    public static File getPodcastDir(String playlistId) {
-        File kfjcDir = new File(Environment.getExternalStoragePublicDirectory(
+    private static File getPodcastDir() {
+        return new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PODCASTS), KFJC_DIRECTORY_NAME);
-        return new File(kfjcDir, playlistId);
+    }
+
+    public static File getPodcastDir(String playlistId) {
+        return new File(getPodcastDir(), playlistId);
     }
 
     public static File getPlaylistFile(String playlistId) {
@@ -83,5 +90,25 @@ public class ExternalStorageUtil {
             return true;
         }
         return false;
+    }
+
+    public static List<BroadcastShow> getSavedShows() {
+        List<BroadcastShow> shows = new LinkedList<>();
+        File podcastDir = getPodcastDir();
+        for (File f : podcastDir.listFiles()) {
+            try {
+                File index = new File(f, KFJC_INDEX_FILENAME);
+                String indexString = new Scanner(index).useDelimiter("\\Z").next();
+                BroadcastShow show = new BroadcastShow(indexString);
+                if (! show.hasError()) {
+                    shows.add(show);
+                }
+            } catch (FileNotFoundException e) {
+                // Do nothing
+            }
+        }
+
+
+        return shows;
     }
 }

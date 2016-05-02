@@ -14,7 +14,7 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
     }
 
     private TextView airName;
-    private TextView id;
+    private TextView timestamp;
     private PodcastClickDelegate clickDelegate;
     private BroadcastShow show;
 
@@ -23,13 +23,13 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
         this.clickDelegate = clickDelegate;
         itemView.setOnClickListener(this);
         airName = (TextView) itemView.findViewById(R.id.airName);
-        id = (TextView) itemView.findViewById(R.id.id);
+        timestamp = (TextView) itemView.findViewById(R.id.timestamp);
     }
 
     public void setShow(BroadcastShow show) {
         this.show = show;
         airName.setText(show.getAirName());
-        id.setText(show.getPlaylistId());
+        timestamp.setText(show.getTimestampString());
     }
 
     @Override

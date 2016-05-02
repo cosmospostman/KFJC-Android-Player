@@ -12,19 +12,26 @@ import java.util.List;
 
 public class PodcastRecyclerAdapter extends RecyclerView.Adapter<PodcastViewHolder> {
 
+    enum Type {
+        HORIZONTAL,
+        VERTICAL
+    }
+
     private List<BroadcastShow> shows;
     private PodcastViewHolder.PodcastClickDelegate clickDelegate;
+    private Type layoutType;
 
-    public PodcastRecyclerAdapter(List<BroadcastShow> shows,
+    public PodcastRecyclerAdapter(List<BroadcastShow> shows, Type type,
                                   PodcastViewHolder.PodcastClickDelegate clickDelegate) {
         this.shows = shows;
         this.clickDelegate = clickDelegate;
+        this.layoutType = type;
     }
 
     @Override
     public PodcastViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.recycler_podcast, null, false);
+                .inflate(viewType, null, false);
         PodcastViewHolder viewHolder = new PodcastViewHolder(view, clickDelegate);
         return viewHolder;
     }
@@ -38,4 +45,16 @@ public class PodcastRecyclerAdapter extends RecyclerView.Adapter<PodcastViewHold
     public int getItemCount() {
         return shows.size();
     }
+
+    @Override
+    public int getItemViewType(int position) {
+        switch (layoutType) {
+            case HORIZONTAL:
+                return R.layout.recycler_podcast;
+            case VERTICAL:
+                return R.layout.recycler_saved_podcast;
+            default:
+                return -1;
+        }
+    };
 }

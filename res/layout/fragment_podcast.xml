@@ -10,7 +10,8 @@
         android:background="@color/white"
         android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -42,10 +43,10 @@
                 android:textSize="14sp"
                 android:text="Saved"/>
 
-            <View
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/savedRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="@color/kfjc_divider"/>
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 

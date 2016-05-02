@@ -26,6 +26,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -345,6 +346,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     }
 
     private void loadFragment(int fragmentId) {
+        Log.i("HOME", "Loading fragment " + fragmentId);
         activeFragmentId = fragmentId;
         switch (fragmentId) {
             case R.id.nav_livestream:
@@ -463,8 +465,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             for (long id : downloadIds) {
                 if (activeDownloads.containsKey(id)) {
                     loadPodcastPlayer(activeDownloads.get(id), false);
+                    return;
                 }
             }
+            loadFragment(R.id.nav_podcast);
         }
     }
 
@@ -517,7 +521,9 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void stopStream() {
         liveStreamFragment.setState(LiveStreamFragment.PlayerState.STOP);
-        streamService.stop();
+        if (streamService != null) {
+            streamService.stop();
+        }
         audioManager.abandonAudioFocus(audioFocusListener);
         notificationUtil.cancelNowPlayNotification();
         if (!isForegroundActivity) {

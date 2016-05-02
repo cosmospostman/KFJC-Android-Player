@@ -19,6 +19,7 @@ import org.kfjc.android.player.model.BroadcastArchive;
 import org.kfjc.android.player.model.BroadcastHour;
 import org.kfjc.android.player.model.BroadcastHourJsonImpl;
 import org.kfjc.android.player.model.BroadcastShow;
+import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class PodcastFragment extends Fragment implements PodcastViewHolder.Podca
 
     private HomeScreenInterface homeScreen;
     private RecyclerView recentShowsView;
+    private RecyclerView savedShowsView;
 
     @Override
     public void onAttach(Context context) {
@@ -49,6 +51,9 @@ public class PodcastFragment extends Fragment implements PodcastViewHolder.Podca
         recentShowsView = (RecyclerView) view.findViewById(R.id.podcastRecyclerView);
         recentShowsView.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        savedShowsView = (RecyclerView) view.findViewById(R.id.savedRecyclerView);
+        savedShowsView.setLayoutManager(
+                new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         return view;
     }
 
@@ -58,6 +63,10 @@ public class PodcastFragment extends Fragment implements PodcastViewHolder.Podca
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
         homeScreen.setNavigationItemChecked(R.id.nav_podcast);
 
+        List<BroadcastShow> savedShows = ExternalStorageUtil.getSavedShows();
+        PodcastRecyclerAdapter adapter = new PodcastRecyclerAdapter(
+                savedShows, PodcastRecyclerAdapter.Type.VERTICAL, PodcastFragment.this);
+        savedShowsView.setAdapter(adapter);
         new GetArchivesTask().execute();
     }
 
@@ -84,7 +93,8 @@ public class PodcastFragment extends Fragment implements PodcastViewHolder.Podca
         @Override
         protected void onPostExecute(List<BroadcastShow> broadcastShows) {
             PodcastRecyclerAdapter adapter =
-                    new PodcastRecyclerAdapter(broadcastShows, PodcastFragment.this);
+                    new PodcastRecyclerAdapter(
+                            broadcastShows, PodcastRecyclerAdapter.Type.HORIZONTAL, PodcastFragment.this);
             recentShowsView.setAdapter(adapter);
         }
     }
