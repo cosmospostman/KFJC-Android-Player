@@ -1,5 +1,6 @@
 package org.kfjc.android.player.util;
 
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
@@ -107,8 +108,22 @@ public class ExternalStorageUtil {
                 // Do nothing
             }
         }
-
-
         return shows;
+    }
+
+    public static boolean hasAllContent(BroadcastShow show) {
+        File podcastDir = getPodcastDir(show.getPlaylistId());
+        if (! (new File(podcastDir, KFJC_INDEX_FILENAME).exists())
+                && new File(podcastDir, KFJC_PLAYLIST_FILENAME).exists()) {
+            return false;
+        }
+        for (String url : show.getUrls()) {
+            String expectedFilename = Uri.parse(url).getLastPathSegment();
+            File expectedFile = new File(podcastDir, expectedFilename);
+            if (!expectedFile.exists()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

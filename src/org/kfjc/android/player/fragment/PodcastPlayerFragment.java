@@ -80,16 +80,20 @@ public class PodcastPlayerFragment extends Fragment {
             }
         });
 
-        fab.setImageResource(R.drawable.ic_file_download_white_48dp);
         airName.setText(show.getAirName());
         dateTime.setText(show.getTimestampString());
-        podcastDetails.setText(show.getUrls().size() + " hour show, 258Mb download.");
+        checkState();
         return view;
     }
 
     private void checkState() {
         if (! ExternalStorageUtil.getPodcastDir(show.getPlaylistId()).exists()) {
             // Show preview and download state
+            fab.setImageResource(R.drawable.ic_file_download_white_48dp);
+            podcastDetails.setText(show.getUrls().size() + " hour show, 258Mb download.");
+        } else if (ExternalStorageUtil.hasAllContent(show)) {
+            // Show play state
+            fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
         }
     }
 
