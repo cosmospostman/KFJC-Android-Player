@@ -25,7 +25,7 @@ import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
-import org.kfjc.android.player.model.Stream;
+import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.util.NotificationUtil;
 
 public class StreamService extends Service {
@@ -41,7 +41,7 @@ public class StreamService extends Service {
 
     public interface MediaListener {
         void onBuffer();
-        void onPlay();
+        void onPlay(MediaSource source);
         void onError(String message);
         void onEnd();
     }
@@ -52,6 +52,7 @@ public class StreamService extends Service {
 		}
 	}
 
+    private MediaSource mediaSource;
 	private MediaListener mediaListener;
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
     private ExoPlayer player;
@@ -113,8 +114,9 @@ public class StreamService extends Service {
 		this.mediaListener = listener;
 	}
 
-    public void play(Context context, Stream stream) {
-        String streamUrl = stream.url;
+    public void play(Context context, MediaSource mediaSource) {
+        this.mediaSource = mediaSource;
+        String streamUrl = mediaSource.url;
         Log.i(TAG, "Playing stream " + streamUrl);
         player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
         player.addListener(exoPlayerListener);
@@ -123,7 +125,7 @@ public class StreamService extends Service {
         startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
 
         Extractor extractor = null;
-        switch (stream.format) {
+        switch (mediaSource.format) {
             case AAC:
                 extractor = new AdtsExtractor();
                 break;
@@ -157,11 +159,11 @@ public class StreamService extends Service {
         Log.i(TAG, "Service stopped");
 	}
 
-    public void reload(Context context, Stream stream) {
+    public void reload(Context context, MediaSource mediaSource) {
         if (player != null) {
             player.stop();
         }
-        play(context, stream);
+        play(context, mediaSource);
     }
 
     private void unregisterReceivers() {
@@ -180,7 +182,7 @@ public class StreamService extends Service {
             switch (state) {
                 case ExoPlayer.STATE_READY:
                     if (playWhenReady) {
-                        mediaListener.onPlay();
+                        mediaListener.onPlay(mediaSource);
                         registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
                         becomingNoisyReceiverRegistered = true;
                     }

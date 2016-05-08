@@ -1,7 +1,6 @@
 package org.kfjc.android.player.fragment;
 
 import android.app.DownloadManager;
-import android.app.Fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -19,32 +18,29 @@ import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
-import org.kfjc.android.player.model.Stream;
+import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
 
 import java.io.File;
 import java.io.IOException;
 
-public class PodcastPlayerFragment extends Fragment {
+public class PodcastPlayerFragment extends PlayerFragment {
 
     public static final String BROADCAST_SHOW_KEY = "broadcastShowKey";
 
-    private enum State {
+    private enum FragmentState {
         PREVIEW,
-        SAVED
+        PLAYER
     }
 
     private BroadcastShow show;
     private DownloadManager downloadManager;
-    private State state;
+    private FragmentState fragmentState;
     private Handler handler = new Handler();
 
     private HomeScreenInterface homeScreen;
-    private FloatingActionButton pullDownFab;
     private FloatingActionButton fab;
-    private TextView airName;
-    private TextView dateTime;
     private TextView podcastDetails;
     private Runnable playClockUpdater = new Runnable() {
         @Override public void run() {
@@ -72,10 +68,11 @@ public class PodcastPlayerFragment extends Fragment {
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
         View view = inflater.inflate(R.layout.fragment_podcastplayer, container, false);
 
-        pullDownFab = (FloatingActionButton) view.findViewById(R.id.pullDownButton);
+        FloatingActionButton pullDownFab = (FloatingActionButton) view.findViewById(R.id.pullDownButton);
+        TextView airName = (TextView) view.findViewById(R.id.airName);
+        TextView dateTime = (TextView) view.findViewById(R.id.podcastDateTime);
+
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
-        airName = (TextView) view.findViewById(R.id.airName);
-        dateTime = (TextView) view.findViewById(R.id.podcastDateTime);
         podcastDetails = (TextView) view.findViewById(R.id.podcastDetails);
 
         pullDownFab.setOnClickListener(new View.OnClickListener() {
@@ -111,27 +108,44 @@ public class PodcastPlayerFragment extends Fragment {
             // Show preview and download state
             fab.setImageResource(R.drawable.ic_file_download_white_48dp);
             podcastDetails.setText(show.getUrls().size() + " hour show, 258Mb download.");
-            state = State.PREVIEW;
+            fragmentState = FragmentState.PREVIEW;
         } else if (ExternalStorageUtil.hasAllContent(show)) {
             // Show play state
             fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-            state = State.SAVED;
+            fragmentState = FragmentState.PLAYER;
         }
     }
 
     private void onFabClicked() {
-        switch (state) {
+        switch (fragmentState) {
             case PREVIEW:
                 homeScreen.requestExternalWritePermission();
                 break;
-            case SAVED:
-                File f = ExternalStorageUtil.getSavedArchivesForShow(show).get(0);
-                try {
-                    homeScreen.playArchive(new Stream(f.getCanonicalPath(), Stream.Format.MP3));
-                    handler.postDelayed(playClockUpdater, 0);
-                } catch (IOException e) {}
+            case PLAYER:
+                onPlayStopButtonClick();
                 break;
         }
+    }
+
+    private void onPlayStopButtonClick() {
+        switch (playerState) {
+            case STOP:
+                playArchive();
+                break;
+            case PLAY:
+                homeScreen.stopPlayer();
+                break;
+        }
+
+    }
+
+    private void playArchive() {
+        File f = ExternalStorageUtil.getSavedArchivesForShow(show).get(0);
+        try {
+            homeScreen.playArchive(new MediaSource(
+                    MediaSource.Type.ARCHIVE, f.getCanonicalPath(), MediaSource.Format.MP3));
+            handler.postDelayed(playClockUpdater, 0);
+        } catch (IOException e) {}
     }
 
     public void onWritePermissionResult(boolean wasGranted) {
@@ -177,4 +191,17 @@ public class PodcastPlayerFragment extends Fragment {
             }
         }
     }
+
+    @Override
+    void onStatePlay() {
+        fab.setImageResource(R.drawable.ic_stop_white_48dp);
+    }
+
+    @Override
+    void onStateStop() {
+        fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+    }
+
+    @Override
+    void onStateBuffer() {}
 }

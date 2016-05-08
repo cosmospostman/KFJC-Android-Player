@@ -38,13 +38,14 @@ import org.kfjc.android.player.KfjcApplication;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
+import org.kfjc.android.player.fragment.PlayerFragment;
 import org.kfjc.android.player.fragment.PlaylistFragment;
 import org.kfjc.android.player.fragment.PodcastFragment;
 import org.kfjc.android.player.fragment.PodcastPlayerFragment;
 import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
-import org.kfjc.android.player.model.Stream;
+import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.HttpUtil;
@@ -189,14 +190,23 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
 
         @Override
-        public void onPlay() {
-            liveStreamFragment.setState(LiveStreamFragment.PlayerState.PLAY);
-            notificationUtil.updateNowPlayNotification(playlistService.getPlaylist());
+        public void onPlay(MediaSource source) {
+            switch (source.type) {
+                case LIVESTREAM:
+                    liveStreamFragment.setState(PlayerFragment.PlayerState.PLAY);
+                    podcastPlayerFragment.setState(PlayerFragment.PlayerState.STOP);
+                    notificationUtil.updateNowPlayNotification(playlistService.getPlaylist());
+                    break;
+                case ARCHIVE:
+                    liveStreamFragment.setState(PlayerFragment.PlayerState.STOP);
+                    podcastPlayerFragment.setState(PlayerFragment.PlayerState.PLAY);
+                    break;
+            }
         }
 
         @Override
         public void onError(String info) {
-            stopStream();
+            stopPlayer();
             String message = getString(R.string.error_generic);
             if (info.contains("HttpDataSourceException")) {
                 message = getString(R.string.error_unable_to_connect);
@@ -206,7 +216,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
         @Override
         public void onEnd() {
-            liveStreamFragment.setState(LiveStreamFragment.PlayerState.STOP);
+            liveStreamFragment.setState(PlayerFragment.PlayerState.STOP);
+            podcastPlayerFragment.setState(PlayerFragment.PlayerState.STOP);
         }
     };
 
@@ -516,7 +527,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     }
 
     @Override
-    public void playArchive(Stream source) {
+    public void playArchive(MediaSource source) {
         streamService.stop();
         audioManager.requestAudioFocus(
                 audioFocusListener,
@@ -526,7 +537,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     }
 
     @Override
-    public void stopStream() {
+    public void stopPlayer() {
         liveStreamFragment.setState(LiveStreamFragment.PlayerState.STOP);
         if (streamService != null) {
             streamService.stop();
@@ -547,7 +558,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     protected void onDestroy() {
         super.onDestroy();
         notificationUtil.cancelNowPlayNotification();
-        stopStream();
+        stopPlayer();
         stopService(streamServiceIntent);
         stopService(playlistServiceIntent);
         if (telephonyManager != null) {

@@ -27,7 +27,7 @@ import android.widget.TextView;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.control.PreferenceControl;
-import org.kfjc.android.player.model.Stream;
+import org.kfjc.android.player.model.MediaSource;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public class SettingsDialog extends KfjcDialog {
     private AudioManager audioManager;
     private Spinner spinner;
     private SwitchCompat backgroundSwitch;
-    private Stream previousPreference;
+    private MediaSource previousPreference;
     private StreamUrlPreferenceChangeHandler urlPreferenceChangeHandler;
     private ContextThemeWrapper themeWrapper;
     private HomeScreenInterface home;
@@ -57,8 +57,8 @@ public class SettingsDialog extends KfjcDialog {
         spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Stream stream = (Stream) parent.getItemAtPosition(position);
-                PreferenceControl.setStreamPreference(stream);
+                MediaSource mediaSource = (MediaSource) parent.getItemAtPosition(position);
+                PreferenceControl.setStreamPreference(mediaSource);
             }
 
             @Override
@@ -107,11 +107,11 @@ public class SettingsDialog extends KfjcDialog {
     }
 
     private void initStreamOptions() {
-        List<Stream> streams = PreferenceControl.getStreams();
+        List<MediaSource> mediaSources = PreferenceControl.getMediaSources();
         StreamAdapter streamAdapter = new StreamAdapter(
-                themeWrapper, android.R.layout.simple_spinner_item, streams);
+                themeWrapper, android.R.layout.simple_spinner_item, mediaSources);
         spinner.setAdapter(streamAdapter);
-        int selectedIndex = streams.indexOf(PreferenceControl.getStreamPreference());
+        int selectedIndex = mediaSources.indexOf(PreferenceControl.getStreamPreference());
         spinner.setSelection(Math.max(0, selectedIndex));
     }
 
@@ -151,13 +151,13 @@ public class SettingsDialog extends KfjcDialog {
                 android.provider.Settings.System.CONTENT_URI, true, mSettingsContentObserver);
     }
 
-    private class StreamAdapter extends ArrayAdapter<Stream> {
-        private List<Stream> streams;
+    private class StreamAdapter extends ArrayAdapter<MediaSource> {
+        private List<MediaSource> mediaSources;
         private Context context;
-        public StreamAdapter(Context context, int resource, List<Stream> streams) {
-            super(context, resource, streams);
+        public StreamAdapter(Context context, int resource, List<MediaSource> mediaSources) {
+            super(context, resource, mediaSources);
             this.context = context;
-            this.streams = streams;
+            this.mediaSources = mediaSources;
         }
 
         @Override
@@ -165,7 +165,7 @@ public class SettingsDialog extends KfjcDialog {
             View view = LayoutInflater.from(context).inflate(
                     android.R.layout.simple_spinner_item, parent, false);
             TextView streamName = (TextView) view.findViewById(android.R.id.text1);
-            streamName.setText(streams.get(position).name);
+            streamName.setText(mediaSources.get(position).name);
             return view;
         }
 
@@ -175,8 +175,8 @@ public class SettingsDialog extends KfjcDialog {
                     android.R.layout.simple_list_item_2, parent, false);
             TextView streamName = (TextView) view.findViewById(android.R.id.text1);
             TextView streamDesc = (TextView) view.findViewById(android.R.id.text2);
-            streamName.setText(streams.get(position).name);
-            streamDesc.setText(streams.get(position).description);
+            streamName.setText(mediaSources.get(position).name);
+            streamDesc.setText(mediaSources.get(position).description);
             streamDesc.setTextColor(ContextCompat.getColor(context, R.color.kfjc_secondary_text));
             return view;
         }

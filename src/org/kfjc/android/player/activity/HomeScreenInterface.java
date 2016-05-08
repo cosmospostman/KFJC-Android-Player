@@ -2,15 +2,14 @@ package org.kfjc.android.player.activity;
 
 import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
-import org.kfjc.android.player.model.Resources;
-import org.kfjc.android.player.model.Stream;
+import org.kfjc.android.player.model.MediaSource;
 
 public interface HomeScreenInterface {
     void setActionbarTitle(String title);
     void playStream();
-    void stopStream();
+    void stopPlayer();
     void restartStream();
-    void playArchive(Stream source);
+    void playArchive(MediaSource source);
     boolean isStreamServicePlaying();
     String getString(int resId);
     void snack(String message, int duration);

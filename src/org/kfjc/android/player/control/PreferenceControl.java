@@ -6,8 +6,7 @@ import android.os.AsyncTask;
 
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.KfjcApplication;
-import org.kfjc.android.player.activity.HomeScreenInterface;
-import org.kfjc.android.player.model.Stream;
+import org.kfjc.android.player.model.MediaSource;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -24,7 +23,7 @@ public class PreferenceControl {
     private static final int PREFERENCE_MODE = Context.MODE_PRIVATE;
 	
 	private static SharedPreferences preferences;
-	private static List<Stream> streams;
+	private static List<MediaSource> mediaSources;
 	private static KfjcApplication app;
 
 	public static void init(final KfjcApplication kfjcApp) {
@@ -36,7 +35,7 @@ public class PreferenceControl {
 		new AsyncTask<Void, Void, Void>() {
 			@Override protected Void doInBackground(Void... unsedParams) {
 				try {
-					streams = app.getKfjcResources().getStreamsList().get();
+					mediaSources = app.getKfjcResources().getStreamsList().get();
 				} catch (InterruptedException | ExecutionException e) {
 					// TODO
 				}
@@ -45,8 +44,8 @@ public class PreferenceControl {
 		}.execute();
 	}
 
-	public static List<Stream> getStreams() {
-		return streams;
+	public static List<MediaSource> getMediaSources() {
+		return mediaSources;
 	}
 
 	public static boolean areBackgroundsEnabled() {
@@ -79,29 +78,29 @@ public class PreferenceControl {
 		editor.commit();
 	}
 	
-	public static Stream getStreamPreference() {
+	public static MediaSource getStreamPreference() {
 		String urlPref = preferences.getString(STREAM_URL_PREFERENCE_KEY, "");
 		// TODO: block on streams being non-null or maybe set streams to fallback initailly?
-		if (streams == null) {
-			return Constants.FALLBACK_STREAM;
+		if (mediaSources == null) {
+			return Constants.FALLBACK_MEDIA_SOURCE;
 		}
 		// Stored URL preference matches a loaded stream
-		for (Stream s : streams) {
+		for (MediaSource s : mediaSources) {
 			if (s.url.equals(urlPref)) {
 				return s;
 			}
 		}
 		// Try first loaded stream
-		if (streams.size() > 0) {
-			return streams.get(0);
+		if (mediaSources.size() > 0) {
+			return mediaSources.get(0);
 		}
 		// Otherwise fallback.
-		return Constants.FALLBACK_STREAM;
+		return Constants.FALLBACK_MEDIA_SOURCE;
     }
 	
-	public static void setStreamPreference(Stream stream) {
+	public static void setStreamPreference(MediaSource mediaSource) {
 		SharedPreferences.Editor editor = preferences.edit();
-		editor.putString(STREAM_URL_PREFERENCE_KEY, stream.url);
+		editor.putString(STREAM_URL_PREFERENCE_KEY, mediaSource.url);
 		editor.commit();
 	}
 }

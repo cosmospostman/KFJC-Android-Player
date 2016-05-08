@@ -1,6 +1,5 @@
 package org.kfjc.android.player.fragment;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,23 +20,14 @@ import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.util.GraphicsUtil;
 
-public class LiveStreamFragment extends Fragment {
+public class LiveStreamFragment extends PlayerFragment {
 
-    public enum PlayerState {
-        PLAY,
-        STOP,
-        BUFFER
-    }
-
-    private HomeScreenInterface homeScreen;
     private GraphicsUtil graphics;
 
     private TextView currentTrackTextView;
     private FloatingActionButton playStopButton;
     private FloatingActionButton settingsButton;
     private ImageView radioDevil;
-
-    private PlayerState playerState = PlayerState.STOP;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -88,7 +78,7 @@ public class LiveStreamFragment extends Fragment {
                         break;
                     case BUFFER:
                     case PLAY:
-                        homeScreen.stopStream();
+                        homeScreen.stopPlayer();
                         break;
                 }
             }
@@ -110,32 +100,6 @@ public class LiveStreamFragment extends Fragment {
                 showSettings();
             }
         });
-    }
-
-    public void setState(PlayerState state) {
-        playerState = state;
-        if (!this.isAdded()) {
-            return;
-        }
-        switch(state) {
-            case STOP:
-                graphics.bufferDevil(radioDevil, false);
-                playStopButton.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-                graphics.radioDevilOff(radioDevil);
-                radioDevil.setEnabled(false);
-                break;
-            case PLAY:
-                graphics.bufferDevil(radioDevil, false);
-                playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
-                graphics.radioDevilOn(radioDevil);
-                radioDevil.setEnabled(true);
-                break;
-            case BUFFER:
-                graphics.bufferDevil(radioDevil, true);
-                playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
-                radioDevil.setEnabled(false);
-                break;
-        }
     }
 
     public void updatePlaylist(Playlist playlist) {
@@ -168,4 +132,26 @@ public class LiveStreamFragment extends Fragment {
         settingsFragment.show(getFragmentManager(), "settings");
     }
 
+    @Override
+    void onStatePlay() {
+        graphics.bufferDevil(radioDevil, false);
+        playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
+        graphics.radioDevilOn(radioDevil);
+        radioDevil.setEnabled(true);
+    }
+
+    @Override
+    void onStateStop() {
+        graphics.bufferDevil(radioDevil, false);
+        playStopButton.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+        graphics.radioDevilOff(radioDevil);
+        radioDevil.setEnabled(false);
+    }
+
+    @Override
+    void onStateBuffer() {
+        graphics.bufferDevil(radioDevil, true);
+        playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
+        radioDevil.setEnabled(false);
+    }
 }

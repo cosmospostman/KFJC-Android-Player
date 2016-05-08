@@ -1,6 +1,6 @@
 package org.kfjc.android.player;
 
-import org.kfjc.android.player.model.Stream;
+import org.kfjc.android.player.model.MediaSource;
 
 import java.util.TimeZone;
 
@@ -15,8 +15,9 @@ public class Constants {
 
     public static final String RESOURCES_URL = "http://www.kfjc.org/api/resources.json";
     public static final String ARCHIVES_URL = "http://kfjc.org/api/archives.php";
-    public static final Stream FALLBACK_STREAM =
-            new Stream("http://netcast6.kfjc.org:80/", "Default", "128k mp3", Stream.Format.MP3);
+    public static final MediaSource FALLBACK_MEDIA_SOURCE =
+            new MediaSource(MediaSource.Type.LIVESTREAM, "http://netcast6.kfjc.org:80/",
+                            "Default", "128k mp3", MediaSource.Format.MP3);
 
     public static final TimeZone BROADCAST_TIMEZONE = TimeZone.getTimeZone("America/Los_Angeles");
 }

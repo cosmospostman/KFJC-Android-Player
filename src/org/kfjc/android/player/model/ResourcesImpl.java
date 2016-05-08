@@ -2,7 +2,6 @@ package org.kfjc.android.player.model;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -33,7 +32,7 @@ public class ResourcesImpl implements Resources {
     private static final String TAG = ResourcesImpl.class.getSimpleName();
     ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
     private Context context;
-    private SettableFuture<List<Stream>> streamsList;
+    private SettableFuture<List<MediaSource>> streamsList;
     private List<String> backgroundsUrls;
     private SettableFuture<String> lavaUrl;
 
@@ -61,23 +60,24 @@ public class ResourcesImpl implements Resources {
             // Streams
             JSONArray jStreams = jResources.getJSONArray("streams");
             Map<String, String> streamMap = new HashMap<>();
-            List<Stream> streamList = new ArrayList<>();
+            List<MediaSource> mediaSourceList = new ArrayList<>();
             for (int i = 0; i < jStreams.length(); i++) {
                 JSONObject stream = jStreams.getJSONObject(i);
                 String url = stream.getString("url");
                 String name = stream.getString("name");
                 String description = stream.getString("desc");
                 String formatString = stream.getString("format");
-                Stream.Format format = Stream.Format.NONE;
+                MediaSource.Format format = MediaSource.Format.NONE;
                 if (formatString.toLowerCase().equals("aac")) {
-                    format = Stream.Format.AAC;
+                    format = MediaSource.Format.AAC;
                 } else if (formatString.toLowerCase().equals("mp3")) {
-                    format = Stream.Format.MP3;
+                    format = MediaSource.Format.MP3;
                 }
-                streamList.add(new Stream(url, name, description, format));
+                mediaSourceList.add(new MediaSource(
+                        MediaSource.Type.LIVESTREAM, url, name, description, format));
                 streamMap.put(name, url);
             }
-            streamsList.set(streamList);
+            streamsList.set(mediaSourceList);
 
             // Backgrounds
             JSONObject jDrawables = jResources.getJSONObject("drawables");
@@ -93,12 +93,12 @@ public class ResourcesImpl implements Resources {
             lavaUrl.set(jDrawables.getString("lava"));
         } catch (JSONException e) {
             Log.e(TAG, "Caught exception parsing streams: " + e.getMessage());
-            streamsList.set(Arrays.asList(Constants.FALLBACK_STREAM));
+            streamsList.set(Arrays.asList(Constants.FALLBACK_MEDIA_SOURCE));
         }
     }
 
     @Override
-    public SettableFuture<List<Stream>> getStreamsList() {
+    public SettableFuture<List<MediaSource>> getStreamsList() {
         return streamsList;
     }
 
