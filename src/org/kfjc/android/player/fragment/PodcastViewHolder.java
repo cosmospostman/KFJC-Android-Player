@@ -41,7 +41,7 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
         this.show = show;
         int color = getColor(show.getTimestamp());
         if (iconLetter != null) {
-            iconLetter.setText("" + show.getAirName().charAt(0));
+            iconLetter.setText(getIconLetter());
             iconLetter.setTextColor(color);
         }
         if (iconBackground != null) {
@@ -49,6 +49,13 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
         }
         airName.setText(show.getAirName());
         timestamp.setText(formatTime(show.getTimestamp()));
+    }
+
+    private String getIconLetter() {
+        if (show.getAirName().toUpperCase().contains("NUMBER 6")) {
+            return "6";
+        }
+        return "" + show.getAirName().charAt(0);
     }
 
     private String formatTime(long timestamp) {
