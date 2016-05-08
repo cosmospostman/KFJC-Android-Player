@@ -368,7 +368,13 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 }
                 // streamService is null while still connecting at application launch
                 if (streamService != null) {
-                    liveStreamFragment.setState(streamService.getPlayerState());
+                    switch (streamService.getPlayerState()) {
+                        case PLAY:
+                            mediaEventHandler.onPlay(streamService.getSource());
+                            break;
+                        case STOP:
+                            mediaEventHandler.onEnd();
+                    }
                 }
                 break;
             case R.id.nav_playlist:
@@ -568,10 +574,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public boolean isStreamServicePlaying() {
-        if (streamService == null) {
-            return false;
-        }
-        return streamService.isPlaying();
+        return streamService != null && streamService.isPlaying();
     }
 
     @Override

@@ -222,4 +222,8 @@ public class StreamService extends Service {
         return player.getDuration();
     }
 
+    public MediaSource getSource() {
+        return mediaSource;
+    }
+
 }
