@@ -32,7 +32,7 @@ public class PodcastRecyclerAdapter extends RecyclerView.Adapter<PodcastViewHold
     public PodcastViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(viewType, null, false);
-        PodcastViewHolder viewHolder = new PodcastViewHolder(view, clickDelegate);
+        PodcastViewHolder viewHolder = new PodcastViewHolder(view, clickDelegate, layoutType);
         return viewHolder;
     }
 

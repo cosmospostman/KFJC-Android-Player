@@ -12,13 +12,14 @@ import org.kfjc.android.player.util.DateUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     public interface PodcastClickDelegate {
         void onClick(BroadcastShow show);
     }
+
+    private PodcastRecyclerAdapter.Type layoutType;
 
     private View iconBackground;
     private TextView iconLetter;
@@ -27,8 +28,10 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
     private PodcastClickDelegate clickDelegate;
     private BroadcastShow show;
 
-    public PodcastViewHolder(View itemView, PodcastClickDelegate clickDelegate) {
+    public PodcastViewHolder(View itemView, PodcastClickDelegate clickDelegate,
+                             PodcastRecyclerAdapter.Type type) {
         super(itemView);
+        this.layoutType = type;
         this.clickDelegate = clickDelegate;
         itemView.setOnClickListener(this);
         iconBackground = itemView.findViewById(R.id.iconBackground);
@@ -59,9 +62,18 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
     }
 
     private String formatTime(long timestamp) {
-        SimpleDateFormat df = new SimpleDateFormat("ha EEE d MMM");
+        SimpleDateFormat df = getSimpleDateFormat();
         df.setTimeZone(Constants.BROADCAST_TIMEZONE);
         return df.format(new Date(DateUtil.roundUpHour(timestamp) * 1000));
+    }
+
+    private SimpleDateFormat getSimpleDateFormat() {
+        if (layoutType == PodcastRecyclerAdapter.Type.HORIZONTAL) {
+            return new SimpleDateFormat("ha EEE d MMM");
+
+        } else  {
+            return new SimpleDateFormat("ha EEE d MMM yyyy");
+        }
     }
 
     private int getClockHour(long timestamp) {

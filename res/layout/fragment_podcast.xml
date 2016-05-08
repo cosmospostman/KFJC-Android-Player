@@ -26,7 +26,9 @@
                 android:textColor="@color/kfjc_secondary_text"
                 android:fontFamily="sans-serif-light"
                 android:textSize="14sp"
+                android:textStyle="bold"
                 android:textAllCaps="true"
+                android:layout_marginBottom="8dp"
                 android:text="Hot (off the) air"/>
 
             <android.support.v7.widget.RecyclerView
@@ -41,6 +43,9 @@
                 android:textAllCaps="true"
                 android:fontFamily="sans-serif-light"
                 android:textSize="14sp"
+                android:layout_marginTop="16dp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"
                 android:text="Saved"/>
 
             <android.support.v7.widget.RecyclerView
