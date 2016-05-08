@@ -73,35 +73,50 @@
 
     </LinearLayout>
 
-    <RelativeLayout
-        android:id="@+id/buttonContainer"
-        android:orientation="horizontal"
+    <LinearLayout
+        android:id="@+id/bottomControls"
+        android:orientation="vertical"
         android:layout_gravity="center_horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="92dp"
+        android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/podcastDetails"
-            android:layout_width="wrap_content"
+        <SeekBar
+            android:id="@+id/playtimeSeekBar"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:background="@color/kfjc_transparent_black"
-            android:fontFamily="sans-serif-light"
-            android:textColor="#ffffff"
-            android:padding="4dp"
-            android:textSize="18sp" />
+            android:layout_centerVertical="true"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            app:backgroundTint="@color/kfjc_red_solid"
-            app:rippleColor="@color/kfjc_mute"
-            app:elevation="2dp"/>
+        <RelativeLayout
+            android:id="@+id/buttonContainer"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/podcastDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:background="@color/kfjc_transparent_black"
+                android:fontFamily="sans-serif-light"
+                android:textColor="#ffffff"
+                android:padding="4dp"
+                android:textSize="18sp" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                app:backgroundTint="@color/kfjc_red_solid"
+                app:rippleColor="@color/kfjc_mute"
+                app:elevation="2dp"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

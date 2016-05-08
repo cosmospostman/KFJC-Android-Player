@@ -2,6 +2,7 @@ package org.kfjc.android.player.fragment;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import org.kfjc.android.player.Constants;
@@ -40,6 +42,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private Handler handler = new Handler();
 
     private HomeScreenInterface homeScreen;
+    private SeekBar playtimeSeekBar;
     private FloatingActionButton fab;
     private TextView podcastDetails;
     private Runnable playClockUpdater = new Runnable() {
@@ -47,6 +50,10 @@ public class PodcastPlayerFragment extends PlayerFragment {
             long pos = homeScreen.getPlayerPosition();
             long dur = homeScreen.getPlayerDuration();
             podcastDetails.setText(pos + ":" + dur);
+
+            playtimeSeekBar.setMax((int)dur/100);
+            playtimeSeekBar.setProgress((int)pos/100);
+
             handler.postDelayed(this, 1000);
         }
     };
@@ -68,6 +75,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
         View view = inflater.inflate(R.layout.fragment_podcastplayer, container, false);
 
+        playtimeSeekBar = (SeekBar) view.findViewById(R.id.playtimeSeekBar);
         FloatingActionButton pullDownFab = (FloatingActionButton) view.findViewById(R.id.pullDownButton);
         TextView airName = (TextView) view.findViewById(R.id.airName);
         TextView dateTime = (TextView) view.findViewById(R.id.podcastDateTime);
@@ -85,10 +93,31 @@ public class PodcastPlayerFragment extends PlayerFragment {
                         .commit();
             }
         });
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onFabClicked();
+            }
+        });
+
+        playtimeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            boolean isTrackingTouch = false;
+            @Override
+            public void onStopTrackingTouch(SeekBar arg0) {
+                isTrackingTouch = false;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar arg0) {
+                isTrackingTouch = true;
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar arg0, int progress, boolean arg2) {
+                if (isTrackingTouch) {
+                    homeScreen.seekPlayer((long) (progress) * 100);
+                }
             }
         });
 

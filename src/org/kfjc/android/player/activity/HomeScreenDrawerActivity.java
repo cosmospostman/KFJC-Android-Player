@@ -608,4 +608,9 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     public long getPlayerDuration() {
         return streamService.getPlayerDuration();
     }
+
+    @Override
+    public void seekPlayer(long positionMillis) {
+        streamService.seekPlayer(positionMillis);
+    }
 }

@@ -132,8 +132,7 @@ public class SettingsDialog extends KfjcDialog {
             }
 
             @Override
-            public void onProgressChanged(
-                    SeekBar arg0, int progress, boolean arg2) {
+            public void onProgressChanged(SeekBar arg0, int progress, boolean arg2) {
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
             }
         });

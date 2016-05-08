@@ -22,4 +22,5 @@ public interface HomeScreenInterface {
     void registerDownload(long downloadId, BroadcastShow show);
     long getPlayerPosition();
     long getPlayerDuration();
+    void seekPlayer(long positionMillis);
 }
