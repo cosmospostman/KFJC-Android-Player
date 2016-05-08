@@ -13,17 +13,46 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="84dp"
+                            android:id="@+id/iconBackground"
+                            android:gravity="center"
+                            android:layout_marginBottom="8dp"
+                            android:background="@color/time_midnight">
+
+                                <TextView
+                                    android:id="@+id/iconLetter"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:background="@drawable/circle"
+                                    android:gravity="center"
+                                    android:textSize="28sp"
+                                    android:textAllCaps="true"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/time_midnight"
+                                    android:text="A"/>
+
+                        </RelativeLayout>
+
                         <TextView
                             android:id="@+id/airName"
-                            android:layout_width="wrap_content"
+                            android:gravity="center_horizontal"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:singleLine="true"
+                            android:ellipsize="end"
                             android:textColor="@color/black"/>
 
                         <TextView
                             android:id="@+id/timestamp"
-                            android:layout_width="wrap_content"
+                            android:gravity="center_horizontal"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/black"/>
+                            android:textSize="12sp"
+                            android:fontFamily="sans-serif-light"
+                            android:textColor="@color/kfjc_secondary_text" />
 
                 </LinearLayout>
 

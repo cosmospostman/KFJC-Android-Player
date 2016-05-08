@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.kfjc.android.player.util.DateUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -94,13 +95,7 @@ public class BroadcastShow implements Parcelable {
     public String getTimestampString() {
         SimpleDateFormat df = new SimpleDateFormat("ha, EEEE d MMMM yyyy");
         df.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
-        return df.format(new Date(roundUpHour(timestamp) * 1000));
-    }
-
-    private static long roundUpHour(long timestampSec) {
-        long remainder = timestampSec % 3600;
-        long timeToAdd = 3600 - remainder;
-        return timestampSec + timeToAdd;
+        return df.format(new Date(DateUtil.roundUpHour(timestamp) * 1000));
     }
 
     public List<String> getUrls() {

@@ -2,6 +2,8 @@ package org.kfjc.android.player;
 
 import org.kfjc.android.player.model.Stream;
 
+import java.util.TimeZone;
+
 public class Constants {
     // TODO: decommission this endpoint once old clients upgrade.
     public static final String CURRENT_TRACK_URL = "http://kfjc.org/api/playlists/current.php";
@@ -15,4 +17,6 @@ public class Constants {
     public static final String ARCHIVES_URL = "http://kfjc.org/api/archives.php";
     public static final Stream FALLBACK_STREAM =
             new Stream("http://netcast6.kfjc.org:80/", "Default", "128k mp3", Stream.Format.MP3);
+
+    public static final TimeZone BROADCAST_TIMEZONE = TimeZone.getTimeZone("America/Los_Angeles");
 }

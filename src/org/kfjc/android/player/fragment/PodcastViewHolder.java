@@ -1,18 +1,27 @@
 package org.kfjc.android.player.fragment;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
+import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.model.BroadcastShow;
+import org.kfjc.android.player.util.DateUtil;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     public interface PodcastClickDelegate {
-        public void onClick(BroadcastShow show);
+        void onClick(BroadcastShow show);
     }
 
+    private View iconBackground;
+    private TextView iconLetter;
     private TextView airName;
     private TextView timestamp;
     private PodcastClickDelegate clickDelegate;
@@ -22,14 +31,44 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
         super(itemView);
         this.clickDelegate = clickDelegate;
         itemView.setOnClickListener(this);
+        iconBackground = itemView.findViewById(R.id.iconBackground);
+        iconLetter = (TextView) itemView.findViewById(R.id.iconLetter);
         airName = (TextView) itemView.findViewById(R.id.airName);
         timestamp = (TextView) itemView.findViewById(R.id.timestamp);
     }
 
     public void setShow(BroadcastShow show) {
         this.show = show;
+        int color = getColor(show.getTimestamp());
+        if (iconLetter != null) {
+            iconLetter.setText("" + show.getAirName().charAt(0));
+            iconLetter.setTextColor(color);
+        }
+        if (iconBackground != null) {
+            iconBackground.setBackgroundColor(color);
+        }
         airName.setText(show.getAirName());
-        timestamp.setText(show.getTimestampString());
+        timestamp.setText(formatTime(show.getTimestamp()));
+    }
+
+    private String formatTime(long timestamp) {
+        SimpleDateFormat df = new SimpleDateFormat("ha EEE d MMM");
+        df.setTimeZone(Constants.BROADCAST_TIMEZONE);
+        return df.format(new Date(DateUtil.roundUpHour(timestamp) * 1000));
+    }
+
+    private int getClockHour(long timestamp) {
+        Date date = new Date(DateUtil.roundUpHour(timestamp) * 1000);
+        SimpleDateFormat df = new SimpleDateFormat("H");
+        df.setTimeZone(Constants.BROADCAST_TIMEZONE);
+        return Integer.parseInt(df.format(date));
+    }
+
+    private int getColor(long timestamp) {
+        final float[] opacities = {1f, 0.86f, 0.72f, 0.58f, 0.44f, 0.30f, 0.16f, 0.30f, 0.44f, 0.58f, 0.72f, 0.86f};
+        int hour = getClockHour(timestamp) / 2;
+        float alpha = (hour < opacities.length) ? opacities[hour] : 1f;
+        return Color.argb((int)(alpha*255), 46, 52, 54);
     }
 
     @Override

@@ -16,6 +16,8 @@
     <color name="kfjc_icon_tint">#8a000000</color>
     <color name="kfjc_navigation_text_color">#de000000</color>
 
+    <color name="time_midnight">#2e3436</color>
+
     <style name="KfjcCompat" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@color/black</item>
     </style>
