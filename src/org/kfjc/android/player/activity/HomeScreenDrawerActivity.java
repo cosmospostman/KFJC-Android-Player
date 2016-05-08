@@ -44,6 +44,7 @@ import org.kfjc.android.player.fragment.PodcastPlayerFragment;
 import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
+import org.kfjc.android.player.model.Stream;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.HttpUtil;
@@ -511,11 +512,17 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void playStream() {
+        playArchive(PreferenceControl.getStreamPreference());
+    }
+
+    @Override
+    public void playArchive(Stream source) {
+        streamService.stop();
         audioManager.requestAudioFocus(
                 audioFocusListener,
                 AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN);
-        streamService.play(getApplicationContext(), PreferenceControl.getStreamPreference());
+        streamService.play(getApplicationContext(), source);
     }
 
     @Override
@@ -576,5 +583,15 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             return new PlaylistJsonImpl("");
         }
         return playlistService.getPlaylist();
+    }
+
+    @Override
+    public long getPlayerPosition() {
+        return streamService.getPlayerPosition();
+    }
+
+    @Override
+    public long getPlayerDuration() {
+        return streamService.getPlayerDuration();
     }
 }

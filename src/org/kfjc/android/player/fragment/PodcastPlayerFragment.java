@@ -6,6 +6,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
+import org.kfjc.android.player.model.Stream;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
 
@@ -28,8 +30,15 @@ public class PodcastPlayerFragment extends Fragment {
 
     public static final String BROADCAST_SHOW_KEY = "broadcastShowKey";
 
+    private enum State {
+        PREVIEW,
+        SAVED
+    }
+
     private BroadcastShow show;
     private DownloadManager downloadManager;
+    private State state;
+    private Handler handler = new Handler();
 
     private HomeScreenInterface homeScreen;
     private FloatingActionButton pullDownFab;
@@ -37,6 +46,14 @@ public class PodcastPlayerFragment extends Fragment {
     private TextView airName;
     private TextView dateTime;
     private TextView podcastDetails;
+    private Runnable playClockUpdater = new Runnable() {
+        @Override public void run() {
+            long pos = homeScreen.getPlayerPosition();
+            long dur = homeScreen.getPlayerDuration();
+            podcastDetails.setText(pos + ":" + dur);
+            handler.postDelayed(this, 1000);
+        }
+    };
 
     @Override
     public void onAttach(Context context) {
@@ -94,14 +111,27 @@ public class PodcastPlayerFragment extends Fragment {
             // Show preview and download state
             fab.setImageResource(R.drawable.ic_file_download_white_48dp);
             podcastDetails.setText(show.getUrls().size() + " hour show, 258Mb download.");
+            state = State.PREVIEW;
         } else if (ExternalStorageUtil.hasAllContent(show)) {
             // Show play state
             fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+            state = State.SAVED;
         }
     }
 
     private void onFabClicked() {
-        homeScreen.requestExternalWritePermission();
+        switch (state) {
+            case PREVIEW:
+                homeScreen.requestExternalWritePermission();
+                break;
+            case SAVED:
+                File f = ExternalStorageUtil.getSavedArchivesForShow(show).get(0);
+                try {
+                    homeScreen.playArchive(new Stream(f.getCanonicalPath(), Stream.Format.MP3));
+                    handler.postDelayed(playClockUpdater, 0);
+                } catch (IOException e) {}
+                break;
+        }
     }
 
     public void onWritePermissionResult(boolean wasGranted) {

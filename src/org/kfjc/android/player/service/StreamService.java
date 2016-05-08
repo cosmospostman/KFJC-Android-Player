@@ -212,4 +212,12 @@ public class StreamService extends Service {
         }
     };
 
+    public long getPlayerPosition() {
+        return player.getCurrentPosition();
+    }
+
+    public long getPlayerDuration() {
+        return player.getDuration();
+    }
+
 }

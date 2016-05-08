@@ -9,6 +9,13 @@ public class Stream {
     public final String description;
     public final Format format;
 
+    public Stream(String url, Format format) {
+        this.url = url;
+        this.name = "";
+        this.description = "";
+        this.format = format;
+    }
+
     public Stream(String url, String name, String description, Format format) {
         this.url = url;
         this.name = name;

@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -125,5 +126,20 @@ public class ExternalStorageUtil {
             }
         }
         return true;
+    }
+
+    public static List<File> getSavedArchivesForShow(BroadcastShow show) {
+        List<File> files = new ArrayList<>();
+        File podcastDir = getPodcastDir(show.getPlaylistId());
+        if (hasAllContent(show)) {
+            for (String url : show.getUrls()) {
+                String expectedFilename = Uri.parse(url).getLastPathSegment();
+                File expectedFile = new File(podcastDir, expectedFilename);
+                if (expectedFile.exists()) {
+                    files.add(expectedFile);
+                }
+            }
+        }
+        return files;
     }
 }
