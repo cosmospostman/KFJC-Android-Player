@@ -10,6 +10,7 @@ import org.kfjc.android.player.util.DateUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -99,6 +100,7 @@ public class BroadcastShow implements Parcelable {
     }
 
     public List<String> getUrls() {
+        Collections.sort(urls);
         return urls;
     }
 
