@@ -46,7 +46,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private TextView podcastDetails;
     private Runnable playClockUpdater = new Runnable() {
         @Override public void run() {
-            Log.i("Player", "RUN");
             long pos = homeScreen.getPlayerPosition();
             long dur = homeScreen.getPlayerDuration();
             podcastDetails.setText(pos + ":" + dur);
@@ -244,9 +243,14 @@ public class PodcastPlayerFragment extends PlayerFragment {
         }
     }
 
+    private void startPlayClockUpdater() {
+        handler.removeCallbacks(playClockUpdater);
+        handler.postDelayed(playClockUpdater, 0);
+    }
+
     private void setPlayState() {
         fab.setImageResource(R.drawable.ic_stop_white_48dp);
-        handler.postDelayed(playClockUpdater, 0);
+        startPlayClockUpdater();
         displayState = PlayerState.PLAY;
     }
 
