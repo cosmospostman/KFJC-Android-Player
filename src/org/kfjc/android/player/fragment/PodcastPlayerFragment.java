@@ -2,12 +2,12 @@ package org.kfjc.android.player.fragment;
 
 import android.app.DownloadManager;
 import android.content.Context;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,12 +41,12 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private FragmentState fragmentState;
     private Handler handler = new Handler();
 
-    private HomeScreenInterface homeScreen;
     private SeekBar playtimeSeekBar;
     private FloatingActionButton fab;
     private TextView podcastDetails;
     private Runnable playClockUpdater = new Runnable() {
         @Override public void run() {
+            Log.i("Player", "RUN");
             long pos = homeScreen.getPlayerPosition();
             long dur = homeScreen.getPlayerDuration();
             podcastDetails.setText(pos + ":" + dur);
@@ -68,6 +68,12 @@ public class PodcastPlayerFragment extends PlayerFragment {
                     + HomeScreenInterface.class.getSimpleName());
         }
         downloadManager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        handler.removeCallbacks(playClockUpdater);
     }
 
     @Override
@@ -157,7 +163,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void onPlayStopButtonClick() {
-        switch (playerState) {
+        switch (displayState) {
             case STOP:
                 playArchive();
                 break;
@@ -173,7 +179,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
         try {
             homeScreen.playArchive(new MediaSource(
                     MediaSource.Type.ARCHIVE, f.getCanonicalPath(), MediaSource.Format.MP3));
-            handler.postDelayed(playClockUpdater, 0);
         } catch (IOException e) {}
     }
 
@@ -222,15 +227,32 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     @Override
-    void onStatePlay() {
+    void onStateChanged(PlayerState state, MediaSource source) {
+        switch (state) {
+            case PLAY:
+                if (source.type == MediaSource.Type.ARCHIVE) {
+                    setPlayState();
+                } else {
+                    setStopState();
+                }
+                break;
+            case STOP:
+                setStopState();
+                break;
+            case BUFFER:
+                break;
+        }
+    }
+
+    private void setPlayState() {
         fab.setImageResource(R.drawable.ic_stop_white_48dp);
+        handler.postDelayed(playClockUpdater, 0);
+        displayState = PlayerState.PLAY;
     }
 
-    @Override
-    void onStateStop() {
+    private void setStopState() {
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+        handler.removeCallbacks(playClockUpdater);
+        displayState = PlayerState.STOP;
     }
-
-    @Override
-    void onStateBuffer() {}
 }

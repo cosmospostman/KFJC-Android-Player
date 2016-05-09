@@ -24,7 +24,7 @@ import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
 import org.kfjc.android.player.Constants;
-import org.kfjc.android.player.fragment.LiveStreamFragment;
+import org.kfjc.android.player.fragment.PlayerFragment;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.util.NotificationUtil;
 
@@ -40,10 +40,8 @@ public class StreamService extends Service {
     private static final int MIN_REBUFFER_MS = 5000;
 
     public interface MediaListener {
-        void onBuffer();
-        void onPlay(MediaSource source);
+        void onStateChange(PlayerFragment.PlayerState state, MediaSource source);
         void onError(String message);
-        void onEnd();
     }
 
 	public class LiveStreamBinder extends Binder {
@@ -91,17 +89,17 @@ public class StreamService extends Service {
         }
     }
 
-    public LiveStreamFragment.PlayerState getPlayerState() {
+    public PlayerFragment.PlayerState getPlayerState() {
         if (player == null) {
-            return LiveStreamFragment.PlayerState.STOP;
+            return PlayerFragment.PlayerState.STOP;
         }
         if (player.getPlaybackState() == ExoPlayer.STATE_BUFFERING) {
-            return LiveStreamFragment.PlayerState.BUFFER;
+            return PlayerFragment.PlayerState.BUFFER;
         }
         if (player.getPlaybackState() == ExoPlayer.STATE_READY) {
-            return LiveStreamFragment.PlayerState.PLAY;
+            return PlayerFragment.PlayerState.PLAY;
         }
-        return LiveStreamFragment.PlayerState.STOP;
+        return PlayerFragment.PlayerState.STOP;
     }
 
     public boolean isPlaying() {
@@ -151,7 +149,7 @@ public class StreamService extends Service {
 	public void stop() {
         if (player != null) {
             player.stop();
-            mediaListener.onEnd();
+            mediaListener.onStateChange(PlayerFragment.PlayerState.STOP, mediaSource);
         }
         unregisterReceivers();
         becomingNoisyReceiverRegistered = false;
@@ -182,21 +180,21 @@ public class StreamService extends Service {
             switch (state) {
                 case ExoPlayer.STATE_READY:
                     if (playWhenReady) {
-                        mediaListener.onPlay(mediaSource);
+                        mediaListener.onStateChange(PlayerFragment.PlayerState.PLAY, mediaSource);
                         registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
                         becomingNoisyReceiverRegistered = true;
                     }
                     break;
                 case ExoPlayer.STATE_PREPARING:
-                    mediaListener.onBuffer();
+                    mediaListener.onStateChange(PlayerFragment.PlayerState.BUFFER, mediaSource);
                     break;
                 case ExoPlayer.STATE_BUFFERING:
                     if (!isPlaying()) {
-                        mediaListener.onBuffer();
+                        mediaListener.onStateChange(PlayerFragment.PlayerState.BUFFER, mediaSource);
                     }
                     break;
                 case ExoPlayer.STATE_ENDED:
-                    mediaListener.onEnd();
+                    mediaListener.onStateChange(PlayerFragment.PlayerState.STOP, mediaSource);
                     unregisterReceivers();
                     break;
                 case ExoPlayer.STATE_IDLE:

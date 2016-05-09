@@ -92,6 +92,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private View view;
     private Snackbar snackbar;
     private Map<Long, BroadcastShow> activeDownloads;
+    private boolean askPermissionsAgain = true;
 
     private boolean isForegroundActivity = false;
     private int activeFragmentId = R.id.nav_livestream;
@@ -173,7 +174,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     StreamService.LiveStreamBinder binder = (StreamService.LiveStreamBinder) service;
                     streamService = binder.getService();
                     streamService.setMediaEventListener(mediaEventHandler);
-                    liveStreamFragment.setState(streamService.getPlayerState());
+                    syncState();
                 }
 
                 @Override
@@ -183,24 +184,21 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
     }
 
-    private StreamService.MediaListener mediaEventHandler = new StreamService.MediaListener() {
-        @Override
-        public void onBuffer() {
-            liveStreamFragment.setState(LiveStreamFragment.PlayerState.BUFFER);
+    public void syncState() {
+        if (streamService != null) {
+            mediaEventHandler.onStateChange(streamService.getPlayerState(), streamService.getSource());
         }
+    }
+
+    private StreamService.MediaListener mediaEventHandler = new StreamService.MediaListener() {
 
         @Override
-        public void onPlay(MediaSource source) {
-            switch (source.type) {
-                case LIVESTREAM:
-                    liveStreamFragment.setState(PlayerFragment.PlayerState.PLAY);
-                    podcastPlayerFragment.setState(PlayerFragment.PlayerState.STOP);
-                    notificationUtil.updateNowPlayNotification(playlistService.getPlaylist());
-                    break;
-                case ARCHIVE:
-                    liveStreamFragment.setState(PlayerFragment.PlayerState.STOP);
-                    podcastPlayerFragment.setState(PlayerFragment.PlayerState.PLAY);
-                    break;
+        public void onStateChange(PlayerFragment.PlayerState state, MediaSource source) {
+            liveStreamFragment.setState(state, source);
+            podcastPlayerFragment.setState(state, source);
+            if (source != null && source.type == MediaSource.Type.LIVESTREAM) {
+                // TODO: refactor the logic
+                notificationUtil.updateNowPlayNotification(playlistService.getPlaylist());
             }
         }
 
@@ -212,12 +210,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 message = getString(R.string.error_unable_to_connect);
             }
             snack(message, Snackbar.LENGTH_LONG);
-        }
-
-        @Override
-        public void onEnd() {
-            liveStreamFragment.setState(PlayerFragment.PlayerState.STOP);
-            podcastPlayerFragment.setState(PlayerFragment.PlayerState.STOP);
         }
     };
 
@@ -291,7 +283,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 KFJC_PERM_WRITE_EXTERNAL);
     }
 
-    private boolean askPermissionsAgain = true;
     @Override
     public void onRequestPermissionsResult(
             int requestCode, String[] permissions, int[] grantResults) {
@@ -350,7 +341,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
         drawerToggle.setDrawerIndicatorEnabled(true);
         drawerLayout.setDrawerListener(drawerToggle);
-        loadFragment(activeFragmentId);
     }
 
     public void setNavigationItemChecked(int navigationItemId) {
@@ -365,16 +355,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 replaceFragment(liveStreamFragment);
                 if (playlistService != null) {
                     liveStreamFragment.updatePlaylist(playlistService.getPlaylist());
-                }
-                // streamService is null while still connecting at application launch
-                if (streamService != null) {
-                    switch (streamService.getPlayerState()) {
-                        case PLAY:
-                            mediaEventHandler.onPlay(streamService.getSource());
-                            break;
-                        case STOP:
-                            mediaEventHandler.onEnd();
-                    }
                 }
                 break;
             case R.id.nav_playlist:
@@ -474,6 +454,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         PreferenceControl.updateStreams();
         isForegroundActivity = true;
         updateBackground();
+        loadFragment(activeFragmentId);
     }
 
     @Override
@@ -544,7 +525,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void stopPlayer() {
-        liveStreamFragment.setState(LiveStreamFragment.PlayerState.STOP);
         if (streamService != null) {
             streamService.stop();
         }
@@ -613,4 +593,5 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     public void seekPlayer(long positionMillis) {
         streamService.seekPlayer(positionMillis);
     }
+
 }

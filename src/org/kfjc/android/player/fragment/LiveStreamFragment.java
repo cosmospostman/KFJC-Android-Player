@@ -17,6 +17,7 @@ import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.activity.LavaLampActivity;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.dialog.SettingsDialog;
+import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.util.GraphicsUtil;
 
@@ -41,7 +42,6 @@ public class LiveStreamFragment extends PlayerFragment {
         radioDevil = (ImageView) view.findViewById(R.id.logo);
         addButtonListeners();
         updatePlaylist(homeScreen.getLatestPlaylist());
-        setState(playerState);
 
         return view;
     }
@@ -72,7 +72,7 @@ public class LiveStreamFragment extends PlayerFragment {
     private void addButtonListeners() {
         playStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                switch (playerState) {
+                switch (displayState) {
                     case STOP:
                         homeScreen.playStream();
                         break;
@@ -133,25 +133,46 @@ public class LiveStreamFragment extends PlayerFragment {
     }
 
     @Override
-    void onStatePlay() {
+    void onStateChanged(PlayerState state, MediaSource source) {
+        switch (state) {
+            case PLAY:
+                if (source.type == MediaSource.Type.LIVESTREAM) {
+                    setPlayState();
+                } else {
+                    setStopState();
+                }
+                break;
+            case STOP:
+                setStopState();
+                break;
+            case BUFFER:
+                if (source.type == MediaSource.Type.LIVESTREAM) {
+                    setBufferState();
+                }
+                break;
+        }
+    }
+
+    private void setPlayState() {
         graphics.bufferDevil(radioDevil, false);
         playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
         graphics.radioDevilOn(radioDevil);
         radioDevil.setEnabled(true);
+        displayState = PlayerState.PLAY;
     }
 
-    @Override
-    void onStateStop() {
+    private void setStopState() {
         graphics.bufferDevil(radioDevil, false);
         playStopButton.setImageResource(R.drawable.ic_play_arrow_white_48dp);
         graphics.radioDevilOff(radioDevil);
         radioDevil.setEnabled(false);
+        displayState = PlayerState.STOP;
     }
 
-    @Override
-    void onStateBuffer() {
+    private void setBufferState() {
         graphics.bufferDevil(radioDevil, true);
         playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
         radioDevil.setEnabled(false);
+        displayState = PlayerState.BUFFER;
     }
 }
