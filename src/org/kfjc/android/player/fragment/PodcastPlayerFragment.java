@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +20,7 @@ import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
 
@@ -48,7 +48,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         @Override public void run() {
             long pos = homeScreen.getPlayerPosition();
             long dur = homeScreen.getPlayerDuration();
-            podcastDetails.setText(pos + ":" + dur);
+            podcastDetails.setText(DateUtil.formatTime(pos) + " | " + DateUtil.formatTime(dur));
 
             playtimeSeekBar.setMax((int)dur/100);
             playtimeSeekBar.setProgress((int)pos/100);
@@ -259,4 +259,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
         handler.removeCallbacks(playClockUpdater);
         displayState = PlayerState.STOP;
     }
+
+
 }
