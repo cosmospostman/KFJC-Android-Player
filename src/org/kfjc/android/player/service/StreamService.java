@@ -128,7 +128,6 @@ public class StreamService extends Service {
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
         }
 
-
         Extractor extractor = null;
         switch (mediaSource.format) {
             case AAC:

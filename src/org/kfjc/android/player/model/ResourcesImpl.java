@@ -74,7 +74,7 @@ public class ResourcesImpl implements Resources {
                     format = MediaSource.Format.MP3;
                 }
                 mediaSourceList.add(new MediaSource(
-                        MediaSource.Type.LIVESTREAM, url, format, name, description));
+                        MediaSource.Type.LIVESTREAM, url, format, 0, name, description));
                 streamMap.put(name, url);
             }
             streamsList.set(mediaSourceList);

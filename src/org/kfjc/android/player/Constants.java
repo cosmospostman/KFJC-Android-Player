@@ -17,7 +17,7 @@ public class Constants {
     public static final String ARCHIVES_URL = "http://kfjc.org/api/archives.php";
     public static final MediaSource FALLBACK_MEDIA_SOURCE =
             new MediaSource(MediaSource.Type.LIVESTREAM, "http://netcast6.kfjc.org:80/",
-                    MediaSource.Format.MP3, "Default", "128k mp3");
+                    MediaSource.Format.MP3, 0, "Default", "128k mp3");
 
     public static final TimeZone BROADCAST_TIMEZONE = TimeZone.getTimeZone("America/Los_Angeles");
 }

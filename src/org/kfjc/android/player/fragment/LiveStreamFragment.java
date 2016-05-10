@@ -106,7 +106,9 @@ public class LiveStreamFragment extends PlayerFragment {
     }
 
     public void updatePlaylist(Playlist playlist) {
-        if (homeScreen.isStreamServicePlaying() && homeScreen.getPlayerSource().type == MediaSource.Type.LIVESTREAM) {
+        if (homeScreen != null
+                && homeScreen.isStreamServicePlaying()
+                && homeScreen.getPlayerSource().type == MediaSource.Type.LIVESTREAM) {
             notificationUtil.updateNowPlayNotification(playlist);
         }
         if (!isAdded()) {

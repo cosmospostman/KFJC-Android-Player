@@ -10,21 +10,24 @@ public class MediaSource {
     public final String name;
     public final String description;
     public final Format format;
+    public final int sequenceNumber;
 
-    public MediaSource(Type type, String url, Format format) {
+    public MediaSource(Type type, String url, Format format, int sequenceNumber) {
         this.url = url;
         this.name = "";
         this.description = "";
         this.format = format;
         this.type = type;
+        this.sequenceNumber = sequenceNumber;
     }
 
-    public MediaSource(Type type, String url, Format format, String name, String description) {
+    public MediaSource(Type type, String url, Format format, int sequenceNumber, String name, String description) {
         this.url = url;
         this.name = name;
         this.description = description;
         this.format = format;
         this.type = type;
+        this.sequenceNumber = sequenceNumber;
     }
 
     @Override
