@@ -1,6 +1,5 @@
 package org.kfjc.android.player.fragment;
 
-import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -107,7 +106,7 @@ public class LiveStreamFragment extends PlayerFragment {
     }
 
     public void updatePlaylist(Playlist playlist) {
-        if (homeScreen.isStreamServicePlaying()) {
+        if (homeScreen.isStreamServicePlaying() && homeScreen.getPlayerSource().type == MediaSource.Type.LIVESTREAM) {
             notificationUtil.updateNowPlayNotification(playlist);
         }
         if (!isAdded()) {

@@ -1,6 +1,5 @@
 package org.kfjc.android.player.activity;
 
-import org.kfjc.android.player.fragment.PlayerFragment;
 import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.MediaSource;
@@ -25,4 +24,5 @@ public interface HomeScreenInterface {
     long getPlayerDuration();
     void seekPlayer(long positionMillis);
     void syncState();
+    MediaSource getPlayerSource();
 }

@@ -190,6 +190,11 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
     }
 
+    @Override
+    public MediaSource getPlayerSource() {
+        return streamService.getSource();
+    }
+
     private StreamService.MediaListener mediaEventHandler = new StreamService.MediaListener() {
 
         @Override

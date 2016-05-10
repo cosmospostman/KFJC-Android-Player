@@ -69,6 +69,7 @@ public class NotificationUtil {
     }
 
     public static Notification kfjcNotification(Context context, String title, String text) {
+        // TODO: intent to current fragment
         PendingIntent kfjcPlayerIntent = PendingIntent.getActivity(
                 context, 0,
                 new Intent(context, HomeScreenDrawerActivity.class),
