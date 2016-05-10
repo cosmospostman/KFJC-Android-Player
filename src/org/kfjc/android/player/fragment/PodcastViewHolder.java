@@ -43,6 +43,9 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
     public void setShow(BroadcastShow show) {
         this.show = show;
         int color = getColor(show.getTimestamp());
+        if (show.getAirName().toUpperCase().contains("SPLIFF")) {
+            color = Color.parseColor("#C8E6C9");
+        }
         if (iconLetter != null) {
             iconLetter.setText(getIconLetter());
             iconLetter.setTextColor(color);
@@ -57,6 +60,12 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
     private String getIconLetter() {
         if (show.getAirName().toUpperCase().contains("NUMBER 6")) {
             return "6";
+        }
+        if (show.getAirName().toUpperCase().contains("CINDERAURA")) {
+            return "\uD83D\uDC3E";
+        }
+        if (show.getAirName().toUpperCase().contains("PAX")) {
+            return "\u262E";
         }
         return "" + show.getAirName().charAt(0);
     }
