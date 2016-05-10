@@ -149,9 +149,9 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                         public void onPlaylistUpdate(Playlist playlist) {
                             liveStreamFragment.updatePlaylist(playlist);
                             playlistFragment.updatePlaylist(playlist);
-                            if (streamService != null && streamService.isPlaying()) {
-                                notificationUtil.updateNowPlayNotification(playlist);
-                            }
+//                            if (streamService != null && streamService.isPlaying()) {
+//                                notificationUtil.updateNowPlayNotification(playlist);
+//                            }
                         }
                     });
                 }

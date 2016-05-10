@@ -19,7 +19,7 @@ public class MediaSource {
         this.type = type;
     }
 
-    public MediaSource(Type type, String url, String name, String description, Format format) {
+    public MediaSource(Type type, String url, Format format, String name, String description) {
         this.url = url;
         this.name = name;
         this.description = description;

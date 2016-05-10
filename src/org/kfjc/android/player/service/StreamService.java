@@ -119,8 +119,15 @@ public class StreamService extends Service {
         player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
         player.addListener(exoPlayerListener);
 
-        Notification n = NotificationUtil.bufferingNotification(context);
-        startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
+        if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
+            Notification n = NotificationUtil.bufferingNotification(context);
+            startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
+        } else if (mediaSource.type == MediaSource.Type.ARCHIVE) {
+            Notification n = NotificationUtil.kfjcNotification(
+                    context, mediaSource.name, mediaSource.description);
+            startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
+        }
+
 
         Extractor extractor = null;
         switch (mediaSource.format) {

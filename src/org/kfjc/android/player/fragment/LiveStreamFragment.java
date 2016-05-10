@@ -1,5 +1,6 @@
 package org.kfjc.android.player.fragment;
 
+import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.util.GraphicsUtil;
+import org.kfjc.android.player.util.NotificationUtil;
 
 public class LiveStreamFragment extends PlayerFragment {
 
@@ -29,6 +31,7 @@ public class LiveStreamFragment extends PlayerFragment {
     private FloatingActionButton playStopButton;
     private FloatingActionButton settingsButton;
     private ImageView radioDevil;
+    private NotificationUtil notificationUtil;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,6 +45,7 @@ public class LiveStreamFragment extends PlayerFragment {
         radioDevil = (ImageView) view.findViewById(R.id.logo);
         addButtonListeners();
         updatePlaylist(homeScreen.getLatestPlaylist());
+        notificationUtil = new NotificationUtil(getActivity());
 
         return view;
     }
@@ -103,6 +107,9 @@ public class LiveStreamFragment extends PlayerFragment {
     }
 
     public void updatePlaylist(Playlist playlist) {
+        if (homeScreen.isStreamServicePlaying()) {
+            notificationUtil.updateNowPlayNotification(playlist);
+        }
         if (!isAdded()) {
             return;
         }

@@ -177,7 +177,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
         File f = ExternalStorageUtil.getSavedArchivesForShow(show).get(0);
         try {
             homeScreen.playArchive(new MediaSource(
-                    MediaSource.Type.ARCHIVE, f.getCanonicalPath(), MediaSource.Format.MP3));
+                    MediaSource.Type.ARCHIVE, f.getCanonicalPath(), MediaSource.Format.MP3,
+                    show.getAirName(), show.getTimestampString()));
         } catch (IOException e) {}
     }
 
