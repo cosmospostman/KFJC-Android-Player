@@ -138,4 +138,20 @@ public class BroadcastShow implements Parcelable {
             return new BroadcastShow[size];
         }
     };
+
+    @Override
+    public boolean equals(Object that) {
+        if (that == this) {
+            return true;
+        }
+        if (!(that instanceof BroadcastShow)) {
+            return false;
+        }
+        BroadcastShow thatShow = (BroadcastShow) that;
+        return thatShow.playlistId.equals(this.playlistId)
+                && thatShow.airName.equals(this.airName)
+                && thatShow.urls.equals(this.urls)
+                && thatShow.timestamp == this.timestamp
+                && thatShow.hasError == this.hasError;
+    }
 }

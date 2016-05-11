@@ -4,9 +4,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,12 +23,17 @@ import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 public class PodcastFragment extends KfjcFragment implements PodcastViewHolder.PodcastClickDelegate {
 
+    private static final String TAG = PodcastFragment.class.getSimpleName();
+
     private RecyclerView recentShowsView;
     private RecyclerView savedShowsView;
+    private PodcastRecyclerAdapter recentShowsAdapter;
+    private List<BroadcastShow> shows = Collections.emptyList();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,10 +56,16 @@ public class PodcastFragment extends KfjcFragment implements PodcastViewHolder.P
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
         homeScreen.setNavigationItemChecked(R.id.nav_podcast);
 
+        recentShowsAdapter = new PodcastRecyclerAdapter(
+                shows, PodcastRecyclerAdapter.Type.HORIZONTAL, PodcastFragment.this);
+        recentShowsView.setAdapter(recentShowsAdapter);
+
         List<BroadcastShow> savedShows = ExternalStorageUtil.getSavedShows();
         PodcastRecyclerAdapter adapter = new PodcastRecyclerAdapter(
                 savedShows, PodcastRecyclerAdapter.Type.VERTICAL, PodcastFragment.this);
         savedShowsView.setAdapter(adapter);
+        setArchives(shows);
+
         new GetArchivesTask().execute();
     }
 
@@ -77,10 +91,21 @@ public class PodcastFragment extends KfjcFragment implements PodcastViewHolder.P
 
         @Override
         protected void onPostExecute(List<BroadcastShow> broadcastShows) {
-            PodcastRecyclerAdapter adapter =
-                    new PodcastRecyclerAdapter(
-                            broadcastShows, PodcastRecyclerAdapter.Type.HORIZONTAL, PodcastFragment.this);
-            recentShowsView.setAdapter(adapter);
+            setArchives(broadcastShows);
         }
+    }
+
+    private void setArchives(List<BroadcastShow> broadcastShows) {
+        if (broadcastShows == null || shows != null && shows.equals(broadcastShows)) {
+            Log.i(TAG, "No new shows to add");
+            return;
+        }
+        shows = broadcastShows;
+        recentShowsAdapter = new PodcastRecyclerAdapter(
+                shows, PodcastRecyclerAdapter.Type.HORIZONTAL, PodcastFragment.this);
+        recentShowsView.setAdapter(recentShowsAdapter);
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setDuration(300);
+        recentShowsView.startAnimation(fadeIn);
     }
 }

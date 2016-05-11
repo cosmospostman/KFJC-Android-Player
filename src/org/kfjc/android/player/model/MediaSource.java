@@ -32,6 +32,9 @@ public class MediaSource {
 
     @Override
     public boolean equals(Object that) {
+        if (that == this) {
+            return true;
+        }
         if (!(that instanceof MediaSource)) {
             return false;
         }

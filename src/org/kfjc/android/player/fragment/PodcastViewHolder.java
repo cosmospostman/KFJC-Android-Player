@@ -103,4 +103,5 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
     public void onClick(View v) {
         clickDelegate.onClick(show);
     }
+
 }
