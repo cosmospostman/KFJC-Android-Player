@@ -367,7 +367,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 }
                 break;
             case R.id.nav_podcast:
-                replaceFragment(podcastFragment);
+                loadPodcastListFragment(false);
                 break;
             case R.id.nav_podcast_player:
                 loadPodcastPlayer(null, true);
@@ -388,6 +388,18 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             ft.setCustomAnimations(R.animator.fade_in_up, R.animator.fade_out_up);
         }
         ft.replace(R.id.home_screen_main_fragment, podcastPlayerFragment)
+            .addToBackStack(null)
+            .commit();
+    }
+
+    @Override
+    public void loadPodcastListFragment(boolean animate) {
+        replaceFragment(podcastFragment);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (animate) {
+            ft.setCustomAnimations(R.animator.fade_in_down, R.animator.fade_out_down);
+        }
+        ft.replace(R.id.home_screen_main_fragment, podcastFragment)
             .addToBackStack(null)
             .commit();
     }
@@ -589,11 +601,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public long getPlayerPosition() {
         return streamService.getPlayerPosition();
-    }
-
-    @Override
-    public long getPlayerDuration() {
-        return streamService.getPlayerDuration();
     }
 
     @Override

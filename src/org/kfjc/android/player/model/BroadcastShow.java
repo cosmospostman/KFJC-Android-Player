@@ -34,6 +34,7 @@ public class BroadcastShow implements Parcelable {
         this.airName = hour.getAirName();
         this.timestamp = hour.getTimestamp();
         urls.add(hour.getUrl());
+        Collections.sort(urls);
     }
 
     public BroadcastShow(String jsonString) {
@@ -55,6 +56,7 @@ public class BroadcastShow implements Parcelable {
         } catch (JSONException e) {
             hasError = true;
         }
+        Collections.sort(urls);
         this.playlistId = playlistId;
         this.airName = airName;
         this.timestamp = timestamp;
@@ -66,6 +68,7 @@ public class BroadcastShow implements Parcelable {
         airName = in.readString();
         timestamp = in.readLong();
         in.readStringList(urls);
+        Collections.sort(urls);
     }
 
     void addHour(BroadcastHour hour) {
@@ -100,7 +103,6 @@ public class BroadcastShow implements Parcelable {
     }
 
     public List<String> getUrls() {
-        Collections.sort(urls);
         return urls;
     }
 
@@ -148,6 +150,7 @@ public class BroadcastShow implements Parcelable {
             return false;
         }
         BroadcastShow thatShow = (BroadcastShow) that;
+
         return thatShow.playlistId.equals(this.playlistId)
                 && thatShow.airName.equals(this.airName)
                 && thatShow.urls.equals(this.urls)

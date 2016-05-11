@@ -19,9 +19,9 @@ public interface HomeScreenInterface {
     void updateBackground();
     void requestExternalWritePermission();
     void loadPodcastPlayer(BroadcastShow show, boolean animate);
+    void loadPodcastListFragment(boolean animate);
     void registerDownload(long downloadId, BroadcastShow show);
     long getPlayerPosition();
-    long getPlayerDuration();
     void seekPlayer(long positionMillis);
     void syncState();
     MediaSource getPlayerSource();

@@ -82,11 +82,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private View.OnClickListener pulldownFabClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            getActivity().getFragmentManager().beginTransaction()
-                    .setCustomAnimations(R.animator.fade_in_down, R.animator.fade_out_down)
-                    .replace(R.id.home_screen_main_fragment, new PodcastFragment())
-                    .addToBackStack(null)
-                    .commit();
+        homeScreen.loadPodcastListFragment(true);
         }
     };
 
