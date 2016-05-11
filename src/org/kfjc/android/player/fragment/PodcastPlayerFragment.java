@@ -43,13 +43,12 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private DownloadManager downloadManager;
     private FragmentState fragmentState;
     private Handler handler = new Handler();
+    private long totalShowTime;
+    private long[] segmentBounds;
 
     private SeekBar playtimeSeekBar;
     private FloatingActionButton fab;
     private TextView podcastDetails;
-
-    private long totalShowTime;
-    private long[] segmentBounds;
 
     private Runnable playClockUpdater = new Runnable() {
         @Override public void run() {
@@ -72,12 +71,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        try {
-            homeScreen = (HomeScreenInterface) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.getClass().getSimpleName() + " must implement "
-                    + HomeScreenInterface.class.getSimpleName());
-        }
         downloadManager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
     }
 

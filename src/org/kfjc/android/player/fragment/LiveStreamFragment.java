@@ -50,17 +50,6 @@ public class LiveStreamFragment extends PlayerFragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            homeScreen = (HomeScreenInterface) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.getClass().getSimpleName() + " must implement "
-                + HomeScreenInterface.class.getSimpleName());
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         homeScreen.setNavigationItemChecked(R.id.nav_livestream);
