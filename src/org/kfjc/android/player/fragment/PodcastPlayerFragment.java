@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
@@ -50,6 +49,18 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private FloatingActionButton fab;
     private TextView podcastDetails;
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        downloadManager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        handler.removeCallbacks(playClockUpdater);
+    }
+
     private Runnable playClockUpdater = new Runnable() {
         @Override public void run() {
             long playerPos = homeScreen.getPlayerPosition();
@@ -68,92 +79,93 @@ public class PodcastPlayerFragment extends PlayerFragment {
         }
     };
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        downloadManager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
-    }
+    private View.OnClickListener pulldownFabClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            getActivity().getFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.animator.fade_in_down, R.animator.fade_out_down)
+                    .replace(R.id.home_screen_main_fragment, new PodcastFragment())
+                    .addToBackStack(null)
+                    .commit();
+        }
+    };
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        handler.removeCallbacks(playClockUpdater);
-    }
+    private View.OnClickListener fabClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (fragmentState) {
+                case PREVIEW:
+                    homeScreen.requestExternalWritePermission();
+                    break;
+                case PLAYER:
+                    onPlayStopButtonClick();
+                    break;
+            }
+        }
+    };
+
+    SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        boolean isTrackingTouch = false;
+        @Override
+        public void onStopTrackingTouch(SeekBar arg0) {
+            isTrackingTouch = false;
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar arg0) {
+            isTrackingTouch = true;
+        }
+
+        @Override
+        public void onProgressChanged(SeekBar arg0, int progress, boolean arg2) {
+            long seekToMillis = (long) (progress) * 100;
+            if (isTrackingTouch) {
+                handler.removeCallbacks(playClockUpdater);
+                seekOverEntireShow(seekToMillis);
+            }
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
         View view = inflater.inflate(R.layout.fragment_podcastplayer, container, false);
 
-        playtimeSeekBar = (SeekBar) view.findViewById(R.id.playtimeSeekBar);
         FloatingActionButton pullDownFab = (FloatingActionButton) view.findViewById(R.id.pullDownButton);
         TextView airName = (TextView) view.findViewById(R.id.airName);
         TextView dateTime = (TextView) view.findViewById(R.id.podcastDateTime);
-
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        playtimeSeekBar = (SeekBar) view.findViewById(R.id.playtimeSeekBar);
         podcastDetails = (TextView) view.findViewById(R.id.podcastDetails);
 
-        pullDownFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().getFragmentManager().beginTransaction()
-                        .setCustomAnimations(R.animator.fade_in_down, R.animator.fade_out_down)
-                        .replace(R.id.home_screen_main_fragment, new PodcastFragment())
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onFabClicked();
-            }
-        });
-
-        playtimeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            boolean isTrackingTouch = false;
-            @Override
-            public void onStopTrackingTouch(SeekBar arg0) {
-                isTrackingTouch = false;
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar arg0) {
-                isTrackingTouch = true;
-            }
-
-            @Override
-            public void onProgressChanged(SeekBar arg0, int progress, boolean arg2) {
-                long seekTo = (long) (progress) * 100;
-                if (isTrackingTouch) {
-                    handler.removeCallbacks(playClockUpdater);
-                    for (int i = 0; i < segmentBounds.length; i++) {
-                        if (seekTo < segmentBounds[i]) {
-                            // load segment i
-                            playArchive(i);
-
-                            //seek to adjusted position
-                            long thisSegmentStart = (i == 0) ? 0 : segmentBounds[i-1];
-                            long extraSeek = (i == 0) ? 0 : PADDING_TIME_MILLIS;
-                            long localSeekTo = seekTo - thisSegmentStart + extraSeek;
-                            homeScreen.seekPlayer(localSeekTo);
-                            return;
-                        }
-                    }
-                }
-            }
-        });
+        pullDownFab.setOnClickListener(pulldownFabClickListener);
+        fab.setOnClickListener(fabClickListener);
+        playtimeSeekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
 
         Bundle bundle = getArguments();
         if (bundle != null) {
-            show = bundle.getParcelable(BROADCAST_SHOW_KEY);
+            this.show = bundle.getParcelable(BROADCAST_SHOW_KEY);
             airName.setText(show.getAirName());
             dateTime.setText(show.getTimestampString());
             checkState();
         }
 
         return view;
+    }
+
+    private void seekOverEntireShow(long seekToMillis) {
+        for (int i = 0; i < segmentBounds.length; i++) {
+            if (seekToMillis < segmentBounds[i]) {
+                // load segment i
+                playArchive(i);
+                //seek to adjusted position
+                long thisSegmentStart = (i == 0) ? 0 : segmentBounds[i-1];
+                long extraSeek = (i == 0) ? 0 : PADDING_TIME_MILLIS;
+                long localSeekTo = seekToMillis - thisSegmentStart + extraSeek;
+                homeScreen.seekPlayer(localSeekTo);
+                return;
+            }
+        }
     }
 
     private void checkState() {
@@ -170,17 +182,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
         }
     }
 
-    private void onFabClicked() {
-        switch (fragmentState) {
-            case PREVIEW:
-                homeScreen.requestExternalWritePermission();
-                break;
-            case PLAYER:
-                onPlayStopButtonClick();
-                break;
-        }
-    }
-
     private void onPlayStopButtonClick() {
         switch (displayState) {
             case STOP:
@@ -191,7 +192,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 homeScreen.stopPlayer();
                 break;
         }
-
     }
 
     private void playArchive(int hourNumber) {
@@ -206,7 +206,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         long[] bounds = new long[files.size()];
         long totalTime = 0;
         for (int i = 0; i < files.size(); i++) {
-            long showTime = countShowTime(files.get(i));
+            long showTime = countFilePlayTime(files.get(i));
 
             // Total
             totalTime += showTime - 2 * PADDING_TIME_MILLIS;
@@ -221,7 +221,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         this.segmentBounds = bounds;
     }
 
-    private long countShowTime(File f) {
+    private long countFilePlayTime(File f) {
         MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
         metaRetriever.setDataSource(f.getPath());
         String durationString =
