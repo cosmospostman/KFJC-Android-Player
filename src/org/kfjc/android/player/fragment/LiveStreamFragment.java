@@ -1,6 +1,5 @@
 package org.kfjc.android.player.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -13,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.activity.LavaLampActivity;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.dialog.SettingsDialog;

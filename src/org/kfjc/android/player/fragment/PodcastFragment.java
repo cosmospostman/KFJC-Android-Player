@@ -1,7 +1,5 @@
 package org.kfjc.android.player.fragment;
 
-import android.app.Fragment;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,7 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.model.BroadcastArchive;
 import org.kfjc.android.player.model.BroadcastHour;
 import org.kfjc.android.player.model.BroadcastHourJsonImpl;
@@ -25,22 +22,10 @@ import org.kfjc.android.player.util.HttpUtil;
 import java.io.IOException;
 import java.util.List;
 
-public class PodcastFragment extends Fragment implements PodcastViewHolder.PodcastClickDelegate {
+public class PodcastFragment extends KfjcFragment implements PodcastViewHolder.PodcastClickDelegate {
 
-    private HomeScreenInterface homeScreen;
     private RecyclerView recentShowsView;
     private RecyclerView savedShowsView;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            homeScreen = (HomeScreenInterface) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.getClass().getSimpleName() + " must implement "
-                    + HomeScreenInterface.class.getSimpleName());
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

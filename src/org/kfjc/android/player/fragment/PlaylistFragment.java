@@ -1,8 +1,6 @@
 package org.kfjc.android.player.fragment;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -15,32 +13,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.dialog.TrackDetailsDialog;
 import org.kfjc.android.player.model.Playlist;
 
 import java.util.List;
 
-public class PlaylistFragment extends Fragment {
+public class PlaylistFragment extends KfjcFragment {
 
     private static final String TAG = PlaylistFragment.class.getSimpleName();
-
-    private HomeScreenInterface homeScreen;
 
     private TextView djNameView;
     private TextView timestringView;
     private LinearLayout playlistListView;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            homeScreen = (HomeScreenInterface) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.getClass().getSimpleName() + " must implement "
-                    + HomeScreenInterface.class.getSimpleName());
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
