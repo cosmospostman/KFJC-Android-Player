@@ -8,9 +8,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -26,6 +29,8 @@ import org.kfjc.android.player.util.HttpUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PodcastPlayerFragment extends PlayerFragment {
@@ -33,21 +38,24 @@ public class PodcastPlayerFragment extends PlayerFragment {
     public static final String BROADCAST_SHOW_KEY = "broadcastShowKey";
     private static final long PADDING_TIME_MILLIS = 300000; // 5 mins
 
-    private enum FragmentState {
-        PREVIEW,
-        PLAYER
-    }
+//    private enum FragmentState {
+//        PREVIEW,
+//        PLAYER
+//    }
 
     private BroadcastShow show;
     private DownloadManager downloadManager;
-    private FragmentState fragmentState;
     private Handler handler = new Handler();
     private long totalShowTime;
     private long[] segmentBounds;
+    private boolean hasOfflineContent;
+    private boolean isCheckingState;
 
     private SeekBar playtimeSeekBar;
     private FloatingActionButton fab;
     private TextView podcastDetails;
+    private LinearLayout bottomControls;
+    private ProgressBar loadingProgress;
 
     @Override
     public void onAttach(Context context) {
@@ -63,6 +71,9 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     private Runnable playClockUpdater = new Runnable() {
         @Override public void run() {
+            if (segmentBounds == null) {
+                return;
+            }
             long playerPos = homeScreen.getPlayerPosition();
 
             int playingSegmentNumber = homeScreen.getPlayerSource().sequenceNumber;
@@ -89,14 +100,14 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private View.OnClickListener fabClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            switch (fragmentState) {
-                case PREVIEW:
-                    homeScreen.requestExternalWritePermission();
-                    break;
-                case PLAYER:
-                    onPlayStopButtonClick();
-                    break;
-            }
+            onPlayStopButtonClick();
+        }
+    };
+
+    private View.OnClickListener downloadClicklistener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            homeScreen.requestExternalWritePermission();
         }
     };
 
@@ -133,6 +144,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         playtimeSeekBar = (SeekBar) view.findViewById(R.id.playtimeSeekBar);
         podcastDetails = (TextView) view.findViewById(R.id.podcastDetails);
+        bottomControls = (LinearLayout) view.findViewById(R.id.bottomControls);
+        loadingProgress = (ProgressBar) view.findViewById(R.id.loadingProgress);
 
         pullDownFab.setOnClickListener(pulldownFabClickListener);
         fab.setOnClickListener(fabClickListener);
@@ -144,6 +157,26 @@ public class PodcastPlayerFragment extends PlayerFragment {
             airName.setText(show.getAirName());
             dateTime.setText(show.getTimestampString());
             checkState();
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected void onPreExecute() {
+                    isCheckingState = true;
+                }
+
+                @Override
+                protected Void doInBackground(Void... params) {
+                    countTotalShowTime();
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    isCheckingState = false;
+                    updateState();
+                    bottomControls.setVisibility(View.VISIBLE);
+                    loadingProgress.setVisibility(View.INVISIBLE);
+                }
+            }.execute();
         }
 
         return view;
@@ -165,17 +198,18 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void checkState() {
-        if (! ExternalStorageUtil.getPodcastDir(show.getPlaylistId()).exists()) {
-            // Show preview and download state
-            fab.setImageResource(R.drawable.ic_file_download_white_48dp);
-            podcastDetails.setText(show.getUrls().size() + " hour show, 258Mb download.");
-            fragmentState = FragmentState.PREVIEW;
+        if (!ExternalStorageUtil.getPodcastDir(show.getPlaylistId()).exists()) {
+            hasOfflineContent = false;
         } else if (ExternalStorageUtil.hasAllContent(show)) {
-            // Show play state
-            fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-            countTotalShowTime();
-            fragmentState = FragmentState.PLAYER;
+            hasOfflineContent = true;
+        } else {
+            hasOfflineContent = false;
         }
+    }
+
+    private void updateState() {
+        fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+        podcastDetails.setText(show.getUrls().size() + " hour show, 258Mb download.");
     }
 
     private void onPlayStopButtonClick() {
@@ -191,25 +225,35 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void playArchive(int hourNumber) {
-        File f = ExternalStorageUtil.getSavedArchivesForShow(show).get(hourNumber);
+        String source = hasOfflineContent
+                ? ExternalStorageUtil.getSavedArchivesForShow(show).get(hourNumber).getPath()
+                : show.getUrls().get(hourNumber);
         homeScreen.playArchive(new MediaSource(
-                MediaSource.Type.ARCHIVE, f.getAbsolutePath(), MediaSource.Format.MP3, hourNumber,
-                show.getAirName(), show.getTimestampString()));
+                MediaSource.Type.ARCHIVE, source, MediaSource.Format.MP3, hourNumber, show));
     }
 
     private void countTotalShowTime() {
-        List<File> files = ExternalStorageUtil.getSavedArchivesForShow(show);
-        long[] bounds = new long[files.size()];
+        List<String> paths = new ArrayList<>();
+
+        if (hasOfflineContent) {
+            for (File f : ExternalStorageUtil.getSavedArchivesForShow(show)) {
+                paths.add(f.getPath());
+            }
+        } else {
+            paths = show.getUrls();
+        }
+
+        long[] bounds = new long[paths.size()];
         long totalTime = 0;
-        for (int i = 0; i < files.size(); i++) {
-            long showTime = countFilePlayTime(files.get(i));
+        for (int i = 0; i < paths.size(); i++) {
+            long showTime = countFilePlayTime(paths.get(i));
 
             // Total
             totalTime += showTime - 2 * PADDING_TIME_MILLIS;
 
             // Bound
             bounds[i] = totalTime + PADDING_TIME_MILLIS;
-            if (i == files.size() - 1) {
+            if (i == paths.size() - 1) {
                 bounds[i] += PADDING_TIME_MILLIS;
             }
         }
@@ -217,9 +261,14 @@ public class PodcastPlayerFragment extends PlayerFragment {
         this.segmentBounds = bounds;
     }
 
-    private long countFilePlayTime(File f) {
+    // TODO: try/catch RuntimeException (setDataSource)
+    private long countFilePlayTime(String path) {
         MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-        metaRetriever.setDataSource(f.getPath());
+        if (path.contains("http")) {
+            metaRetriever.setDataSource(path, Collections.<String, String>emptyMap());
+        } else {
+            metaRetriever.setDataSource(path);
+        }
         String durationString =
                 metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         return Long.parseLong(durationString);
@@ -273,7 +322,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
     void onStateChanged(PlayerState state, MediaSource source) {
         switch (state) {
             case PLAY:
-                if (source.type == MediaSource.Type.ARCHIVE) {
+                if (source.type == MediaSource.Type.ARCHIVE
+                        && source.show.getPlaylistId().equals(show.getPlaylistId())) {
                     setPlayState();
                 } else {
                     setStopState();
@@ -283,6 +333,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 setStopState();
                 break;
             case BUFFER:
+                setBufferState();
                 break;
         }
     }
@@ -294,13 +345,24 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     private void setPlayState() {
         fab.setImageResource(R.drawable.ic_stop_white_48dp);
+        if (!isCheckingState) {
+            loadingProgress.setVisibility(View.INVISIBLE);
+        }
         startPlayClockUpdater();
         displayState = PlayerState.PLAY;
     }
 
     private void setStopState() {
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-        handler.removeCallbacks(playClockUpdater);
+        if (!isCheckingState) {
+            loadingProgress.setVisibility(View.INVISIBLE);
+        }        handler.removeCallbacks(playClockUpdater);
         displayState = PlayerState.STOP;
+    }
+
+    private void setBufferState() {
+        loadingProgress.setVisibility(View.VISIBLE);
+        fab.setImageResource(R.drawable.ic_stop_white_48dp);
+        displayState = PlayerState.PLAY;
     }
 }

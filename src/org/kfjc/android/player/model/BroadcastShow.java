@@ -78,6 +78,7 @@ public class BroadcastShow implements Parcelable {
         // Use earliest timestamp as start of show.
         timestamp = Math.min(timestamp, hour.getTimestamp());
         urls.add(hour.getUrl());
+        Collections.sort(urls);
     }
 
     public String getPlaylistId() {

@@ -12,14 +12,7 @@ public class MediaSource {
     public final Format format;
     public final int sequenceNumber;
 
-    public MediaSource(Type type, String url, Format format, int sequenceNumber) {
-        this.url = url;
-        this.name = "";
-        this.description = "";
-        this.format = format;
-        this.type = type;
-        this.sequenceNumber = sequenceNumber;
-    }
+    public final BroadcastShow show;
 
     public MediaSource(Type type, String url, Format format, int sequenceNumber, String name, String description) {
         this.url = url;
@@ -28,6 +21,17 @@ public class MediaSource {
         this.format = format;
         this.type = type;
         this.sequenceNumber = sequenceNumber;
+        this.show = null;
+    }
+
+    public MediaSource(Type type, String url, Format format, int sequenceNumber, BroadcastShow show) {
+        this.url = url;
+        this.format = format;
+        this.type = type;
+        this.sequenceNumber = sequenceNumber;
+        this.name = show.getAirName();
+        this.description = show.getTimestampString();
+        this.show = show;
     }
 
     @Override

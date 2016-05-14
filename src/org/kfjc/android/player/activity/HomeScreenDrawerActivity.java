@@ -531,7 +531,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     public void playArchive(MediaSource source) {
         if (streamService.getSource() != null
                 && streamService.getSource().equals(source)) {
-            Log.i("HomeScreen", " returning ");
             return;
         }
         streamService.stop();

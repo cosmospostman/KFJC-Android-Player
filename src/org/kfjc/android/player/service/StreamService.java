@@ -124,7 +124,7 @@ public class StreamService extends Service {
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
         } else if (mediaSource.type == MediaSource.Type.ARCHIVE) {
             Notification n = NotificationUtil.kfjcNotification(
-                    context, mediaSource.name, mediaSource.description);
+                    context, mediaSource.show.getAirName(), mediaSource.show.getTimestampString());
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
         }
 

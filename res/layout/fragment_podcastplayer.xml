@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:baselineAligned="false"
     android:layout_height="fill_parent"
@@ -79,6 +78,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:visibility="invisible"
         android:padding="16dp">
 
         <SeekBar
@@ -111,6 +111,7 @@
                 android:layout_height="56dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
+                android:layout_margin="4dp"
                 app:backgroundTint="@color/kfjc_red_solid"
                 app:rippleColor="@color/kfjc_mute"
                 app:elevation="2dp"/>
@@ -118,5 +119,15 @@
         </RelativeLayout>
 
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/loadingProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/LinearProgress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_marginBottom="-8dp"
+        android:layout_marginTop="-4dp"
+        android:indeterminate="true"/>
 
 </LinearLayout>
