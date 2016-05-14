@@ -14,12 +14,6 @@ public abstract class PlayerFragment extends KfjcFragment {
         BUFFER
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        homeScreen.syncState();
-    }
-
     public void setState(PlayerState state, MediaSource source) {
         playerState = state;
         playerSource = source;

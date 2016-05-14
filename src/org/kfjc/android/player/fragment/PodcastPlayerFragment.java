@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +50,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private boolean hasOfflineContent;
     private boolean isCheckingState;
 
+    private TextView airName;
+    private TextView dateTime;
     private SeekBar playtimeSeekBar;
     private FloatingActionButton fab;
     private TextView podcastDetails;
@@ -139,8 +140,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
         View view = inflater.inflate(R.layout.fragment_podcastplayer, container, false);
 
         FloatingActionButton pullDownFab = (FloatingActionButton) view.findViewById(R.id.pullDownButton);
-        TextView airName = (TextView) view.findViewById(R.id.airName);
-        TextView dateTime = (TextView) view.findViewById(R.id.podcastDateTime);
+        airName = (TextView) view.findViewById(R.id.airName);
+        dateTime = (TextView) view.findViewById(R.id.podcastDateTime);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         playtimeSeekBar = (SeekBar) view.findViewById(R.id.playtimeSeekBar);
         podcastDetails = (TextView) view.findViewById(R.id.podcastDetails);
@@ -151,6 +152,12 @@ public class PodcastPlayerFragment extends PlayerFragment {
         fab.setOnClickListener(fabClickListener);
         playtimeSeekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
 
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         Bundle bundle = getArguments();
         if (bundle != null) {
             this.show = bundle.getParcelable(BROADCAST_SHOW_KEY);
@@ -179,8 +186,13 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 }
             }.execute();
         }
+    }
 
-        return view;
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(PodcastPlayerFragment.BROADCAST_SHOW_KEY, show);
+        outState.putAll(bundle);
     }
 
     private void seekOverEntireShow(long seekToMillis) {

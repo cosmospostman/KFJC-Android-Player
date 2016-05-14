@@ -370,13 +370,17 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 loadPodcastListFragment(false);
                 break;
             case R.id.nav_podcast_player:
-                loadPodcastPlayer(null, true);
+                loadPodcastPlayer(null, false);
                 break;
         }
     }
 
     @Override
     public void loadPodcastPlayer(BroadcastShow show, boolean animate) {
+        if (activeFragmentId == R.id.nav_podcast_player) {
+            return;
+        }
+        activeFragmentId = R.id.nav_podcast_player;
         podcastPlayerFragment = new PodcastPlayerFragment();
         if (show != null) {
             Bundle bundle = new Bundle();
@@ -394,7 +398,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void loadPodcastListFragment(boolean animate) {
-        replaceFragment(podcastFragment);
+        activeFragmentId = R.id.nav_podcast;
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         if (animate) {
             ft.setCustomAnimations(R.animator.fade_in_down, R.animator.fade_out_down);
