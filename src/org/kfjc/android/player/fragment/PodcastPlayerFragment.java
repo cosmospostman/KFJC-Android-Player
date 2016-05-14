@@ -173,6 +173,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 protected void onPostExecute(Void aVoid) {
                     isCheckingState = false;
                     updateState();
+                    homeScreen.syncState();
                     bottomControls.setVisibility(View.VISIBLE);
                     loadingProgress.setVisibility(View.INVISIBLE);
                 }
