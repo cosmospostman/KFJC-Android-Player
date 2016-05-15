@@ -27,4 +27,6 @@ public interface HomeScreenInterface {
     void seekPlayer(long positionMillis);
     void syncState();
     MediaSource getPlayerSource();
+    void setSegmentBounds(long[] segmentBounds);
+    long[] getSegmentBounds();
 }

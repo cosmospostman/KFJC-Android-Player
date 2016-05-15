@@ -51,7 +51,7 @@ public class LiveStreamFragment extends PlayerFragment {
     public void onResume() {
         super.onResume();
         homeScreen.setNavigationItemChecked(R.id.nav_livestream);
-        homeScreen.syncState();
+//        homeScreen.syncState();
     }
 
     @Override
@@ -59,6 +59,9 @@ public class LiveStreamFragment extends PlayerFragment {
         super.onPause();
         graphics.bufferDevil(radioDevil, false);
     }
+
+    @Override
+    void updateClock() {}
 
     private void addButtonListeners() {
         playStopButton.setOnClickListener(new View.OnClickListener() {

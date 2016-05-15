@@ -36,11 +36,9 @@ import java.util.List;
 public class PodcastPlayerFragment extends PlayerFragment {
 
     public static final String BROADCAST_SHOW_KEY = "broadcastShowKey";
-    private static final long PADDING_TIME_MILLIS = 300000; // 5 mins
 
     private BroadcastShow show;
     private DownloadManager downloadManager;
-    private Handler handler = new Handler();
     private long totalShowTime;
     private long[] segmentBounds;
     private boolean hasOfflineContent;
@@ -60,34 +58,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
         super.onAttach(context);
         downloadManager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
     }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        handler.removeCallbacks(playClockUpdater);
-    }
-
-    private Runnable playClockUpdater = new Runnable() {
-        @Override public void run() {
-            if (segmentBounds == null) {
-                return;
-            }
-            long playerPos = homeScreen.getPlayerPosition();
-
-            int playingSegmentNumber = homeScreen.getPlayerSource().sequenceNumber;
-            long segmentOffset = (playingSegmentNumber == 0) ? 0 : segmentBounds[playingSegmentNumber - 1];
-            long extra = (playingSegmentNumber == 0) ? 0 : PADDING_TIME_MILLIS;
-            long pos = playerPos + segmentOffset - extra;
-
-            podcastDetails.setText(DateUtil.formatTime(pos - PADDING_TIME_MILLIS)
-                    + " | " + DateUtil.formatTime(totalShowTime - 2 * PADDING_TIME_MILLIS));
-
-            playtimeSeekBar.setMax((int)totalShowTime/100);
-            playtimeSeekBar.setProgress((int)pos/100);
-
-            handler.postDelayed(this, 1000);
-        }
-    };
 
     private View.OnClickListener pulldownFabClickListener = new View.OnClickListener() {
         @Override
@@ -222,7 +192,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 playArchive(i);
                 //seek to adjusted position
                 long thisSegmentStart = (i == 0) ? 0 : segmentBounds[i-1];
-                long extraSeek = (i == 0) ? 0 : PADDING_TIME_MILLIS;
+                long extraSeek = (i == 0) ? 0 : Constants.PODCAST_PAD_TIME_MILLIS;
                 long localSeekTo = seekToMillis - thisSegmentStart + extraSeek;
                 homeScreen.seekPlayer(localSeekTo);
                 return;
@@ -247,15 +217,20 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     private void onPlayStopButtonClick() {
         switch (displayState) {
+            case PAUSE:
+                if (playerSource.type == MediaSource.Type.ARCHIVE
+                        && playerSource.show.getPlaylistId().equals(show.getPlaylistId())) {
+                    homeScreen.unpausePlayer();
+                    break;
+                } // else fall through:
             case STOP:
                 playArchive(0);
-                homeScreen.seekPlayer(PADDING_TIME_MILLIS);
+                homeScreen.seekPlayer(Constants.PODCAST_PAD_TIME_MILLIS);
+                homeScreen.setSegmentBounds(segmentBounds);
                 break;
             case PLAY:
                 homeScreen.pausePlayer();
                 break;
-            case PAUSE:
-                homeScreen.unpausePlayer();
         }
     }
 
@@ -265,6 +240,24 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 : show.getUrls().get(hourNumber);
         homeScreen.playArchive(new MediaSource(
                 MediaSource.Type.ARCHIVE, source, MediaSource.Format.MP3, hourNumber, show));
+    }
+
+    void updateClock() {
+        if (segmentBounds == null) {
+            return;
+        }
+        long playerPos = homeScreen.getPlayerPosition();
+
+        int playingSegmentNumber = homeScreen.getPlayerSource().sequenceNumber;
+        long segmentOffset = (playingSegmentNumber == 0) ? 0 : segmentBounds[playingSegmentNumber - 1];
+        long extra = (playingSegmentNumber == 0) ? 0 : Constants.PODCAST_PAD_TIME_MILLIS;
+        long pos = playerPos + segmentOffset - extra;
+
+        podcastDetails.setText(DateUtil.formatTime(pos - Constants.PODCAST_PAD_TIME_MILLIS)
+                + " | " + DateUtil.formatTime(totalShowTime - 2 * Constants.PODCAST_PAD_TIME_MILLIS));
+
+        playtimeSeekBar.setMax((int)totalShowTime/100);
+        playtimeSeekBar.setProgress((int)pos/100);
     }
 
     private void countTotalShowTime() {
@@ -284,15 +277,15 @@ public class PodcastPlayerFragment extends PlayerFragment {
             long showTime = countFilePlayTime(paths.get(i));
 
             // Total
-            totalTime += showTime - 2 * PADDING_TIME_MILLIS;
+            totalTime += showTime - 2 * Constants.PODCAST_PAD_TIME_MILLIS;
 
             // Bound
-            bounds[i] = totalTime + PADDING_TIME_MILLIS;
+            bounds[i] = totalTime + Constants.PODCAST_PAD_TIME_MILLIS;
             if (i == paths.size() - 1) {
-                bounds[i] += PADDING_TIME_MILLIS;
+                bounds[i] += Constants.PODCAST_PAD_TIME_MILLIS;
             }
         }
-        totalTime += 2 * PADDING_TIME_MILLIS;
+        totalTime += 2 * Constants.PODCAST_PAD_TIME_MILLIS;
         this.totalShowTime = totalTime;
         this.segmentBounds = bounds;
     }
@@ -377,11 +370,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
         }
     }
 
-    private void startPlayClockUpdater() {
-        handler.removeCallbacks(playClockUpdater);
-        handler.postDelayed(playClockUpdater, 0);
-    }
-
     private void setPlayState() {
         fab.setImageResource(R.drawable.ic_pause_white_48dp);
         if (!isCheckingState) {
@@ -393,6 +381,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     private void setPauseState() {
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+        updateClock();
         displayState = PlayerState.PAUSE;
     }
 

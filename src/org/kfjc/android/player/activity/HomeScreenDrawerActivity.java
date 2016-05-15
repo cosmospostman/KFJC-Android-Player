@@ -94,6 +94,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private Snackbar snackbar;
     private Map<Long, BroadcastShow> activeDownloads;
     private boolean askPermissionsAgain = true;
+    private long[] segmentBounds;
 
     private boolean isForegroundActivity = false;
     private int activeFragmentId = R.id.nav_livestream;
@@ -199,6 +200,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         public void onStateChange(PlayerFragment.PlayerState state, MediaSource source) {
             liveStreamFragment.setState(state, source);
             podcastPlayerFragment.setState(state, source);
+            podcastFragment.setState(state, source);
             if (source != null && source.type == MediaSource.Type.LIVESTREAM) {
                 // TODO: refactor the logic
                 notificationUtil.updateNowPlayNotification(playlistService.getPlaylist());
@@ -631,5 +633,15 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void unpausePlayer() {
         streamService.unpause();
+    }
+
+    @Override
+    public void setSegmentBounds(long[] segmentBounds) {
+        this.segmentBounds = segmentBounds;
+    }
+
+    @Override
+    public long[] getSegmentBounds() {
+        return this.segmentBounds;
     }
 }

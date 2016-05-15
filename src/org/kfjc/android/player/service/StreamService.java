@@ -123,7 +123,9 @@ public class StreamService extends Service {
             return PlayerFragment.PlayerState.BUFFER;
         }
         if (player.getPlaybackState() == ExoPlayer.STATE_READY) {
-            return PlayerFragment.PlayerState.PLAY;
+            return isPaused
+                    ? PlayerFragment.PlayerState.PAUSE
+                    : PlayerFragment.PlayerState.PLAY;
         }
         return PlayerFragment.PlayerState.STOP;
     }
