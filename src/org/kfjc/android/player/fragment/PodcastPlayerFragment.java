@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
+import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
@@ -49,6 +50,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private TextView dateTime;
     private SeekBar playtimeSeekBar;
     private FloatingActionButton fab;
+    private FloatingActionButton settingsButton;
     private TextView podcastDetails;
     private LinearLayout bottomControls;
     private ProgressBar loadingProgress;
@@ -101,6 +103,26 @@ public class PodcastPlayerFragment extends PlayerFragment {
         }
     };
 
+    private View.OnClickListener settingsButtonClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            showSettings();
+        }
+    };
+
+    private void showSettings() {
+        SettingsDialog settingsFragment = new SettingsDialog();
+        settingsFragment.setUrlPreferenceChangeHandler(
+                new SettingsDialog.StreamUrlPreferenceChangeHandler() {
+                    @Override public void onStreamUrlPreferenceChange() {
+                        if (homeScreen.isStreamServicePlaying()) {
+                            homeScreen.restartStream();
+                        }
+                    }
+                });
+        settingsFragment.show(getFragmentManager(), "settings");
+    }
+
     private View.OnClickListener downloadClicklistener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -139,6 +161,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         airName = (TextView) view.findViewById(R.id.airName);
         dateTime = (TextView) view.findViewById(R.id.podcastDateTime);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        settingsButton = (FloatingActionButton) view.findViewById(R.id.settingsButton);
         playtimeSeekBar = (SeekBar) view.findViewById(R.id.playtimeSeekBar);
         podcastDetails = (TextView) view.findViewById(R.id.podcastDetails);
         bottomControls = (LinearLayout) view.findViewById(R.id.bottomControls);
@@ -146,6 +169,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
         pullDownFab.setOnClickListener(pulldownFabClickListener);
         fab.setOnClickListener(fabClickListener);
+        settingsButton.setOnClickListener(settingsButtonClickListener);
         playtimeSeekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
 
         return view;

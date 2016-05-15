@@ -115,7 +115,7 @@ public class LiveStreamFragment extends PlayerFragment {
         return Html.fromHtml(e.getArtist() + spacer + "<i>" + e.getTrack() + "</i>");
     }
 
-    public void showSettings() {
+    private void showSettings() {
         SettingsDialog settingsFragment = new SettingsDialog();
         settingsFragment.setUrlPreferenceChangeHandler(
                 new SettingsDialog.StreamUrlPreferenceChangeHandler() {

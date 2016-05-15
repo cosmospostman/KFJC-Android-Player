@@ -106,6 +106,20 @@
                 android:textSize="18sp" />
 
             <android.support.design.widget.FloatingActionButton
+                android:id="@+id/settingsButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="78dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_volume_up_white_48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                app:fabSize="mini"
+                app:backgroundTint="@color/kfjc_mute"
+                app:rippleColor="@color/kfjc_mute"
+                app:elevation="2dp" />
+
+            <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"
                 android:layout_width="56dp"
                 android:layout_height="56dp"

@@ -46,7 +46,7 @@
     <string name="permission_phone_rationale">KFJC only uses phone permissions to automatically
         stop playback when your phone is in use. We don\'t snoop!</string>
 
-    <string name="setting_audio_quality">Audio quality</string>
+    <string name="setting_audio_quality">Live stream audio quality</string>
     <string name="setting_backgrounds">Hourly backgrounds</string>
     <string name="status_connecting">Connecting to KFJC...</string>
     <string name="status_default_stream">Using default stream</string>
