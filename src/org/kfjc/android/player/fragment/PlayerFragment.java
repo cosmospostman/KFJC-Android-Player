@@ -10,6 +10,7 @@ public abstract class PlayerFragment extends KfjcFragment {
 
     public enum PlayerState {
         PLAY,
+        PAUSE,
         STOP,
         BUFFER
     }

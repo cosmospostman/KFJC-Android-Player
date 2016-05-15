@@ -623,4 +623,13 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         streamService.seekPlayer(positionMillis);
     }
 
+    @Override
+    public void pausePlayer() {
+        streamService.pause();
+    }
+
+    @Override
+    public void unpausePlayer() {
+        streamService.unpause();
+    }
 }

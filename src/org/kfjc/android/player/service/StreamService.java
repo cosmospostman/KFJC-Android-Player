@@ -130,8 +130,6 @@ public class StreamService extends Service {
         this.mediaSource = mediaSource;
         String streamUrl = mediaSource.url;
         Log.i(TAG, "Playing stream " + streamUrl);
-        player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
-        player.addListener(exoPlayerListener);
 
         if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
             Notification n = NotificationUtil.bufferingNotification(context);
@@ -141,6 +139,9 @@ public class StreamService extends Service {
                     context, mediaSource.show.getAirName(), mediaSource.show.getTimestampString());
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
         }
+
+        player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
+        player.addListener(exoPlayerListener);
 
         Extractor extractor = null;
         switch (mediaSource.format) {
@@ -166,7 +167,23 @@ public class StreamService extends Service {
         player.setPlayWhenReady(true);
     }
 
-	public void stop() {
+    private boolean isPaused = false;
+
+    public void pause() {
+        player.setPlayWhenReady(false);
+        isPaused = true;
+    }
+
+    public void unpause() {
+        if (isPaused) {
+            Log.i(TAG, "Unpausing");
+            player.setPlayWhenReady(true);
+            isPaused = false;
+            return;
+        }
+    }
+
+    public void stop() {
         if (player != null) {
             player.stop();
             mediaListener.onStateChange(PlayerFragment.PlayerState.STOP, mediaSource);
@@ -211,6 +228,8 @@ public class StreamService extends Service {
                         registerReceiver(onStopReciever, onStopIntentFilter);
                         becomingNoisyReceiverRegistered = true;
                         onStopReceiverRegistered = true;
+                    } else {
+                         mediaListener.onStateChange(PlayerFragment.PlayerState.PAUSE, mediaSource);
                     }
                     break;
                 case ExoPlayer.STATE_PREPARING:

@@ -232,8 +232,10 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 homeScreen.seekPlayer(PADDING_TIME_MILLIS);
                 break;
             case PLAY:
-                homeScreen.stopPlayer();
+                homeScreen.pausePlayer();
                 break;
+            case PAUSE:
+                homeScreen.unpausePlayer();
         }
     }
 
@@ -342,6 +344,9 @@ public class PodcastPlayerFragment extends PlayerFragment {
                     setStopState();
                 }
                 break;
+            case PAUSE:
+                setPauseState();
+                break;
             case STOP:
                 setStopState();
                 break;
@@ -357,12 +362,17 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void setPlayState() {
-        fab.setImageResource(R.drawable.ic_stop_white_48dp);
+        fab.setImageResource(R.drawable.ic_pause_white_48dp);
         if (!isCheckingState) {
             loadingProgress.setVisibility(View.INVISIBLE);
         }
         startPlayClockUpdater();
         displayState = PlayerState.PLAY;
+    }
+
+    private void setPauseState() {
+        fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+        displayState = PlayerState.PAUSE;
     }
 
     private void setStopState() {

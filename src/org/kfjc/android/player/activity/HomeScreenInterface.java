@@ -8,6 +8,8 @@ public interface HomeScreenInterface {
     void setActionbarTitle(String title);
     void playStream();
     void stopPlayer();
+    void pausePlayer();
+    void unpausePlayer();
     void restartStream();
     void playArchive(MediaSource source);
     boolean isStreamServicePlaying();
