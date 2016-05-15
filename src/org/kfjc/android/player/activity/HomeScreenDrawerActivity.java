@@ -57,6 +57,7 @@ import java.util.Map;
 
 public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeScreenInterface {
 
+    public static final String INTENT_FROM_NOTIFICATION = "fromNotification";
     public static final String INTENT_DOWNLOAD_CLICKED = "downloadClicked";
     public static final String INTENT_DOWNLOAD_IDS = "downloadIds";
 
@@ -477,6 +478,16 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     protected void onNewIntent(Intent intent) {
+        if (intent.getBooleanExtra(INTENT_FROM_NOTIFICATION, false) && streamService.getSource() != null) {
+            switch (streamService.getSource().type) {
+                case LIVESTREAM:
+                    loadFragment(R.id.nav_livestream);
+                    return;
+                case ARCHIVE:
+                    loadPodcastPlayer(streamService.getSource().show, false);
+                    return;
+            }
+        }
         long[] downloadIds = intent.getLongArrayExtra(INTENT_DOWNLOAD_IDS);
         if (downloadIds != null && downloadIds.length > 0) {
             for (long id : downloadIds) {
@@ -534,7 +545,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void playArchive(MediaSource source) {
         if (streamService.getSource() != null
-                && streamService.getSource().equals(source)) {
+                && streamService.getSource().equals(source)
+                && streamService.isPlaying()) {
             return;
         }
         streamService.stop();

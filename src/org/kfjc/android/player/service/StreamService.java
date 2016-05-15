@@ -30,11 +30,15 @@ import org.kfjc.android.player.util.NotificationUtil;
 
 public class StreamService extends Service {
 
+    public static final String INTENT_STOP = "action_stop";
+
     private static final String TAG = StreamService.class.getSimpleName();
     private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
     private static final int BUFFER_SEGMENT_COUNT = 256;
     private static final IntentFilter becomingNoisyIntentFilter =
             new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+    private static final IntentFilter onStopIntentFilter =
+            new IntentFilter(INTENT_STOP);
 
     private static final int MIN_BUFFER_MS = 5000;
     private static final int MIN_REBUFFER_MS = 5000;
@@ -55,6 +59,7 @@ public class StreamService extends Service {
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
     private ExoPlayer player;
     private boolean becomingNoisyReceiverRegistered = false;
+    private boolean onStopReceiverRegistered = false;
 
     /**
      * The Becoming Noisy broadcast intent is sent when audio output hardware changes, perhaps
@@ -65,6 +70,15 @@ public class StreamService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                stop();
+            }
+        }
+    };
+
+    private BroadcastReceiver onStopReciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (INTENT_STOP.equals(intent.getAction())) {
                 stop();
             }
         }
@@ -159,6 +173,7 @@ public class StreamService extends Service {
         }
         unregisterReceivers();
         becomingNoisyReceiverRegistered = false;
+        onStopReceiverRegistered = false;
         stopForeground(true);
         Log.i(TAG, "Service stopped");
 	}
@@ -178,6 +193,11 @@ public class StreamService extends Service {
         } catch (IllegalArgumentException e) {
             // receiver was already unregistered.
         }
+        try {
+            if (onStopReceiverRegistered) {
+                unregisterReceiver(onStopReciever);
+            }
+        } catch (IllegalArgumentException e) {}
     }
 
     private ExoPlayer.Listener exoPlayerListener = new ExoPlayer.Listener() {
@@ -188,7 +208,9 @@ public class StreamService extends Service {
                     if (playWhenReady) {
                         mediaListener.onStateChange(PlayerFragment.PlayerState.PLAY, mediaSource);
                         registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
+                        registerReceiver(onStopReciever, onStopIntentFilter);
                         becomingNoisyReceiverRegistered = true;
+                        onStopReceiverRegistered = true;
                     }
                     break;
                 case ExoPlayer.STATE_PREPARING:
