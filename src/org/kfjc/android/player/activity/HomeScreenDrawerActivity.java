@@ -95,6 +95,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private Map<Long, BroadcastShow> activeDownloads;
     private boolean askPermissionsAgain = true;
     private long[] segmentBounds;
+    private long totalPlayTime;
 
     private boolean isForegroundActivity = false;
     private int activeFragmentId = R.id.nav_livestream;
@@ -643,5 +644,15 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public long[] getSegmentBounds() {
         return this.segmentBounds;
+    }
+
+    @Override
+    public void setTotalPlayTime(long playTime) {
+        this.totalPlayTime = playTime;
+    }
+
+    @Override
+    public long getTotalPlayTime() {
+        return this.totalPlayTime;
     }
 }

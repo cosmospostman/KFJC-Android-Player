@@ -219,6 +219,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
             case STOP:
                 playArchive(0);
                 homeScreen.seekPlayer(Constants.PODCAST_PAD_TIME_MILLIS);
+                homeScreen.setTotalPlayTime(totalShowTime);
                 homeScreen.setSegmentBounds(segmentBounds);
                 break;
             case PLAY:

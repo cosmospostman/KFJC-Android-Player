@@ -29,4 +29,6 @@ public interface HomeScreenInterface {
     MediaSource getPlayerSource();
     void setSegmentBounds(long[] segmentBounds);
     long[] getSegmentBounds();
+    void setTotalPlayTime(long playTime);
+    long getTotalPlayTime();
 }

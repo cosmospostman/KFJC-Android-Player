@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -42,6 +43,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     private TextView nowPlayingLabel;
     private TextView clockLabel;
     private FloatingActionButton fab;
+    private ProgressBar playProgress;
     private RelativeLayout nowPlayingPanel;
 
     @Override
@@ -60,6 +62,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         clockLabel = (TextView) view.findViewById(R.id.clockLabel);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(fabClickListener);
+        playProgress = (ProgressBar) view.findViewById(R.id.playProgress);
         nowPlayingPanel = (RelativeLayout) view.findViewById(R.id.nowPlayingPanel);
         nowPlayingPanel.setOnClickListener(nowPlayingClickListener);
 
@@ -117,6 +120,9 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         long pos = playerPos + segmentOffset - extra;
         String timeStr = DateUtil.formatTime(pos - Constants.PODCAST_PAD_TIME_MILLIS);
         clockLabel.setText(timeStr);
+
+        playProgress.setMax((int)homeScreen.getTotalPlayTime()/100);
+        playProgress.setProgress((int)pos/100);
     }
 
     @Override
@@ -142,6 +148,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
 
     private void setPlayState() {
         nowPlayingPanel.setVisibility(View.VISIBLE);
+        playProgress.setVisibility(View.VISIBLE);
         fab.setImageResource(R.drawable.ic_pause_white_48dp);
         startPlayClockUpdater();
         displayState = PlayerState.PLAY;
@@ -149,6 +156,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
 
     private void setPauseState() {
         nowPlayingPanel.setVisibility(View.VISIBLE);
+        playProgress.setVisibility(View.VISIBLE);
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
         updateClock();
         displayState = PlayerState.PAUSE;
@@ -156,6 +164,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
 
     private void setStopState() {
         nowPlayingPanel.setVisibility(View.GONE);
+        playProgress.setVisibility(View.GONE);
     }
 
     private class GetArchivesTask extends AsyncTask<Void, Void, List<BroadcastShow>> {
