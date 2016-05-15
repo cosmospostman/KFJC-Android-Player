@@ -44,7 +44,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private boolean hasOfflineContent;
     private boolean isCheckingState;
 
-    private TextView airName;
     private TextView dateTime;
     private SeekBar playtimeSeekBar;
     private FloatingActionButton fab;
@@ -128,7 +127,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
         View view = inflater.inflate(R.layout.fragment_podcastplayer, container, false);
 
         FloatingActionButton pullDownFab = (FloatingActionButton) view.findViewById(R.id.pullDownButton);
-        airName = (TextView) view.findViewById(R.id.airName);
         dateTime = (TextView) view.findViewById(R.id.podcastDateTime);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         settingsButton = (FloatingActionButton) view.findViewById(R.id.settingsButton);
@@ -151,7 +149,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             this.show = bundle.getParcelable(BROADCAST_SHOW_KEY);
-            airName.setText(show.getAirName());
+            homeScreen.setActionbarTitle(show.getAirName());
             dateTime.setText(show.getTimestampString());
             checkState();
             new AsyncTask<Void, Void, Void>() {
@@ -169,7 +167,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 @Override
                 protected void onPostExecute(Void aVoid) {
                     isCheckingState = false;
-                    updateState();
+                    fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
                     homeScreen.syncState();
                     bottomControls.setVisibility(View.VISIBLE);
                     loadingProgress.setVisibility(View.INVISIBLE);
@@ -208,11 +206,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
         } else {
             hasOfflineContent = false;
         }
-    }
-
-    private void updateState() {
-        fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-        podcastDetails.setText(show.getUrls().size() + " hour show, 258Mb download.");
     }
 
     private void onPlayStopButtonClick() {

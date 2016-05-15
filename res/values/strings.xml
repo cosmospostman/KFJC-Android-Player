@@ -3,9 +3,9 @@
     <string name="action_pause">Pause</string>
     <string name="action_play">Play</string>
     <string name="action_stop">Stop</string>
+    <string name="app_name">KFJC</string>
 
-    <string name="app_name">
-            KFJC</string>
+    <string name="button_playlist"><u>Playlist</u></string>
 
     <string name="default_dj_name"
             translation_description="DJ name to show if nobody is signed into spidey">
