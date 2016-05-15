@@ -53,6 +53,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         homeScreen.setNavigationItemChecked(R.id.nav_podcast);
         View view = inflater.inflate(R.layout.fragment_podcast, container, false);
         recentShowsView = (RecyclerView) view.findViewById(R.id.podcastRecyclerView);
+        recentShowsView.addItemDecoration(new PodcastRecyclerDecorator(getActivity()));
         recentShowsView.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         savedShowsView = (RecyclerView) view.findViewById(R.id.savedRecyclerView);
@@ -99,7 +100,6 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         recentShowsAdapter = new PodcastRecyclerAdapter(
                 shows, PodcastRecyclerAdapter.Type.HORIZONTAL, PodcastFragment.this);
         recentShowsView.setAdapter(recentShowsAdapter);
-        recentShowsView.addItemDecoration(new PodcastRecyclerDecorator(getActivity()));
 
         List<BroadcastShow> savedShows = ExternalStorageUtil.getSavedShows();
         PodcastRecyclerAdapter adapter = new PodcastRecyclerAdapter(
