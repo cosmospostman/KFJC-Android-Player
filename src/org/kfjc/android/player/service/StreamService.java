@@ -1,6 +1,7 @@
 package org.kfjc.android.player.service;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -30,7 +31,11 @@ import org.kfjc.android.player.util.NotificationUtil;
 
 public class StreamService extends Service {
 
+    public static final String INTENT_CONTROL = "controlIntent";
+    public static final String INTENT_CONTROL_ACTION = "controlIntentAction";
     public static final String INTENT_STOP = "action_stop";
+    public static final String INTENT_PAUSE = "action_pause";
+    public static final String INTENT_UNPAUSE = "action_unpause";
 
     private static final String TAG = StreamService.class.getSimpleName();
     private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
@@ -38,7 +43,7 @@ public class StreamService extends Service {
     private static final IntentFilter becomingNoisyIntentFilter =
             new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
     private static final IntentFilter onStopIntentFilter =
-            new IntentFilter(INTENT_STOP);
+            new IntentFilter(INTENT_CONTROL);
 
     private static final int MIN_BUFFER_MS = 5000;
     private static final int MIN_REBUFFER_MS = 5000;
@@ -59,7 +64,8 @@ public class StreamService extends Service {
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
     private ExoPlayer player;
     private boolean becomingNoisyReceiverRegistered = false;
-    private boolean onStopReceiverRegistered = false;
+    private boolean onControlReceiverRegistered = false;
+    private boolean isPaused = false;
 
     /**
      * The Becoming Noisy broadcast intent is sent when audio output hardware changes, perhaps
@@ -75,11 +81,17 @@ public class StreamService extends Service {
         }
     };
 
-    private BroadcastReceiver onStopReciever = new BroadcastReceiver() {
+    private BroadcastReceiver onControlReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (INTENT_STOP.equals(intent.getAction())) {
-                stop();
+            if (INTENT_CONTROL.equals(intent.getAction())) {
+                if (INTENT_STOP.equals(intent.getStringExtra(INTENT_CONTROL_ACTION))) {
+                    stop();
+                } else if (INTENT_PAUSE.equals(intent.getStringExtra(INTENT_CONTROL_ACTION))) {
+                    pause();
+                } else if (INTENT_UNPAUSE.equals(intent.getStringExtra(INTENT_CONTROL_ACTION))) {
+                    unpause();
+                }
             }
         }
     };
@@ -135,9 +147,7 @@ public class StreamService extends Service {
             Notification n = NotificationUtil.bufferingNotification(context);
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
         } else if (mediaSource.type == MediaSource.Type.ARCHIVE) {
-            Notification n = NotificationUtil.kfjcNotification(
-                    context, mediaSource.show.getAirName(), mediaSource.show.getTimestampString());
-            startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
+            startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_PAUSE));
         }
 
         player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
@@ -167,10 +177,16 @@ public class StreamService extends Service {
         player.setPlayWhenReady(true);
     }
 
-    private boolean isPaused = false;
+    private Notification buildNotification(String action) {
+        return NotificationUtil.kfjcNotification(
+                this, mediaSource.show.getAirName(), mediaSource.show.getTimestampString(), action);
+    }
 
     public void pause() {
         player.setPlayWhenReady(false);
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
+        notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_UNPAUSE));
         isPaused = true;
     }
 
@@ -178,6 +194,9 @@ public class StreamService extends Service {
         if (isPaused) {
             Log.i(TAG, "Unpausing");
             player.setPlayWhenReady(true);
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
+            notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_PAUSE));
             isPaused = false;
             return;
         }
@@ -190,7 +209,7 @@ public class StreamService extends Service {
         }
         unregisterReceivers();
         becomingNoisyReceiverRegistered = false;
-        onStopReceiverRegistered = false;
+        onControlReceiverRegistered = false;
         stopForeground(true);
         Log.i(TAG, "Service stopped");
 	}
@@ -211,8 +230,8 @@ public class StreamService extends Service {
             // receiver was already unregistered.
         }
         try {
-            if (onStopReceiverRegistered) {
-                unregisterReceiver(onStopReciever);
+            if (onControlReceiverRegistered) {
+                unregisterReceiver(onControlReceiver);
             }
         } catch (IllegalArgumentException e) {}
     }
@@ -225,9 +244,9 @@ public class StreamService extends Service {
                     if (playWhenReady) {
                         mediaListener.onStateChange(PlayerFragment.PlayerState.PLAY, mediaSource);
                         registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
-                        registerReceiver(onStopReciever, onStopIntentFilter);
+                        registerReceiver(onControlReceiver, onStopIntentFilter);
                         becomingNoisyReceiverRegistered = true;
-                        onStopReceiverRegistered = true;
+                        onControlReceiverRegistered = true;
                     } else {
                          mediaListener.onStateChange(PlayerFragment.PlayerState.PAUSE, mediaSource);
                     }

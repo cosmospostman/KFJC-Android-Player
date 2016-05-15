@@ -1,6 +1,5 @@
 package org.kfjc.android.player.util;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,8 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Icon;
-import android.media.ThumbnailUtils;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -24,7 +21,7 @@ public class NotificationUtil {
     public static final int KFJC_NOTIFICATION_ID = 1;
 
     private Context context;
-    private NotificationManager notificationManager;
+    private static NotificationManager notificationManager;
 
     public NotificationUtil(Context context) {
         this.context = context;
@@ -40,11 +37,13 @@ public class NotificationUtil {
             cancelNowPlayNotification();
             postNotification(
                     context.getString(R.string.app_name),
-                    context.getString(R.string.empty_string));
+                    context.getString(R.string.empty_string),
+                    StreamService.INTENT_STOP);
         } else {
             postNotification(
                     playlist.getDjName(),
-                    artistTrackStringNotification(playlist.getLastTrackEntry()));
+                    artistTrackStringNotification(playlist.getLastTrackEntry()),
+                    StreamService.INTENT_STOP);
         }
     }
 
@@ -71,10 +70,11 @@ public class NotificationUtil {
         return kfjcNotification(context,
                 context.getString(R.string.app_name),
                 context.getString(R.string.format_buffering,
-                        PreferenceControl.getStreamPreference().description));
+                        PreferenceControl.getStreamPreference().description),
+                StreamService.INTENT_STOP);
     }
 
-    public static Notification kfjcNotification(Context context, String title, String text) {
+    public static Notification kfjcNotification(Context context, String title, String text, String action) {
         Intent i = new Intent(context, HomeScreenDrawerActivity.class);
         i.putExtra(HomeScreenDrawerActivity.INTENT_FROM_NOTIFICATION, true);
         PendingIntent kfjcPlayerIntent = PendingIntent.getActivity(
@@ -91,25 +91,34 @@ public class NotificationUtil {
             .setContentIntent(kfjcPlayerIntent)
             .setPriority(Notification.PRIORITY_HIGH);
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // Should instead build action with Icon.fromResource (but only for Api 23+)
-            builder
-                .addAction(R.drawable.ic_stop_white_48dp,
-                        context.getString(R.string.action_stop), buildStopIntent(context))
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setStyle(new Notification.MediaStyle()
-                    .setShowActionsInCompactView(0));
+            if (action.equals(StreamService.INTENT_STOP)) {
+                // Should instead build action with Icon.fromResource (but only for Api 23+)
+                builder.addAction(R.drawable.ic_stop_white_48dp,
+                        context.getString(R.string.action_stop), buildControlIntent(context, action));
+            } else if (action.equals(StreamService.INTENT_PAUSE)) {
+                builder.addAction(R.drawable.ic_pause_white_48dp,
+                        context.getString(R.string.action_pause), buildControlIntent(context, action));
+            } else if (action.equals(StreamService.INTENT_UNPAUSE)) {
+                builder.addAction(R.drawable.ic_play_arrow_white_48dp,
+                        context.getString(R.string.action_play), buildControlIntent(context, action));
+            }
+            builder.setVisibility(Notification.VISIBILITY_PUBLIC)
+            .setStyle(new Notification.MediaStyle()
+                .setShowActionsInCompactView(0));
         }
         return builder.build();
     }
 
-    private static PendingIntent buildStopIntent(Context context) {
-        Intent stopIntent = new Intent(StreamService.INTENT_STOP);
-        return PendingIntent.getBroadcast(context, 0, stopIntent, PendingIntent.FLAG_ONE_SHOT);
+    private static PendingIntent buildControlIntent(Context context, String action) {
+        Intent stopIntent = new Intent(StreamService.INTENT_CONTROL);
+        stopIntent.putExtra(StreamService.INTENT_CONTROL_ACTION, action);
+        return PendingIntent.getBroadcast(context, 0, stopIntent,
+                PendingIntent.FLAG_ONE_SHOT|PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    public void postNotification(String title, String text) {
+    public void postNotification(String title, String text, String action) {
         notificationManager.notify(
-                KFJC_NOTIFICATION_ID, kfjcNotification(context, title, text));
+                KFJC_NOTIFICATION_ID, kfjcNotification(context, title, text, action));
     }
 
     public void cancelNowPlayNotification() {
