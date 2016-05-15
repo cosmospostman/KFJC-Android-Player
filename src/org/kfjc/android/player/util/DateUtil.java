@@ -15,8 +15,14 @@ public class DateUtil {
     }
 
     public static String formatTime(long timeMillis) {
-        long roundedTimeMillis = (long)(timeMillis/1000.0 +.5) * 1000;
-        Date timestamp = new Date(roundedTimeMillis);
+        long timeMillisRoundedToSecond = (long)(timeMillis/1000.0 +.5) * 1000;
+        boolean isNegativeTime = false;
+        if (timeMillisRoundedToSecond < 0) {
+            isNegativeTime = true;
+            timeMillisRoundedToSecond = Math.abs(timeMillisRoundedToSecond);
+        }
+
+        Date timestamp = new Date(timeMillisRoundedToSecond);
 
         SimpleDateFormat hours = new SimpleDateFormat("H");
         SimpleDateFormat minutes = new SimpleDateFormat("mm");
@@ -32,6 +38,9 @@ public class DateUtil {
         String secondsStr = seconds.format(timestamp);
 
         StringBuilder sb = new StringBuilder();
+        if (isNegativeTime) {
+            sb.append("-");
+        }
         if (Integer.parseInt(hoursStr) > 0) {
             sb.append(hoursStr + ":");
         }

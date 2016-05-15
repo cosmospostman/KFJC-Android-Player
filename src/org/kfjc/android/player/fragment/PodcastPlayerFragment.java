@@ -37,11 +37,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
     public static final String BROADCAST_SHOW_KEY = "broadcastShowKey";
     private static final long PADDING_TIME_MILLIS = 300000; // 5 mins
 
-//    private enum FragmentState {
-//        PREVIEW,
-//        PLAYER
-//    }
-
     private BroadcastShow show;
     private DownloadManager downloadManager;
     private Handler handler = new Handler();
@@ -82,7 +77,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
             long extra = (playingSegmentNumber == 0) ? 0 : PADDING_TIME_MILLIS;
             long pos = playerPos + segmentOffset - extra;
 
-            podcastDetails.setText(DateUtil.formatTime(pos) + " | " + DateUtil.formatTime(totalShowTime));
+            podcastDetails.setText(DateUtil.formatTime(pos - PADDING_TIME_MILLIS)
+                    + " | " + DateUtil.formatTime(totalShowTime - 2 * PADDING_TIME_MILLIS));
 
             playtimeSeekBar.setMax((int)totalShowTime/100);
             playtimeSeekBar.setProgress((int)pos/100);
@@ -272,6 +268,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 bounds[i] += PADDING_TIME_MILLIS;
             }
         }
+        totalTime += 2 * PADDING_TIME_MILLIS;
         this.totalShowTime = totalTime;
         this.segmentBounds = bounds;
     }
