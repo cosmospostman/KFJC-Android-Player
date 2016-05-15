@@ -96,6 +96,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         recentShowsAdapter = new PodcastRecyclerAdapter(
                 shows, PodcastRecyclerAdapter.Type.HORIZONTAL, PodcastFragment.this);
         recentShowsView.setAdapter(recentShowsAdapter);
+        recentShowsView.addItemDecoration(new PodcastRecyclerDecorator(getActivity()));
 
         List<BroadcastShow> savedShows = ExternalStorageUtil.getSavedShows();
         PodcastRecyclerAdapter adapter = new PodcastRecyclerAdapter(

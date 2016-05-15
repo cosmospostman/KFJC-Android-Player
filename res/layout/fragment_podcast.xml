@@ -17,8 +17,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
             <!-- TODO: abstract styles -->
             <TextView
@@ -29,6 +28,9 @@
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textAllCaps="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:text="Hot (off the) air"/>
 
@@ -44,15 +46,19 @@
                 android:textAllCaps="true"
                 android:fontFamily="sans-serif-light"
                 android:textSize="14sp"
-                android:layout_marginTop="16dp"
                 android:textStyle="bold"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
-                android:text="Saved"/>
+                android:text="Available Offline"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/savedRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp" />
 
         </LinearLayout>
 
