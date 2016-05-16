@@ -12,6 +12,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -97,6 +99,9 @@ public class ExternalStorageUtil {
     public static List<BroadcastShow> getSavedShows() {
         List<BroadcastShow> shows = new LinkedList<>();
         File podcastDir = getPodcastDir();
+        if (podcastDir.listFiles() == null) {
+            return Collections.emptyList();
+        }
         for (File f : podcastDir.listFiles()) {
             try {
                 File index = new File(f, KFJC_INDEX_FILENAME);
