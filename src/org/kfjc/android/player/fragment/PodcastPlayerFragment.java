@@ -6,7 +6,6 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +17,7 @@ import android.widget.TextView;
 
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
+import org.kfjc.android.player.dialog.PlaylistDialog;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
@@ -44,6 +44,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private boolean hasOfflineContent;
     private boolean isCheckingState;
 
+    private View playlistButton;
     private TextView dateTime;
     private SeekBar playtimeSeekBar;
     private FloatingActionButton fab;
@@ -76,6 +77,14 @@ public class PodcastPlayerFragment extends PlayerFragment {
         @Override
         public void onClick(View v) {
             showSettings();
+        }
+    };
+
+    private View.OnClickListener showPlaylist = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            PlaylistDialog.newInstance(show.getAirName(), show.getPlaylistId())
+                    .show(getFragmentManager(), "playlist");
         }
     };
 
@@ -126,6 +135,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
         View view = inflater.inflate(R.layout.fragment_podcastplayer, container, false);
 
+        playlistButton = view.findViewById(R.id.playlist);
         FloatingActionButton pullDownFab = (FloatingActionButton) view.findViewById(R.id.pullDownButton);
         dateTime = (TextView) view.findViewById(R.id.podcastDateTime);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
@@ -135,6 +145,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         bottomControls = (LinearLayout) view.findViewById(R.id.bottomControls);
         loadingProgress = (ProgressBar) view.findViewById(R.id.loadingProgress);
 
+        playlistButton.setOnClickListener(showPlaylist);
         pullDownFab.setOnClickListener(pulldownFabClickListener);
         fab.setOnClickListener(fabClickListener);
         settingsButton.setOnClickListener(settingsButtonClickListener);

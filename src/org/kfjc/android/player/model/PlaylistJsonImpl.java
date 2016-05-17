@@ -6,7 +6,8 @@ import com.google.common.base.Strings;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.kfjc.android.player.R;
+import org.json.JSONObject;
+import org.kfjc.android.player.util.DateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class PlaylistJsonImpl implements Playlist {
 
     boolean hasError;
     String djName;
-    String timeString;
+    long timestampMillis;
     List<PlaylistEntry> entries;
     String jsonString;
 
@@ -32,19 +33,19 @@ public class PlaylistJsonImpl implements Playlist {
             if (TextUtils.isEmpty(jsonPlaylistString)) {
                 hasError = true;
                 djName = "";
-                timeString = "";
+                timestampMillis = 0L;
                 return;
             }
-            JSONArray jsonPlaylist = new JSONArray(jsonPlaylistString);
+            JSONObject jsonPlaylist = new JSONObject(jsonPlaylistString);
+            JSONObject metadata = jsonPlaylist.getJSONObject("show_info");
+            JSONArray playlist = jsonPlaylist.getJSONArray("playlist");
 
-            JSONArray title = jsonPlaylist.getJSONArray(0);
-            djName = tryGetString(title, 0);
-            timeString = tryGetString(title, 1);
+            djName = metadata.getString("air_name");
+            timestampMillis = metadata.getLong("start_time");
 
-            JSONArray jsonEntries = jsonPlaylist.getJSONArray(1);
             entries = new ArrayList<>();
-            for (int i = 0; i < jsonEntries.length(); i++) {
-                JSONArray jsonEntry = jsonEntries.getJSONArray(i);
+            for (int i = 0; i < playlist.length(); i++) {
+                JSONObject jsonEntry = playlist.getJSONObject(i);
                 entries.add(new PlaylistEntryJsonImpl(jsonEntry));
             }
             hasError = false;
@@ -71,7 +72,7 @@ public class PlaylistJsonImpl implements Playlist {
 
     @Override
     public String getTime() {
-        return timeString;
+        return DateUtil.roundHourFormat(timestampMillis, DateUtil.FORMAT_DELUXE_DATE);
     }
 
     @Override
@@ -95,13 +96,18 @@ public class PlaylistJsonImpl implements Playlist {
         String track;
         String album;
         String time;
+        String label;
 
-        public PlaylistEntryJsonImpl(JSONArray entry) {
-            artist = tryGetString(entry, 0);
-            track = tryGetString(entry, 1);
-            album = tryGetString(entry, 2);
-            time = tryGetString(entry, 3);
-            time = time.replaceAll("\\sPM", "p").replaceAll("\\sAM", "a");
+        public PlaylistEntryJsonImpl(JSONObject entry) {
+            artist = tryGetString(entry, "artist");
+            track = tryGetString(entry, "track_title");
+            album = tryGetString(entry, "album_title");
+            label = tryGetString(entry, "album_label");
+            long timestamp = tryGetLong(entry, "time_played");
+            if (timestamp > 0L) {
+                time = DateUtil.format(timestamp, DateUtil.FORMAT_HH_MM)
+                        .replaceAll("\\sPM", "p").replaceAll("\\sAM", "a");
+            }
         }
 
         @Override
@@ -126,7 +132,7 @@ public class PlaylistJsonImpl implements Playlist {
 
         @Override
         public String getLabel() {
-            return "";
+            return label;
         }
 
         @Override
@@ -134,18 +140,30 @@ public class PlaylistJsonImpl implements Playlist {
             return Strings.isNullOrEmpty(time)
                     && Strings.isNullOrEmpty(artist)
                     && Strings.isNullOrEmpty(album)
-                    && Strings.isNullOrEmpty(track);
+                    && Strings.isNullOrEmpty(track)
+                    && Strings.isNullOrEmpty(label);
         }
     }
 
-    private static String tryGetString(JSONArray array, int index) {
-        if (array == null) {
+    private static String tryGetString(JSONObject object, String key) {
+        if (object == null) {
             return "";
         }
         try {
-            return array.getString(index);
+            return object.getString(key);
         } catch (JSONException e) {
             return "";
+        }
+    }
+
+    private static long tryGetLong(JSONObject object, String key) {
+        if (object == null) {
+            return 0L;
+        }
+        try {
+            return object.getLong(key);
+        } catch (JSONException e) {
+            return 0L;
         }
     }
 }

@@ -98,9 +98,7 @@ public class BroadcastShow implements Parcelable {
     }
 
     public String getTimestampString() {
-        SimpleDateFormat df = new SimpleDateFormat("ha, EEEE d MMMM yyyy");
-        df.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
-        return df.format(new Date(DateUtil.roundUpHour(timestamp) * 1000));
+        return DateUtil.roundHourFormat(timestamp, DateUtil.FORMAT_DELUXE_DATE);
     }
 
     public List<String> getUrls() {

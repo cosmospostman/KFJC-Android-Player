@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
+import com.google.common.io.Files;
+
 import org.kfjc.android.player.model.BroadcastShow;
 import org.kfjc.android.player.model.Playlist;
 
@@ -11,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -103,18 +106,21 @@ public class ExternalStorageUtil {
             return Collections.emptyList();
         }
         for (File f : podcastDir.listFiles()) {
-            try {
-                File index = new File(f, KFJC_INDEX_FILENAME);
-                String indexString = new Scanner(index).useDelimiter("\\Z").next();
-                BroadcastShow show = new BroadcastShow(indexString);
-                if (! show.hasError()) {
-                    shows.add(show);
-                }
-            } catch (FileNotFoundException e) {
-                // Do nothing
+            File index = new File(f, KFJC_INDEX_FILENAME);
+            BroadcastShow show = new BroadcastShow(readFile(index));
+            if (! show.hasError()) {
+                shows.add(show);
             }
         }
         return shows;
+    }
+
+    public static String readFile(File f) {
+        try {
+            return Files.toString(f, Charset.defaultCharset());
+        } catch (IOException e) {
+            return "";
+        }
     }
 
     public static boolean hasAllContent(BroadcastShow show) {

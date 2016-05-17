@@ -54,7 +54,7 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
             iconBackground.setBackgroundColor(color);
         }
         airName.setText(show.getAirName());
-        timestamp.setText(formatTime(show.getTimestamp()));
+        timestamp.setText(DateUtil.roundHourFormat(show.getTimestamp(), getSimpleDateFormat()));
     }
 
     private String getIconLetter() {
@@ -70,19 +70,10 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
         return "" + show.getAirName().charAt(0);
     }
 
-    private String formatTime(long timestamp) {
-        SimpleDateFormat df = getSimpleDateFormat();
-        df.setTimeZone(Constants.BROADCAST_TIMEZONE);
-        return df.format(new Date(DateUtil.roundUpHour(timestamp) * 1000));
-    }
-
     private SimpleDateFormat getSimpleDateFormat() {
-        if (layoutType == PodcastRecyclerAdapter.Type.HORIZONTAL) {
-            return new SimpleDateFormat("ha EEE d MMM");
-
-        } else  {
-            return new SimpleDateFormat("ha EEE d MMM yyyy");
-        }
+        return (layoutType == PodcastRecyclerAdapter.Type.HORIZONTAL)
+            ? DateUtil.FORMAT_SHORT_DATE
+            : DateUtil.FORMAT_FULL_DATE;
     }
 
     private int getClockHour(long timestamp) {

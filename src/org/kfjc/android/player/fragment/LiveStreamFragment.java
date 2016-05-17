@@ -120,8 +120,8 @@ public class LiveStreamFragment extends PlayerFragment {
     }
 
     private void showSettings() {
-        SettingsDialog settingsFragment = new SettingsDialog();
-        settingsFragment.setUrlPreferenceChangeHandler(
+        SettingsDialog settingsDialog = new SettingsDialog();
+        settingsDialog.setUrlPreferenceChangeHandler(
                 new SettingsDialog.StreamUrlPreferenceChangeHandler() {
             @Override public void onStreamUrlPreferenceChange() {
                 if (homeScreen.isStreamServicePlaying()) {
@@ -129,7 +129,7 @@ public class LiveStreamFragment extends PlayerFragment {
                 }
             }
         });
-        settingsFragment.show(getFragmentManager(), "settings");
+        settingsDialog.show(getFragmentManager(), "settings");
     }
 
     @Override
