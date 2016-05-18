@@ -129,7 +129,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
-        homeScreen.setActionBarBackArrow(true);
+//        homeScreen.setActionBarBackArrow(true);
         View view = inflater.inflate(R.layout.fragment_podcastplayer, container, false);
 
         playlistButton = view.findViewById(R.id.playlist);

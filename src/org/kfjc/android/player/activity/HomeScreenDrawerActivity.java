@@ -378,7 +378,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private void loadFragment(int fragmentId) {
         Log.i("HOME", "Loading fragment " + fragmentId);
         activeFragmentId = fragmentId;
-        setActionBarBackArrow(false);
         switch (fragmentId) {
             case R.id.nav_livestream:
                 replaceFragment(liveStreamFragment);
@@ -397,7 +396,11 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 loadPodcastListFragment(false);
                 break;
             case R.id.nav_podcast_player:
-                loadPodcastPlayer(streamService.getSource().show, false);
+                if (streamService.getSource() != null) {
+                    loadPodcastPlayer(streamService.getSource().show, false);
+                } else {
+                    loadPodcastPlayer(null, false);
+                }
                 break;
         }
     }
@@ -438,6 +441,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     }
 
     private void replaceFragment(Fragment fragment) {
+        setActionBarBackArrow(false);
         getFragmentManager().beginTransaction()
                 .replace(R.id.home_screen_main_fragment, fragment)
                 .addToBackStack(null)
@@ -501,7 +505,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         PreferenceControl.updateStreams();
         isForegroundActivity = true;
         updateBackground();
-        setActionBarBackArrow(false);
         loadFragment(activeFragmentId);
     }
 
