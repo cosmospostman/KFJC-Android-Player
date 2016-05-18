@@ -112,13 +112,14 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
 
     @Override
     void updateClock() {
-        long playerPos = homeScreen.getPlayerPosition();
-        int playingSegmentNumber = homeScreen.getPlayerSource().sequenceNumber;
-        long segmentOffset = (playingSegmentNumber == 0)
+        final long playerPos = homeScreen.getPlayerPosition();
+        final long padding = homeScreen.getPlayerSource().show.getHourPaddingTimeMillis();
+        final int playingSegmentNumber = homeScreen.getPlayerSource().sequenceNumber;
+        final long segmentOffset = (playingSegmentNumber == 0)
                 ? 0 : homeScreen.getSegmentBounds()[playingSegmentNumber - 1];
-        long extra = (playingSegmentNumber == 0) ? 0 : Constants.PODCAST_PAD_TIME_MILLIS;
-        long pos = playerPos + segmentOffset - extra;
-        String timeStr = DateUtil.formatTime(pos - Constants.PODCAST_PAD_TIME_MILLIS);
+        final long extra = (playingSegmentNumber == 0) ? 0 : padding;
+        final long pos = playerPos + segmentOffset - extra;
+        String timeStr = DateUtil.formatTime(pos - padding);
         clockLabel.setText(timeStr);
 
         playProgress.setMax((int)homeScreen.getTotalPlayTime()/100);

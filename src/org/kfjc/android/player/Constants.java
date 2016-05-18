@@ -20,5 +20,4 @@ public class Constants {
                     MediaSource.Format.MP3, 0, "Default", "128k mp3");
 
     public static final TimeZone BROADCAST_TIMEZONE = TimeZone.getTimeZone("America/Los_Angeles");
-    public static final long PODCAST_PAD_TIME_MILLIS = 300000; // 5 mins
 }

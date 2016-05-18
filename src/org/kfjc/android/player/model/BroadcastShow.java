@@ -18,6 +18,8 @@ public class BroadcastShow implements Parcelable {
     private static final String KEY_AIRNAME = "airName";
     private static final String KEY_STARTTIME = "startTime";
     private static final String KEY_URLS = "urls";
+    private static final String KEY_PLAYTIME = "playtime";
+    private static final String KEY_PADDING = "padding";
 
     private final String playlistId;
     private final String airName;
@@ -25,11 +27,17 @@ public class BroadcastShow implements Parcelable {
     private final List<String> urls;
     private boolean hasError;
 
+    // These are assumed to be the same for all hours.
+    private long hourPlayTimeMillis;
+    private long hourPaddingTimeMillis;
+
     BroadcastShow(BroadcastHour hour) {
         urls = new ArrayList<>();
         this.playlistId = hour.getPlaylistId();
         this.airName = hour.getAirName();
         this.timestamp = hour.getTimestamp();
+        this.hourPaddingTimeMillis = hour.getPaddingTimeMillis();
+        this.hourPlayTimeMillis = hour.getPlayTimeMillis();
         urls.add(hour.getUrl());
         Collections.sort(urls);
     }
@@ -39,12 +47,16 @@ public class BroadcastShow implements Parcelable {
         urls = new ArrayList<>();
         String playlistId = "";
         String airName = "";
+        long hourPlayTime = 0L;
+        long hourPaddingTime = 0L;
         long timestamp = 0L;
         try {
             JSONObject in = new JSONObject(jsonString);
             playlistId = in.getString(KEY_PLAYLIST_ID);
             airName = in.getString(KEY_AIRNAME);
             timestamp = in.getLong(KEY_STARTTIME);
+            hourPaddingTime = in.getLong(KEY_PADDING);
+            hourPlayTime = in.getLong(KEY_PLAYTIME);
             JSONArray inUrls = in.getJSONArray(KEY_URLS);
             for (int i = 0; i < inUrls.length(); i++) {
                 urls.add(inUrls.getString(i));
@@ -57,6 +69,8 @@ public class BroadcastShow implements Parcelable {
         this.playlistId = playlistId;
         this.airName = airName;
         this.timestamp = timestamp;
+        this.hourPlayTimeMillis = hourPlayTime;
+        this.hourPaddingTimeMillis = hourPaddingTime;
     }
 
     public BroadcastShow(Parcel in) {
@@ -64,6 +78,8 @@ public class BroadcastShow implements Parcelable {
         playlistId = in.readString();
         airName = in.readString();
         timestamp = in.readLong();
+        hourPaddingTimeMillis = in.readLong();
+        hourPlayTimeMillis = in.readLong();
         in.readStringList(urls);
         Collections.sort(urls);
     }
@@ -74,6 +90,8 @@ public class BroadcastShow implements Parcelable {
         }
         // Use earliest timestamp as start of show.
         timestamp = Math.min(timestamp, hour.getTimestamp());
+        hourPaddingTimeMillis = hour.getPaddingTimeMillis();
+        hourPlayTimeMillis = hour.getPlayTimeMillis();
         urls.add(hour.getUrl());
         Collections.sort(urls);
     }
@@ -86,8 +104,16 @@ public class BroadcastShow implements Parcelable {
         return airName;
     }
 
-    public Long getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
+    }
+
+    public long getHourPlayTimeMillis() {
+        return hourPlayTimeMillis;
+    }
+
+    public long getHourPaddingTimeMillis() {
+        return hourPaddingTimeMillis;
     }
 
     public boolean hasError() {
@@ -108,8 +134,11 @@ public class BroadcastShow implements Parcelable {
             out.put(KEY_PLAYLIST_ID, playlistId);
             out.put(KEY_AIRNAME, airName);
             out.put(KEY_STARTTIME, timestamp);
+            out.put(KEY_PADDING, hourPaddingTimeMillis);
+            out.put(KEY_PLAYTIME, hourPlayTimeMillis);
             JSONArray urls = new JSONArray(this.urls);
             out.put(KEY_URLS, urls);
+
         } catch (JSONException e) {}
         return out.toString();
     }
@@ -124,6 +153,8 @@ public class BroadcastShow implements Parcelable {
         dest.writeString(playlistId);
         dest.writeString(airName);
         dest.writeLong(timestamp);
+        dest.writeLong(hourPaddingTimeMillis);
+        dest.writeLong(hourPlayTimeMillis);
         dest.writeStringList(urls);
     }
 

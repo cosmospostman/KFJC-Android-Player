@@ -2,13 +2,10 @@ package org.kfjc.android.player.fragment;
 
 import android.app.DownloadManager;
 import android.content.Context;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,7 +30,6 @@ import org.kfjc.android.player.util.HttpUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class PodcastPlayerFragment extends PlayerFragment {
@@ -129,7 +125,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
-//        homeScreen.setActionBarBackArrow(true);
         View view = inflater.inflate(R.layout.fragment_podcastplayer, container, false);
 
         playlistButton = view.findViewById(R.id.playlist);
@@ -196,7 +191,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 playArchive(i);
                 //seek to adjusted position
                 long thisSegmentStart = (i == 0) ? 0 : segmentBounds[i-1];
-                long extraSeek = (i == 0) ? 0 : Constants.PODCAST_PAD_TIME_MILLIS;
+                long extraSeek = (i == 0) ? 0 : show.getHourPaddingTimeMillis();
                 long localSeekTo = seekToMillis - thisSegmentStart + extraSeek;
                 homeScreen.seekPlayer(localSeekTo);
                 return;
@@ -224,7 +219,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 } // else fall through:
             case STOP:
                 playArchive(0);
-                homeScreen.seekPlayer(Constants.PODCAST_PAD_TIME_MILLIS);
+                homeScreen.seekPlayer(show.getHourPaddingTimeMillis());
                 homeScreen.setTotalPlayTime(totalShowTime);
                 homeScreen.setSegmentBounds(segmentBounds);
                 break;
@@ -250,11 +245,11 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
         int playingSegmentNumber = homeScreen.getPlayerSource().sequenceNumber;
         long segmentOffset = (playingSegmentNumber == 0) ? 0 : segmentBounds[playingSegmentNumber - 1];
-        long extra = (playingSegmentNumber == 0) ? 0 : Constants.PODCAST_PAD_TIME_MILLIS;
+        long extra = (playingSegmentNumber == 0) ? 0 : show.getHourPaddingTimeMillis();
         long pos = playerPos + segmentOffset - extra;
 
-        podcastDetails.setText(DateUtil.formatTime(pos - Constants.PODCAST_PAD_TIME_MILLIS)
-                + " | " + DateUtil.formatTime(totalShowTime - 2 * Constants.PODCAST_PAD_TIME_MILLIS));
+        podcastDetails.setText(DateUtil.formatTime(pos - show.getHourPaddingTimeMillis())
+                + " | " + DateUtil.formatTime(totalShowTime - 2 * show.getHourPaddingTimeMillis()));
 
         playtimeSeekBar.setMax((int)totalShowTime/100);
         playtimeSeekBar.setProgress((int)pos/100);
@@ -274,33 +269,20 @@ public class PodcastPlayerFragment extends PlayerFragment {
         long[] bounds = new long[paths.size()];
         long totalTime = 0;
         for (int i = 0; i < paths.size(); i++) {
-            long showTime = countFilePlayTime(paths.get(i));
+            long showTime = show.getHourPlayTimeMillis();
 
             // Total
-            totalTime += showTime - 2 * Constants.PODCAST_PAD_TIME_MILLIS;
+            totalTime += showTime - 2 * show.getHourPaddingTimeMillis();
 
             // Bound
-            bounds[i] = totalTime + Constants.PODCAST_PAD_TIME_MILLIS;
+            bounds[i] = totalTime + show.getHourPaddingTimeMillis();
             if (i == paths.size() - 1) {
-                bounds[i] += Constants.PODCAST_PAD_TIME_MILLIS;
+                bounds[i] += show.getHourPaddingTimeMillis();
             }
         }
-        totalTime += 2 * Constants.PODCAST_PAD_TIME_MILLIS;
+        totalTime += 2 * show.getHourPaddingTimeMillis();
         this.totalShowTime = totalTime;
         this.segmentBounds = bounds;
-    }
-
-    // TODO: try/catch RuntimeException (setDataSource)
-    private long countFilePlayTime(String path) {
-        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-        if (path.contains("http")) {
-            metaRetriever.setDataSource(path, Collections.<String, String>emptyMap());
-        } else {
-            metaRetriever.setDataSource(path);
-        }
-        String durationString =
-                metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        return Long.parseLong(durationString);
     }
 
     public void onWritePermissionResult(boolean wasGranted) {

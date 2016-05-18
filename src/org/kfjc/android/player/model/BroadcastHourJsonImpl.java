@@ -3,6 +3,7 @@ package org.kfjc.android.player.model;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.kfjc.android.player.Constants;
 
 /** Example input:
  *  { "air_name":"Abacus Finch",
@@ -45,5 +46,15 @@ public class BroadcastHourJsonImpl implements BroadcastHour  {
     @Override
     public String getPlaylistId() {
         return playlistId;
+    }
+
+    @Override
+    public long getPlayTimeMillis() {
+        return 4200000L; //70mins
+    }
+
+    @Override
+    public long getPaddingTimeMillis() {
+        return 300000L; //5mins
     }
 }

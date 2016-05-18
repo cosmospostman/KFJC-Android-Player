@@ -108,7 +108,9 @@ public class ExternalStorageUtil {
         for (File f : podcastDir.listFiles()) {
             File index = new File(f, KFJC_INDEX_FILENAME);
             BroadcastShow show = new BroadcastShow(readFile(index));
-            if (! show.hasError()) {
+            if (show.hasError()) {
+                Log.i(LOG_TAG, "Show has error");
+            } else {
                 shows.add(show);
             }
         }
