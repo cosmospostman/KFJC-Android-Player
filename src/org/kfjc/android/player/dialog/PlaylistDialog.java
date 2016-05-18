@@ -33,6 +33,7 @@ public class PlaylistDialog extends DialogFragment {
     private static final String TAG = PlaylistDialog.class.getSimpleName();
     public static final String PLAYLIST_ID_KEY = "playlistIdKey";
     public static final String DJ_NAME_KEY = "djNameKey";
+    public static final String TIME_KEY = "timeKey";
 
     private TextView djNameView;
     private TextView timestringView;
@@ -41,12 +42,14 @@ public class PlaylistDialog extends DialogFragment {
 
     private String playlistId;
     private String djName;
+    private String time;
 
-    public static PlaylistDialog newInstance(String djName, String playlistId) {
+    public static PlaylistDialog newInstance(String djName, String time, String playlistId) {
         PlaylistDialog f = new PlaylistDialog();
         Bundle args = new Bundle();
         args.putString(PLAYLIST_ID_KEY, playlistId);
         args.putString(DJ_NAME_KEY, djName);
+        args.putString(TIME_KEY, time);
         f.setArguments(args);
         return f;
     }
@@ -56,6 +59,7 @@ public class PlaylistDialog extends DialogFragment {
         super.onCreate(savedInstanceState);
         playlistId = getArguments().getString(PLAYLIST_ID_KEY);
         djName = getArguments().getString(DJ_NAME_KEY);
+        time = getArguments().getString(TIME_KEY);
     }
 
     @Override
@@ -80,6 +84,7 @@ public class PlaylistDialog extends DialogFragment {
         djNameView = (TextView) view.findViewById(R.id.pl_djname);
         djNameView.setText(djName);
         timestringView = (TextView) view.findViewById(R.id.pl_timestring);
+        timestringView.setText(time);
         playlistListView = (LinearLayout) view.findViewById(R.id.playlist_list_view);
         loadingProgress = (ProgressBar) view.findViewById(R.id.loadingProgress);
 
@@ -134,14 +139,11 @@ public class PlaylistDialog extends DialogFragment {
             return;
         }
         djNameView.setText(emptyDefault(playlist.getDjName()));
-        timestringView.setText(emptyDefault(playlist.getTime()));
-        timestringView.setVisibility(View.VISIBLE);
         playlistListView.setVisibility(View.VISIBLE);
         buildPlaylistLayout(getActivity(), playlistListView, playlist.getTrackEntries());
 
         Animation fadeIn = new AlphaAnimation(0, 1);
         fadeIn.setDuration(300);
-        timestringView.startAnimation(fadeIn);
         playlistListView.startAnimation(fadeIn);
     }
 
