@@ -114,7 +114,7 @@
             app:fabSize="mini"
             app:backgroundTint="@color/kfjc_red_solid"
             app:rippleColor="@color/kfjc_mute"
-            app:elevation="2dp" />
+            app:elevation="0dp" />
 
         <TextView
             android:id="@+id/clockLabel"
