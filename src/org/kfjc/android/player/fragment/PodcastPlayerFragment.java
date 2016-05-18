@@ -136,6 +136,9 @@ public class PodcastPlayerFragment extends PlayerFragment {
         bottomControls = (LinearLayout) view.findViewById(R.id.bottomControls);
         loadingProgress = (ProgressBar) view.findViewById(R.id.loadingProgress);
 
+        View downloadButton = view.findViewById(R.id.downloadButton);
+        downloadButton.setOnClickListener(downloadClicklistener);
+
         playlistButton.setOnClickListener(showPlaylist);
         fab.setOnClickListener(fabClickListener);
         settingsButton.setOnClickListener(settingsButtonClickListener);
