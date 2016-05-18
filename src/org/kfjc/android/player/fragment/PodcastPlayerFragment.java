@@ -7,7 +7,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -58,13 +61,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
         super.onAttach(context);
         downloadManager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
     }
-
-    private View.OnClickListener pulldownFabClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-        homeScreen.loadPodcastListFragment(true);
-        }
-    };
 
     private View.OnClickListener fabClickListener = new View.OnClickListener() {
         @Override
@@ -133,10 +129,10 @@ public class PodcastPlayerFragment extends PlayerFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
+        homeScreen.setActionBarBackArrow(true);
         View view = inflater.inflate(R.layout.fragment_podcastplayer, container, false);
 
         playlistButton = view.findViewById(R.id.playlist);
-        FloatingActionButton pullDownFab = (FloatingActionButton) view.findViewById(R.id.pullDownButton);
         dateTime = (TextView) view.findViewById(R.id.podcastDateTime);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         settingsButton = (FloatingActionButton) view.findViewById(R.id.settingsButton);
@@ -146,7 +142,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
         loadingProgress = (ProgressBar) view.findViewById(R.id.loadingProgress);
 
         playlistButton.setOnClickListener(showPlaylist);
-        pullDownFab.setOnClickListener(pulldownFabClickListener);
         fab.setOnClickListener(fabClickListener);
         settingsButton.setOnClickListener(settingsButtonClickListener);
         playtimeSeekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
@@ -402,5 +397,10 @@ public class PodcastPlayerFragment extends PlayerFragment {
         loadingProgress.setVisibility(View.VISIBLE);
         fab.setImageResource(R.drawable.ic_stop_white_48dp);
         displayState = PlayerState.PLAY;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
     }
 }

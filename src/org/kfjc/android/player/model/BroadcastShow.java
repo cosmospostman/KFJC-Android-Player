@@ -8,12 +8,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.kfjc.android.player.util.DateUtil;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 public class BroadcastShow implements Parcelable {
 
@@ -98,7 +95,7 @@ public class BroadcastShow implements Parcelable {
     }
 
     public String getTimestampString() {
-        return DateUtil.roundHourFormat(timestamp, DateUtil.FORMAT_DELUXE_DATE);
+        return DateUtil.roundUpHourFormat(timestamp, DateUtil.FORMAT_DELUXE_DATE);
     }
 
     public List<String> getUrls() {

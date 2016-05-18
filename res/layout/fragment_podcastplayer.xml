@@ -45,20 +45,6 @@
 
         </RelativeLayout>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/pullDownButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="-20dp"
-            android:layout_marginLeft="8dp"
-            android:src="@drawable/ic_expand_more_white_48dp"
-            app:layout_anchor="@id/buttonWell"
-            app:layout_anchorGravity="top|end"
-            app:fabSize="mini"
-            app:backgroundTint="@color/kfjc_mute"
-            app:rippleColor="@color/kfjc_transparent_black"
-            app:elevation="0dp" />
-
     </LinearLayout>
 
     <LinearLayout

@@ -72,7 +72,7 @@ public class PlaylistJsonImpl implements Playlist {
 
     @Override
     public String getTime() {
-        return DateUtil.roundHourFormat(timestampMillis, DateUtil.FORMAT_DELUXE_DATE);
+        return DateUtil.roundDownHourFormat(timestampMillis, DateUtil.FORMAT_DELUXE_DATE);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class PlaylistJsonImpl implements Playlist {
             label = tryGetString(entry, "album_label");
             long timestamp = tryGetLong(entry, "time_played");
             if (timestamp > 0L) {
-                time = DateUtil.format(timestamp, DateUtil.FORMAT_HH_MM)
+                time = DateUtil.format(timestamp, DateUtil.FORMAT_H_MM)
                         .replaceAll("\\sPM", "p").replaceAll("\\sAM", "a");
             }
         }

@@ -31,4 +31,5 @@ public interface HomeScreenInterface {
     long[] getSegmentBounds();
     void setTotalPlayTime(long playTime);
     long getTotalPlayTime();
+    void setActionBarBackArrow(boolean isBackArrorw);
 }

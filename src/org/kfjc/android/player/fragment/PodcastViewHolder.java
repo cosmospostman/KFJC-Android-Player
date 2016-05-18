@@ -54,7 +54,7 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
             iconBackground.setBackgroundColor(color);
         }
         airName.setText(show.getAirName());
-        timestamp.setText(DateUtil.roundHourFormat(show.getTimestamp(), getSimpleDateFormat()));
+        timestamp.setText(DateUtil.roundUpHourFormat(show.getTimestamp(), getSimpleDateFormat()));
     }
 
     private String getIconLetter() {

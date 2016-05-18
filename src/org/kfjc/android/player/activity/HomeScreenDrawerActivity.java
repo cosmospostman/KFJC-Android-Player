@@ -27,6 +27,7 @@ import android.support.v7.widget.Toolbar;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -343,12 +344,31 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close
         );
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawerToggle.isDrawerIndicatorEnabled()) {
+                    drawerLayout.openDrawer(Gravity.LEFT);
+                } else {
+                    if (activeFragmentId == R.id.nav_podcast_player) {
+                        loadPodcastListFragment(true);
+                    }
+                }
+            }
+        });
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        drawerLayout.addDrawerListener(drawerToggle);
+    }
 
-        drawerToggle.setDrawerIndicatorEnabled(true);
-        drawerLayout.setDrawerListener(drawerToggle);
+    @Override
+    public void setActionBarBackArrow(boolean isBackArrow) {
+        if (isBackArrow) {
+            drawerToggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            drawerToggle.setDrawerIndicatorEnabled(true);
+        }
     }
 
     public void setNavigationItemChecked(int navigationItemId) {
@@ -358,6 +378,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private void loadFragment(int fragmentId) {
         Log.i("HOME", "Loading fragment " + fragmentId);
         activeFragmentId = fragmentId;
+        setActionBarBackArrow(false);
         switch (fragmentId) {
             case R.id.nav_livestream:
                 replaceFragment(liveStreamFragment);
@@ -376,7 +397,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 loadPodcastListFragment(false);
                 break;
             case R.id.nav_podcast_player:
-                loadPodcastPlayer(null, false);
+                loadPodcastListFragment(false);
                 break;
         }
     }
@@ -386,6 +407,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         if (activeFragmentId == R.id.nav_podcast_player) {
             return;
         }
+        setActionBarBackArrow(true);
         activeFragmentId = R.id.nav_podcast_player;
         podcastPlayerFragment = new PodcastPlayerFragment();
         if (show != null) {
@@ -395,7 +417,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         if (animate) {
-            ft.setCustomAnimations(R.animator.fade_in_up, R.animator.fade_out_up);
+            ft.setCustomAnimations(R.animator.fade_in_to_left, R.animator.fade_out_to_left);
         }
         ft.replace(R.id.home_screen_main_fragment, podcastPlayerFragment)
             .addToBackStack(null)
@@ -405,9 +427,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void loadPodcastListFragment(boolean animate) {
         activeFragmentId = R.id.nav_podcast;
+        setActionBarBackArrow(false);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         if (animate) {
-            ft.setCustomAnimations(R.animator.fade_in_down, R.animator.fade_out_down);
+            ft.setCustomAnimations(R.animator.fade_in_to_right, R.animator.fade_out_to_right);
         }
         ft.replace(R.id.home_screen_main_fragment, podcastFragment)
             .addToBackStack(null)
@@ -478,6 +501,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         PreferenceControl.updateStreams();
         isForegroundActivity = true;
         updateBackground();
+        setActionBarBackArrow(false);
         loadFragment(activeFragmentId);
     }
 

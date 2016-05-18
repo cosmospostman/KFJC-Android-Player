@@ -11,15 +11,22 @@ public class DateUtil {
 
     private static final int SECONDS_IN_HOUR = 3600;
 
-    public static final SimpleDateFormat FORMAT_HH_MM = new SimpleDateFormat("hh:mm a");
+    public static final SimpleDateFormat FORMAT_H_MM = new SimpleDateFormat("h:mm a");
     public static final SimpleDateFormat FORMAT_DELUXE_DATE = new SimpleDateFormat("ha, EEEE d MMMM yyyy");
     public static final SimpleDateFormat FORMAT_FULL_DATE = new SimpleDateFormat("ha EEE d MMM yyyy");
     public static final SimpleDateFormat FORMAT_SHORT_DATE = new SimpleDateFormat("ha EEE d MMM");
 
     public static long roundUpHour(long timestampSec) {
+        return timestampSec + remainderToHour(timestampSec);
+    }
+
+    public static long roundDownHour(long timestampSec) {
+        return timestampSec + SECONDS_IN_HOUR - remainderToHour(timestampSec);
+    }
+
+    private static long remainderToHour(long timestampSec) {
         long remainder = timestampSec % SECONDS_IN_HOUR;
-        long timeToAdd = SECONDS_IN_HOUR - remainder;
-        return timestampSec + timeToAdd;
+        return SECONDS_IN_HOUR - remainder;
     }
 
     public static String format(long timestamp, SimpleDateFormat df) {
@@ -27,9 +34,14 @@ public class DateUtil {
         return df.format(new Date(timestamp * 1000));
     }
 
-    public static String roundHourFormat(long timestamp, SimpleDateFormat df) {
+    public static String roundUpHourFormat(long timestamp, SimpleDateFormat df) {
         df.setTimeZone(Constants.BROADCAST_TIMEZONE);
         return df.format(new Date(DateUtil.roundUpHour(timestamp) * 1000));
+    }
+
+    public static String roundDownHourFormat(long timestamp, SimpleDateFormat df) {
+        df.setTimeZone(Constants.BROADCAST_TIMEZONE);
+        return df.format(new Date(DateUtil.roundDownHour(timestamp) * 1000));
     }
 
     /**
