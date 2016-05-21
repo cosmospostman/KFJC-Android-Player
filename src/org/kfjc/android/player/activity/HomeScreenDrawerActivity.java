@@ -579,6 +579,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 && streamService.isPlaying()) {
             return;
         }
+        streamService.stop();
         audioManager.requestAudioFocus(
                 audioFocusListener,
                 AudioManager.STREAM_MUSIC,

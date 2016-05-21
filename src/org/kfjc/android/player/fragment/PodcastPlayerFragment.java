@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,13 +37,12 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     private ShowDetails show;
     private DownloadManager downloadManager;
-    private boolean isCheckingState;
 
     private View playlistButton;
     private TextView dateTime;
     private SeekBar playtimeSeekBar;
     private FloatingActionButton fab;
-    private FloatingActionButton settingsButton;
+    private View settingsButton;
     private TextView podcastDetails;
     private LinearLayout bottomControls;
     private ProgressBar loadingProgress;
@@ -103,7 +103,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         @Override
         public void onProgressChanged(SeekBar arg0, int progress, boolean arg2) {
             long seekToMillis = (long) (progress) * 100;
-            if (isTrackingTouch) {
+            if (isTrackingTouch && displayState != PlayerState.STOP) {
                 handler.removeCallbacks(playClockUpdater);
                 updateClockHelper(seekToMillis);
                 homeScreen.seekPlayer(seekToMillis);
@@ -119,9 +119,9 @@ public class PodcastPlayerFragment extends PlayerFragment {
         playlistButton = view.findViewById(R.id.playlist);
         dateTime = (TextView) view.findViewById(R.id.podcastDateTime);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
-        settingsButton = (FloatingActionButton) view.findViewById(R.id.settingsButton);
+        settingsButton = view.findViewById(R.id.settingsButton);
         playtimeSeekBar = (SeekBar) view.findViewById(R.id.playtimeSeekBar);
-        podcastDetails = (TextView) view.findViewById(R.id.podcastDetails);
+        podcastDetails = (TextView) view.findViewById(R.id.playtimeDisplay);
         bottomControls = (LinearLayout) view.findViewById(R.id.bottomControls);
         loadingProgress = (ProgressBar) view.findViewById(R.id.loadingProgress);
 
@@ -145,7 +145,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
             homeScreen.setActionbarTitle(show.getAirName());
             dateTime.setText(show.getTimestampString());
 
-            isCheckingState = false;
             fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
             homeScreen.syncState();
             bottomControls.setVisibility(View.VISIBLE);
@@ -185,8 +184,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private void updateClockHelper(long playerPos) {
         long totalShowTime = homeScreen.getPlayerSource().show.getTotalShowTimeMillis();
 
-        podcastDetails.setText(DateUtil.formatTime(playerPos - show.getHourPaddingTimeMillis())
-                + " | " + DateUtil.formatTime(totalShowTime - 2 * show.getHourPaddingTimeMillis()));
+        podcastDetails.setText(DateUtil.formatTime(playerPos - show.getHourPaddingTimeMillis()));
 
         playtimeSeekBar.setMax((int)totalShowTime/100);
         playtimeSeekBar.setProgress((int)playerPos/100);
@@ -260,9 +258,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     private void setPlayState() {
         fab.setImageResource(R.drawable.ic_pause_white_48dp);
-        if (!isCheckingState) {
-            loadingProgress.setVisibility(View.INVISIBLE);
-        }
+        loadingProgress.setVisibility(View.INVISIBLE);
         startPlayClockUpdater();
         displayState = PlayerState.PLAY;
     }
@@ -275,9 +271,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     private void setStopState() {
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-        if (!isCheckingState) {
             loadingProgress.setVisibility(View.INVISIBLE);
-        }        handler.removeCallbacks(playClockUpdater);
+        handler.removeCallbacks(playClockUpdater);
         displayState = PlayerState.STOP;
     }
 

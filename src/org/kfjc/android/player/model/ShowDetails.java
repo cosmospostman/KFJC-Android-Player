@@ -28,6 +28,7 @@ public class ShowDetails implements Parcelable {
     private static final String KEY_PADDING = "padding";
     private static final String KEY_TOTAL_TIME = "totalTimeMillis";
     private static final String KEY_SEGMENT_BOUNDS = "segmentBounds";
+    private static final String KEY_FILE_SIZE = "fileSize";
 
     private String playlistId;
     private String airName;
@@ -37,6 +38,7 @@ public class ShowDetails implements Parcelable {
 
     private long totalShowTimeMillis;
     private long[] segmentBounds;
+    private long totalFileSizeBytes;
 
     // These are assumed to be the same for all hours.
     private long hourPlayTimeMillis;
@@ -54,6 +56,7 @@ public class ShowDetails implements Parcelable {
             this.hourPaddingTimeMillis = hour.getPaddingTimeMillis();
             this.hourPlayTimeMillis = hour.getPlayTimeMillis();
             urls.add(hour.getUrl());
+            totalFileSizeBytes += hour.getFileSize();
         }
         countTotalShowTime();
         Collections.sort(urls);
@@ -103,6 +106,7 @@ public class ShowDetails implements Parcelable {
             }
             this.segmentBounds = Longs.toArray(segmentBounds);
             totalShowTimeMillis = in.getLong(KEY_TOTAL_TIME);
+            totalFileSizeBytes = in.getLong(KEY_FILE_SIZE);
             hasError = false;
         } catch (JSONException e) {
             hasError = true;
@@ -125,6 +129,7 @@ public class ShowDetails implements Parcelable {
         in.readStringList(urls);
         segmentBounds = in.createLongArray();
         totalShowTimeMillis = in.readLong();
+        totalFileSizeBytes = in.readLong();
         Collections.sort(urls);
     }
 
@@ -138,6 +143,7 @@ public class ShowDetails implements Parcelable {
         dest.writeStringList(urls);
         dest.writeLongArray(segmentBounds);
         dest.writeLong(totalShowTimeMillis);
+        dest.writeLong(totalFileSizeBytes);
     }
 
     public String getPlaylistId() {
@@ -181,6 +187,7 @@ public class ShowDetails implements Parcelable {
             JSONArray segmentBounds = new JSONArray(Longs.asList(this.segmentBounds));
             out.put(KEY_SEGMENT_BOUNDS, segmentBounds);
             out.put(KEY_TOTAL_TIME, totalShowTimeMillis);
+            out.put(KEY_FILE_SIZE, totalFileSizeBytes);
         } catch (JSONException e) {}
         return out.toString();
     }

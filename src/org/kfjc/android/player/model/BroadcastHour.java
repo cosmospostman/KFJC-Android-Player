@@ -14,4 +14,5 @@ public interface BroadcastHour {
     String getPlaylistId();
     long getPlayTimeMillis();
     long getPaddingTimeMillis();
+    long getFileSize();
 }
