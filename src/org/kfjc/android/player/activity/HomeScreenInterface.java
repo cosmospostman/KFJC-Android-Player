@@ -27,6 +27,5 @@ public interface HomeScreenInterface {
     void seekPlayer(long positionMillis);
     void syncState();
     MediaSource getPlayerSource();
-    long[] getSegmentBounds();
     void setActionBarBackArrow(boolean isBackArrorw);
 }

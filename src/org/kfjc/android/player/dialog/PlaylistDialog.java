@@ -121,7 +121,7 @@ public class PlaylistDialog extends DialogFragment {
         });
 
         if (playlist != null) {
-            updatePlaylist(playlist);
+            updatePlaylist(playlist, false);
         } else {
             loadPlaylist(playlistId);
         }
@@ -153,12 +153,12 @@ public class PlaylistDialog extends DialogFragment {
 
             @Override
             protected void onPostExecute(Playlist playlist) {
-                updatePlaylist(playlist);
+                updatePlaylist(playlist, true);
             }
         }.execute();
     }
 
-    public void updatePlaylist(Playlist playlist) {
+    public void updatePlaylist(Playlist playlist, boolean animate) {
         if (!isAdded()) {
             return;
         }
@@ -172,7 +172,7 @@ public class PlaylistDialog extends DialogFragment {
         buildPlaylistLayout(getActivity(), playlistListView, playlist.getTrackEntries());
 
         Animation fadeIn = new AlphaAnimation(0, 1);
-        fadeIn.setDuration(300);
+        fadeIn.setDuration(animate ? 300 : 0);
         playlistListView.startAnimation(fadeIn);
     }
 

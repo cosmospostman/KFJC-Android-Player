@@ -39,7 +39,6 @@ import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.fragment.PlayerFragment;
-import org.kfjc.android.player.fragment.PlaylistFragment;
 import org.kfjc.android.player.fragment.PodcastFragment;
 import org.kfjc.android.player.fragment.PodcastPlayerFragment;
 import org.kfjc.android.player.model.ShowDetails;
@@ -84,7 +83,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private BroadcastReceiver downloadClickedReceiver;
 
     private LiveStreamFragment liveStreamFragment;
-    private PlaylistFragment playlistFragment;
     private PodcastFragment podcastFragment;
     private PodcastPlayerFragment podcastPlayerFragment;
     private NavigationView navigationView;
@@ -94,8 +92,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private Snackbar snackbar;
     private Map<Long, ShowDetails> activeDownloads;
     private boolean askPermissionsAgain = true;
-    private long[] segmentBounds;
-    private long totalPlayTime;
 
     private boolean isForegroundActivity = false;
     private int activeFragmentId = R.id.nav_livestream;
@@ -121,7 +117,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         activeDownloads = new HashMap<>();
 
         this.liveStreamFragment = new LiveStreamFragment();
-        this.playlistFragment = new PlaylistFragment();
         this.podcastFragment = new PodcastFragment();
         this.podcastPlayerFragment = new PodcastPlayerFragment();
 
@@ -151,7 +146,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                         @Override
                         public void onPlaylistUpdate(Playlist playlist) {
                             liveStreamFragment.updatePlaylist(playlist);
-                            playlistFragment.updatePlaylist(playlist);
                         }
                     });
                 }
@@ -381,13 +375,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 replaceFragment(liveStreamFragment);
                 if (playlistService != null) {
                     liveStreamFragment.updatePlaylist(playlistService.getPlaylist());
-                }
-                break;
-            case R.id.nav_playlist:
-                replaceFragment(playlistFragment);
-                drawerToggle.syncState();
-                if (playlistService != null) {
-                    playlistFragment.updatePlaylist(playlistService.getPlaylist());
                 }
                 break;
             case R.id.nav_podcast:
@@ -661,11 +648,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void unpausePlayer() {
         streamService.unpause();
-    }
-
-    @Override
-    public long[] getSegmentBounds() {
-        return this.segmentBounds;
     }
 
 }

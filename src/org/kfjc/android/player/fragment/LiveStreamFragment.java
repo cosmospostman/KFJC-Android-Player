@@ -182,9 +182,9 @@ public class LiveStreamFragment extends PlayerFragment {
         @Override
         public void onClick(View v) {
             Playlist playlist = homeScreen.getLatestPlaylist();
-            PlaylistDialog d = PlaylistDialog.newInstance(playlist.toJsonString());
+            PlaylistDialog d = PlaylistDialog.newInstance(
+                    playlist == null ? "" : playlist.toJsonString());
             d.show(getFragmentManager(), "playlist");
-            d.updatePlaylist(playlist);
         }
     };
 }

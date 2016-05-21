@@ -7,11 +7,6 @@
             android:tint="@color/kfjc_icon_tint"
             android:title="@string/nav_livestream" />
         <item
-            android:id="@+id/nav_playlist"
-            android:icon="@drawable/ic_book_black_24dp"
-            android:tint="@color/kfjc_icon_tint"
-            android:title="@string/nav_playlists" />
-        <item
             android:id="@+id/nav_podcast"
             android:icon="@drawable/ic_today_black_24dp"
             android:tint="@color/kfjc_icon_tint"
