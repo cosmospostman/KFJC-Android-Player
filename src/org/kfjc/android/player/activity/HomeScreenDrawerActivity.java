@@ -569,17 +569,16 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void playStream() {
-        playArchive(PreferenceControl.getStreamPreference());
+        playSource(PreferenceControl.getStreamPreference());
     }
 
     @Override
-    public void playArchive(MediaSource source) {
+    public void playSource(MediaSource source) {
         if (streamService.getSource() != null
                 && streamService.getSource().equals(source)
                 && streamService.isPlaying()) {
             return;
         }
-        streamService.stop();
         audioManager.requestAudioFocus(
                 audioFocusListener,
                 AudioManager.STREAM_MUSIC,
@@ -650,7 +649,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void seekPlayer(long positionMillis) {
-        streamService.seekPlayer(positionMillis);
+        streamService.seekOverEntireShow(positionMillis);
     }
 
     @Override
@@ -664,22 +663,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     }
 
     @Override
-    public void setSegmentBounds(long[] segmentBounds) {
-        this.segmentBounds = segmentBounds;
-    }
-
-    @Override
     public long[] getSegmentBounds() {
         return this.segmentBounds;
     }
 
-    @Override
-    public void setTotalPlayTime(long playTime) {
-        this.totalPlayTime = playTime;
-    }
-
-    @Override
-    public long getTotalPlayTime() {
-        return this.totalPlayTime;
-    }
 }

@@ -11,7 +11,7 @@ public interface HomeScreenInterface {
     void pausePlayer();
     void unpausePlayer();
     void restartStream();
-    void playArchive(MediaSource source);
+    void playSource(MediaSource source);
     boolean isStreamServicePlaying();
     String getString(int resId);
     void snack(String message, int duration);
@@ -27,9 +27,6 @@ public interface HomeScreenInterface {
     void seekPlayer(long positionMillis);
     void syncState();
     MediaSource getPlayerSource();
-    void setSegmentBounds(long[] segmentBounds);
     long[] getSegmentBounds();
-    void setTotalPlayTime(long playTime);
-    long getTotalPlayTime();
     void setActionBarBackArrow(boolean isBackArrorw);
 }

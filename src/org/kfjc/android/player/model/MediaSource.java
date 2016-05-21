@@ -10,24 +10,21 @@ public class MediaSource {
     public final String name;
     public final String description;
     public final Format format;
-    public final int sequenceNumber;
     public final ShowDetails show;
 
-    public MediaSource(Type type, String url, Format format, int sequenceNumber, String name, String description) {
+    public MediaSource(String url, Format format, String name, String description) {
         this.url = url;
         this.name = name;
         this.description = description;
         this.format = format;
-        this.type = type;
-        this.sequenceNumber = sequenceNumber;
+        this.type = Type.LIVESTREAM;
         this.show = null;
     }
 
-    public MediaSource(Type type, String url, Format format, int sequenceNumber, ShowDetails show) {
-        this.url = url;
-        this.format = format;
-        this.type = type;
-        this.sequenceNumber = sequenceNumber;
+    public MediaSource(ShowDetails show) {
+        this.url = null;
+        this.format = Format.MP3;
+        this.type = Type.ARCHIVE;
         this.name = show.getAirName();
         this.description = show.getTimestampString();
         this.show = show;
@@ -41,6 +38,13 @@ public class MediaSource {
         if (!(that instanceof MediaSource)) {
             return false;
         }
-        return ((MediaSource) that).url.equals(this.url);
+        MediaSource thatSource = (MediaSource) that;
+        if (thatSource.url != null) {
+            return thatSource.url.equals(this.url);
+        }
+        if (thatSource.show != null && this.show != null) {
+            return thatSource.show.getTimestamp() == this.show.getTimestamp();
+        }
+        return false;
     }
 }

@@ -70,6 +70,8 @@ public class StreamService extends Service {
     private boolean onControlReceiverRegistered = false;
     private boolean isPaused = false;
 
+    private int activeSourceNumber = -1;
+
     /**
      * The Becoming Noisy broadcast intent is sent when audio output hardware changes, perhaps
      * from headphones to internal speaker. In such cases, we stop the stream to avoid
@@ -145,22 +147,24 @@ public class StreamService extends Service {
 
     public void play(MediaSource mediaSource) {
         this.mediaSource = mediaSource;
-        String streamUrl = mediaSource.url;
-
+        stop();
         if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
             Notification n = NotificationUtil.bufferingNotification(getApplicationContext());
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
+            play(mediaSource.url);
         } else if (mediaSource.type == MediaSource.Type.ARCHIVE) {
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_PAUSE));
+            activeSourceNumber = -1;
+            playArchiveHour(0);
         }
-
-        play(streamUrl);
     }
 
     private void play(String streamUrl) {
         Log.i(TAG, "Playing stream " + streamUrl);
-        player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
-        player.addListener(exoPlayerListener);
+        if (player == null) {
+            player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
+            player.addListener(exoPlayerListener);
+        }
         Extractor extractor = null;
         switch (mediaSource.format) {
             case AAC:
@@ -211,8 +215,23 @@ public class StreamService extends Service {
     }
 
     public void stop() {
+        stop(true);
+	}
+
+    private void stop(boolean alsoReset) {
         if (player != null) {
             player.stop();
+            Log.i(TAG, "Player stopped");
+        }
+        if (alsoReset) {
+            reset();
+        }
+    }
+
+    private void reset() {
+        if (player != null) {
+            player.release();
+            player = null;
             mediaListener.onStateChange(PlayerFragment.PlayerState.STOP, mediaSource);
         }
         unregisterReceivers();
@@ -220,7 +239,7 @@ public class StreamService extends Service {
         onControlReceiverRegistered = false;
         stopForeground(true);
         Log.i(TAG, "Service stopped");
-	}
+    }
 
     public void reload(MediaSource mediaSource) {
         if (player != null) {
@@ -291,30 +310,23 @@ public class StreamService extends Service {
      * @return true if a next hour was started.
      */
     private boolean playNextArchiveHour() {
-        if (mediaSource.show == null) {
-            return false;
-        }
-        String thisUrl = mediaSource.url;
-        List<File> showFiles = mediaSource.show.getFiles();
-        for (int i = 0; i < showFiles.size() - 1; i++) {
-            if (showFiles.get(i).getPath().equals(thisUrl)) {
-                play(showFiles.get(i+1).getPath());
-                seekPlayer(2 * mediaSource.show.getHourPaddingTimeMillis());
-                return true;
-            }
+        if (mediaSource.show.getUrls().size() > activeSourceNumber) {
+            playArchiveHour(activeSourceNumber + 1);
+            seek(2 * mediaSource.show.getHourPaddingTimeMillis());
+            return true;
         }
         return false;
     }
 
     public long getPlayerPosition() {
-        return player.getCurrentPosition();
+        long segmentOffset = (activeSourceNumber == 0)
+                ? 0 : mediaSource.show.getSegmentBounds()[activeSourceNumber - 1];
+        long extra = (activeSourceNumber == 0)
+                ? 0 : mediaSource.show.getHourPaddingTimeMillis();
+        return player.getCurrentPosition() + segmentOffset - extra;
     }
 
-    public long getPlayerDuration() {
-        return player.getDuration();
-    }
-
-    public void seekPlayer(long positionMillis) {
+    public void seek(long positionMillis) {
         player.seekTo(positionMillis);
     }
 
@@ -322,4 +334,34 @@ public class StreamService extends Service {
         return mediaSource;
     }
 
+    public void seekOverEntireShow(long seekToMillis) {
+        long[] segmentBounds = mediaSource.show.getSegmentBounds();
+        for (int i = 0; i < segmentBounds.length; i++) {
+            if (seekToMillis < segmentBounds[i]) {
+                // load segment i
+                playArchiveHour(i);
+                //seek to adjusted position
+                long thisSegmentStart = (i == 0) ? 0 : segmentBounds[i-1];
+                long extraSeek = (i == 0) ? 0 : mediaSource.show.getHourPaddingTimeMillis();
+                long localSeekTo = seekToMillis - thisSegmentStart + extraSeek;
+                seek(localSeekTo);
+                return;
+            }
+        }
+    }
+
+    private void playArchiveHour(int hour) {
+        if (activeSourceNumber == hour) {
+            return;
+        }
+        activeSourceNumber = hour;
+        File expectedSavedHour = mediaSource.show.getSavedHourUrl(hour);
+        stop(false);
+        if (expectedSavedHour.exists()) {
+            play(expectedSavedHour.getPath());
+        } else {
+            play(mediaSource.show.getUrls().get(hour));
+        }
+        seek(mediaSource.show.getHourPaddingTimeMillis());
+    }
 }

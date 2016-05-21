@@ -29,8 +29,6 @@ import org.kfjc.android.player.util.HttpUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PodcastPlayerFragment extends PlayerFragment {
 
@@ -38,9 +36,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     private ShowDetails show;
     private DownloadManager downloadManager;
-    private long totalShowTime;
-    private long[] segmentBounds;
-    private boolean hasOfflineContent;
     private boolean isCheckingState;
 
     private View playlistButton;
@@ -81,15 +76,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
     };
 
     private void showSettings() {
+        //TODO: clean up for podcast usecase
         SettingsDialog settingsFragment = new SettingsDialog();
-        settingsFragment.setUrlPreferenceChangeHandler(
-                new SettingsDialog.StreamUrlPreferenceChangeHandler() {
-                    @Override public void onStreamUrlPreferenceChange() {
-                        if (homeScreen.isStreamServicePlaying()) {
-                            homeScreen.restartStream();
-                        }
-                    }
-                });
         settingsFragment.show(getFragmentManager(), "settings");
     }
 
@@ -117,7 +105,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
             long seekToMillis = (long) (progress) * 100;
             if (isTrackingTouch) {
                 handler.removeCallbacks(playClockUpdater);
-                seekOverEntireShow(seekToMillis);
+                updateClockHelper(seekToMillis);
+                homeScreen.seekPlayer(seekToMillis);
             }
         }
     };
@@ -155,28 +144,12 @@ public class PodcastPlayerFragment extends PlayerFragment {
             this.show = bundle.getParcelable(BROADCAST_SHOW_KEY);
             homeScreen.setActionbarTitle(show.getAirName());
             dateTime.setText(show.getTimestampString());
-            checkState();
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected void onPreExecute() {
-                    isCheckingState = true;
-                }
 
-                @Override
-                protected Void doInBackground(Void... params) {
-                    countTotalShowTime();
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(Void aVoid) {
-                    isCheckingState = false;
-                    fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-                    homeScreen.syncState();
-                    bottomControls.setVisibility(View.VISIBLE);
-                    loadingProgress.setVisibility(View.INVISIBLE);
-                }
-            }.execute();
+            isCheckingState = false;
+            fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+            homeScreen.syncState();
+            bottomControls.setVisibility(View.VISIBLE);
+            loadingProgress.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -185,31 +158,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
         Bundle bundle = new Bundle();
         bundle.putParcelable(PodcastPlayerFragment.BROADCAST_SHOW_KEY, show);
         outState.putAll(bundle);
-    }
-
-    private void seekOverEntireShow(long seekToMillis) {
-        for (int i = 0; i < segmentBounds.length; i++) {
-            if (seekToMillis < segmentBounds[i]) {
-                // load segment i
-                playArchive(i);
-                //seek to adjusted position
-                long thisSegmentStart = (i == 0) ? 0 : segmentBounds[i-1];
-                long extraSeek = (i == 0) ? 0 : show.getHourPaddingTimeMillis();
-                long localSeekTo = seekToMillis - thisSegmentStart + extraSeek;
-                homeScreen.seekPlayer(localSeekTo);
-                return;
-            }
-        }
-    }
-
-    private void checkState() {
-        if (!ExternalStorageUtil.getPodcastDir(show.getPlaylistId()).exists()) {
-            hasOfflineContent = false;
-        } else if (ExternalStorageUtil.hasAllContent(show)) {
-            hasOfflineContent = true;
-        } else {
-            hasOfflineContent = false;
-        }
     }
 
     private void onPlayStopButtonClick() {
@@ -221,10 +169,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
                     break;
                 } // else fall through:
             case STOP:
-                playArchive(0);
-                homeScreen.seekPlayer(show.getHourPaddingTimeMillis());
-                homeScreen.setTotalPlayTime(totalShowTime);
-                homeScreen.setSegmentBounds(segmentBounds);
+                homeScreen.playSource(new MediaSource(show));
                 break;
             case PLAY:
                 homeScreen.pausePlayer();
@@ -232,64 +177,19 @@ public class PodcastPlayerFragment extends PlayerFragment {
         }
     }
 
-    private void playArchive(int hourNumber) {
-        String source;
-        if (hasOfflineContent) {
-            show.setFiles(ExternalStorageUtil.getSavedArchivesForShow(show));
-            source = show.getFiles().get(hourNumber).getPath();
-        } else {
-            source = show.getUrls().get(hourNumber);
-        }
-        homeScreen.playArchive(new MediaSource(
-                MediaSource.Type.ARCHIVE, source, MediaSource.Format.MP3, hourNumber, show));
+    void updateClock() {
+        updateClockHelper(homeScreen.getPlayerPosition());
+
     }
 
-    void updateClock() {
-        if (segmentBounds == null) {
-            return;
-        }
-        long playerPos = homeScreen.getPlayerPosition();
+    private void updateClockHelper(long playerPos) {
+        long totalShowTime = homeScreen.getPlayerSource().show.getTotalShowTimeMillis();
 
-        int playingSegmentNumber = homeScreen.getPlayerSource().sequenceNumber;
-        long segmentOffset = (playingSegmentNumber == 0) ? 0 : segmentBounds[playingSegmentNumber - 1];
-        long extra = (playingSegmentNumber == 0) ? 0 : show.getHourPaddingTimeMillis();
-        long pos = playerPos + segmentOffset - extra;
-
-        podcastDetails.setText(DateUtil.formatTime(pos - show.getHourPaddingTimeMillis())
+        podcastDetails.setText(DateUtil.formatTime(playerPos - show.getHourPaddingTimeMillis())
                 + " | " + DateUtil.formatTime(totalShowTime - 2 * show.getHourPaddingTimeMillis()));
 
         playtimeSeekBar.setMax((int)totalShowTime/100);
-        playtimeSeekBar.setProgress((int)pos/100);
-    }
-
-    private void countTotalShowTime() {
-        List<String> paths = new ArrayList<>();
-
-        if (hasOfflineContent) {
-            for (File f : ExternalStorageUtil.getSavedArchivesForShow(show)) {
-                paths.add(f.getPath());
-            }
-        } else {
-            paths = show.getUrls();
-        }
-
-        long[] bounds = new long[paths.size()];
-        long totalTime = 0;
-        for (int i = 0; i < paths.size(); i++) {
-            long showTime = show.getHourPlayTimeMillis();
-
-            // Total
-            totalTime += showTime - 2 * show.getHourPaddingTimeMillis();
-
-            // Bound
-            bounds[i] = totalTime + show.getHourPaddingTimeMillis();
-            if (i == paths.size() - 1) {
-                bounds[i] += show.getHourPaddingTimeMillis();
-            }
-        }
-        totalTime += 2 * show.getHourPaddingTimeMillis();
-        this.totalShowTime = totalTime;
-        this.segmentBounds = bounds;
+        playtimeSeekBar.setProgress((int)playerPos/100);
     }
 
     public void onWritePermissionResult(boolean wasGranted) {

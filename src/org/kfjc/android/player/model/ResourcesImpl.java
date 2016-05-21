@@ -73,8 +73,7 @@ public class ResourcesImpl implements Resources {
                 } else if (formatString.toLowerCase().equals("mp3")) {
                     format = MediaSource.Format.MP3;
                 }
-                mediaSourceList.add(new MediaSource(
-                        MediaSource.Type.LIVESTREAM, url, format, 0, name, description));
+                mediaSourceList.add(new MediaSource(url, format, name, description));
                 streamMap.put(name, url);
             }
             streamsList.set(mediaSourceList);

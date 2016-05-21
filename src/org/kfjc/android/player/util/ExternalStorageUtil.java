@@ -138,18 +138,10 @@ public class ExternalStorageUtil {
         return true;
     }
 
-    public static List<File> getSavedArchivesForShow(ShowDetails show) {
+    public static File getSavedArchive(String playlistId, String hourUrl) {
         List<File> files = new ArrayList<>();
-        File podcastDir = getPodcastDir(show.getPlaylistId());
-        if (hasAllContent(show)) {
-            for (String url : show.getUrls()) {
-                String expectedFilename = Uri.parse(url).getLastPathSegment();
-                File expectedFile = new File(podcastDir, expectedFilename);
-                if (expectedFile.exists()) {
-                    files.add(expectedFile);
-                }
-            }
-        }
-        return files;
+        File podcastDir = getPodcastDir(playlistId);
+        String expectedFilename = Uri.parse(hourUrl).getLastPathSegment();
+        return new File(podcastDir, expectedFilename);
     }
 }
