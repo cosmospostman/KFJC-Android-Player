@@ -1,6 +1,5 @@
 package org.kfjc.android.player.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -27,7 +26,7 @@ public class LiveStreamFragment extends PlayerFragment {
 
     private TextView currentTrackTextView;
     private FloatingActionButton playStopButton;
-    private FloatingActionButton settingsButton;
+    private View settingsButton;
     private ImageView radioDevil;
     private NotificationUtil notificationUtil;
 
@@ -38,7 +37,7 @@ public class LiveStreamFragment extends PlayerFragment {
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_stream));
         View view = inflater.inflate(R.layout.fragment_livestream, container, false);
         currentTrackTextView = (TextView) view.findViewById(R.id.currentTrack);
-        settingsButton = (FloatingActionButton) view.findViewById(R.id.settingsButton);
+        settingsButton = view.findViewById(R.id.settingsButton);
         playStopButton = (FloatingActionButton) view.findViewById(R.id.playstopbutton);
         radioDevil = (ImageView) view.findViewById(R.id.logo);
         addButtonListeners();
