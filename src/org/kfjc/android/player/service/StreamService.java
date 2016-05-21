@@ -29,6 +29,9 @@ import org.kfjc.android.player.fragment.PlayerFragment;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.util.NotificationUtil;
 
+import java.io.File;
+import java.util.List;
+
 public class StreamService extends Service {
 
     public static final String INTENT_CONTROL = "controlIntent";
@@ -140,21 +143,24 @@ public class StreamService extends Service {
 		this.mediaListener = listener;
 	}
 
-    public void play(Context context, MediaSource mediaSource) {
+    public void play(MediaSource mediaSource) {
         this.mediaSource = mediaSource;
         String streamUrl = mediaSource.url;
-        Log.i(TAG, "Playing stream " + streamUrl);
 
         if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
-            Notification n = NotificationUtil.bufferingNotification(context);
+            Notification n = NotificationUtil.bufferingNotification(getApplicationContext());
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
         } else if (mediaSource.type == MediaSource.Type.ARCHIVE) {
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_PAUSE));
         }
 
+        play(streamUrl);
+    }
+
+    private void play(String streamUrl) {
+        Log.i(TAG, "Playing stream " + streamUrl);
         player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
         player.addListener(exoPlayerListener);
-
         Extractor extractor = null;
         switch (mediaSource.format) {
             case AAC:
@@ -166,7 +172,7 @@ public class StreamService extends Service {
         }
         ExtractorSampleSource sampleSource = new ExtractorSampleSource(
                 Uri.parse(streamUrl),
-                new DefaultUriDataSource(context, Constants.USER_AGENT),
+                new DefaultUriDataSource(getApplicationContext(), Constants.USER_AGENT),
                 new DefaultAllocator(BUFFER_SEGMENT_SIZE),
                 BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE,
                 5,
@@ -216,11 +222,11 @@ public class StreamService extends Service {
         Log.i(TAG, "Service stopped");
 	}
 
-    public void reload(Context context, MediaSource mediaSource) {
+    public void reload(MediaSource mediaSource) {
         if (player != null) {
             player.stop();
         }
-        play(context, mediaSource);
+        play(mediaSource);
     }
 
     private void unregisterReceivers() {
@@ -264,6 +270,7 @@ public class StreamService extends Service {
                 case ExoPlayer.STATE_ENDED:
                     mediaListener.onStateChange(PlayerFragment.PlayerState.STOP, mediaSource);
                     unregisterReceivers();
+                    playNextArchiveHour();
                     break;
                 case ExoPlayer.STATE_IDLE:
                     break;
@@ -279,6 +286,25 @@ public class StreamService extends Service {
             mediaListener.onError(e.getMessage());
         }
     };
+
+    /**
+     * @return true if a next hour was started.
+     */
+    private boolean playNextArchiveHour() {
+        if (mediaSource.show == null) {
+            return false;
+        }
+        String thisUrl = mediaSource.url;
+        List<File> showFiles = mediaSource.show.getFiles();
+        for (int i = 0; i < showFiles.size() - 1; i++) {
+            if (showFiles.get(i).getPath().equals(thisUrl)) {
+                play(showFiles.get(i+1).getPath());
+                seekPlayer(2 * mediaSource.show.getHourPaddingTimeMillis());
+                return true;
+            }
+        }
+        return false;
+    }
 
     public long getPlayerPosition() {
         return player.getCurrentPosition();

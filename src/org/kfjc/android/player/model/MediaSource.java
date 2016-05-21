@@ -11,7 +11,6 @@ public class MediaSource {
     public final String description;
     public final Format format;
     public final int sequenceNumber;
-
     public final BroadcastShow show;
 
     public MediaSource(Type type, String url, Format format, int sequenceNumber, String name, String description) {

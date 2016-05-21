@@ -33,8 +33,7 @@
                                     android:textSize="28sp"
                                     android:textAllCaps="true"
                                     android:textStyle="bold"
-                                    android:textColor="@color/time_midnight"
-                                    android:text="A"/>
+                                    android:textColor="@color/time_midnight"/>
 
                         </RelativeLayout>
 

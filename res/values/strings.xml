@@ -45,6 +45,9 @@
     <string name="permission_phone_title">Phone permissions</string>
     <string name="permission_phone_rationale">KFJC only uses phone permissions to automatically
         stop playback when your phone is in use. We don\'t snoop!</string>
+    <string name="podcast_label_recent_archives">Hot (off the) air</string>
+    <string name="podcast_label_saved_archives">Available offline</string>
+
 
     <string name="setting_audio_quality">Live stream audio quality</string>
     <string name="setting_backgrounds">Hourly backgrounds</string>
@@ -68,4 +71,7 @@
     <string name="format_share_track_details"
         translation_description="String for sharing, combining artist (%1s), track (%2$s) and album (%3$s)">
         From KFJC: %1$s - %2$s (%3$s)</string>
+    <string name="format_archive_file"
+        translation_description="DJ name, plus which archive file (of total hours for that show)">
+        %1$s, part %d of %d</string>
 </resources>

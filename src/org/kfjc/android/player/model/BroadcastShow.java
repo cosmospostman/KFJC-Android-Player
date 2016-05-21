@@ -3,11 +3,14 @@ package org.kfjc.android.player.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.common.collect.Lists;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.kfjc.android.player.util.DateUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +28,7 @@ public class BroadcastShow implements Parcelable {
     private final String airName;
     private long timestamp;
     private final List<String> urls;
+    private List<File> files;
     private boolean hasError;
 
     // These are assumed to be the same for all hours.
@@ -183,5 +187,13 @@ public class BroadcastShow implements Parcelable {
                 && thatShow.urls.equals(this.urls)
                 && thatShow.timestamp == this.timestamp
                 && thatShow.hasError == this.hasError;
+    }
+
+    public void setFiles(List<File> files) {
+        this.files = files;
+    }
+
+    public List<File> getFiles() {
+        return this.files;
     }
 }

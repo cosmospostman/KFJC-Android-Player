@@ -376,7 +376,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     }
 
     private void loadFragment(int fragmentId) {
-        Log.i("HOME", "Loading fragment " + fragmentId);
         activeFragmentId = fragmentId;
         switch (fragmentId) {
             case R.id.nav_livestream:
@@ -586,7 +585,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 audioFocusListener,
                 AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN);
-        streamService.play(getApplicationContext(), source);
+        streamService.play(source);
     }
 
     @Override
@@ -603,7 +602,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void restartStream() {
-        streamService.reload(getApplicationContext(), PreferenceControl.getStreamPreference());
+        streamService.reload(PreferenceControl.getStreamPreference());
     }
 
     @Override
