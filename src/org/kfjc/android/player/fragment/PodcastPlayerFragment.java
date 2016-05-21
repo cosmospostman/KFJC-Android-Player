@@ -2,6 +2,7 @@ package org.kfjc.android.player.fragment;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -42,6 +44,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private TextView dateTime;
     private SeekBar playtimeSeekBar;
     private FloatingActionButton fab;
+    private ImageButton downloadButton;
     private View settingsButton;
     private TextView podcastDetails;
     private LinearLayout bottomControls;
@@ -63,8 +66,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private View.OnClickListener settingsButtonClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            showSettings();
-        }
+            SettingsDialog settingsFragment = new SettingsDialog();
+            settingsFragment.show(getFragmentManager(), "settings");        }
     };
 
     private View.OnClickListener showPlaylist = new View.OnClickListener() {
@@ -74,12 +77,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
                     .show(getFragmentManager(), "playlist");
         }
     };
-
-    private void showSettings() {
-        //TODO: clean up for podcast usecase
-        SettingsDialog settingsFragment = new SettingsDialog();
-        settingsFragment.show(getFragmentManager(), "settings");
-    }
 
     private View.OnClickListener downloadClicklistener = new View.OnClickListener() {
         @Override
@@ -125,7 +122,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         bottomControls = (LinearLayout) view.findViewById(R.id.bottomControls);
         loadingProgress = (ProgressBar) view.findViewById(R.id.loadingProgress);
 
-        View downloadButton = view.findViewById(R.id.downloadButton);
+        downloadButton = (ImageButton) view.findViewById(R.id.downloadButton);
         downloadButton.setOnClickListener(downloadClicklistener);
 
         playlistButton.setOnClickListener(showPlaylist);
@@ -145,11 +142,19 @@ public class PodcastPlayerFragment extends PlayerFragment {
             homeScreen.setActionbarTitle(show.getAirName());
             dateTime.setText(show.getTimestampString());
 
+            updateDownloadState();
             fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
             homeScreen.syncState();
             bottomControls.setVisibility(View.VISIBLE);
             loadingProgress.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private void updateDownloadState() {
+        int iconResource = ExternalStorageUtil.hasAllContent(show)
+                ? R.drawable.ic_offline_pin_white_48dp
+                : R.drawable.ic_file_download_white_48dp;
+        downloadButton.setImageResource(iconResource);
     }
 
     @Override
