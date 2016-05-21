@@ -14,6 +14,7 @@ import android.widget.TextView;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.LavaLampActivity;
 import org.kfjc.android.player.control.PreferenceControl;
+import org.kfjc.android.player.dialog.PlaylistDialog;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
@@ -39,6 +40,8 @@ public class LiveStreamFragment extends PlayerFragment {
         currentTrackTextView = (TextView) view.findViewById(R.id.currentTrack);
         settingsButton = view.findViewById(R.id.settingsButton);
         playStopButton = (FloatingActionButton) view.findViewById(R.id.playstopbutton);
+        View playlistButton = view.findViewById(R.id.playlist);
+        playlistButton.setOnClickListener(showPlaylist);
         radioDevil = (ImageView) view.findViewById(R.id.logo);
         addButtonListeners();
         updatePlaylist(homeScreen.getLatestPlaylist());
@@ -174,4 +177,14 @@ public class LiveStreamFragment extends PlayerFragment {
         radioDevil.setEnabled(false);
         displayState = PlayerState.BUFFER;
     }
+
+    private View.OnClickListener showPlaylist = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Playlist playlist = homeScreen.getLatestPlaylist();
+            PlaylistDialog d = PlaylistDialog.newInstance(playlist.toJsonString());
+            d.show(getFragmentManager(), "playlist");
+            d.updatePlaylist(playlist);
+        }
+    };
 }

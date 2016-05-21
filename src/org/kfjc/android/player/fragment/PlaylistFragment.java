@@ -55,7 +55,7 @@ public class PlaylistFragment extends KfjcFragment {
             return;
         }
         djNameView.setText(emptyDefault(playlist.getDjName()));
-        timestringView.setText(emptyDefault(playlist.getTime()));
+        timestringView.setText(emptyDefault(""+playlist.getTimestampMillis()));
         buildPlaylistLayout(getActivity(), playlistListView, playlist.getTrackEntries());
     }
 

@@ -5,7 +5,7 @@ import java.util.List;
 public interface Playlist {
     boolean hasError();
     String getDjName();
-    String getTime();
+    long getTimestampMillis();
     PlaylistEntry getLastTrackEntry();
     List<PlaylistEntry> getTrackEntries();
     String toJsonString();

@@ -71,8 +71,8 @@ public class PlaylistJsonImpl implements Playlist {
     }
 
     @Override
-    public String getTime() {
-        return DateUtil.roundDownHourFormat(timestampMillis, DateUtil.FORMAT_DELUXE_DATE);
+    public long getTimestampMillis() {
+        return timestampMillis;
     }
 
     @Override

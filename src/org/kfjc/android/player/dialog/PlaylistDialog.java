@@ -22,6 +22,7 @@ import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
+import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
 
@@ -35,6 +36,7 @@ public class PlaylistDialog extends DialogFragment {
     public static final String PLAYLIST_ID_KEY = "playlistIdKey";
     public static final String DJ_NAME_KEY = "djNameKey";
     public static final String TIME_KEY = "timeKey";
+    public static final String JSON_PLAYLIST_KEY = "jsonPlaylistKey";
 
     private TextView djNameView;
     private TextView timestringView;
@@ -43,14 +45,23 @@ public class PlaylistDialog extends DialogFragment {
 
     private String playlistId;
     private String djName;
-    private String time;
+    private long timestamp;
+    private Playlist playlist;
 
-    public static PlaylistDialog newInstance(String djName, String time, String playlistId) {
+    public static PlaylistDialog newInstance(String djName, long timestamp, String playlistId) {
         PlaylistDialog f = new PlaylistDialog();
         Bundle args = new Bundle();
         args.putString(PLAYLIST_ID_KEY, playlistId);
         args.putString(DJ_NAME_KEY, djName);
-        args.putString(TIME_KEY, time);
+        args.putLong(TIME_KEY, timestamp);
+        f.setArguments(args);
+        return f;
+    }
+
+    public static PlaylistDialog newInstance(String playlistJson) {
+        PlaylistDialog f = new PlaylistDialog();
+        Bundle args = new Bundle();
+        args.putString(JSON_PLAYLIST_KEY, playlistJson);
         f.setArguments(args);
         return f;
     }
@@ -58,9 +69,17 @@ public class PlaylistDialog extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        playlistId = getArguments().getString(PLAYLIST_ID_KEY);
-        djName = getArguments().getString(DJ_NAME_KEY);
-        time = getArguments().getString(TIME_KEY);
+        String jsonPlaylist = getArguments().getString(JSON_PLAYLIST_KEY);
+        if (jsonPlaylist != null) {
+            playlist = new PlaylistJsonImpl(jsonPlaylist);
+            djName = playlist.getDjName();
+            timestamp = playlist.getTimestampMillis();
+        } else {
+            playlistId = getArguments().getString(PLAYLIST_ID_KEY);
+            djName = getArguments().getString(DJ_NAME_KEY);
+            timestamp = getArguments().getLong(TIME_KEY);
+        }
+
     }
 
     @Override
@@ -86,7 +105,10 @@ public class PlaylistDialog extends DialogFragment {
         djNameView = (TextView) view.findViewById(R.id.pl_djname);
         djNameView.setText(djName);
         timestringView = (TextView) view.findViewById(R.id.pl_timestring);
-        timestringView.setText(time);
+        if (timestamp > 0L) {
+            String timeString = DateUtil.roundDownHourFormat(timestamp, DateUtil.FORMAT_DELUXE_DATE);
+            timestringView.setText(timeString);
+        }
         playlistListView = (LinearLayout) view.findViewById(R.id.playlist_list_view);
         loadingProgress = (ProgressBar) view.findViewById(R.id.loadingProgress);
 
@@ -98,7 +120,12 @@ public class PlaylistDialog extends DialogFragment {
             }
         });
 
-        loadPlaylist(playlistId);
+        if (playlist != null) {
+            updatePlaylist(playlist);
+        } else {
+            loadPlaylist(playlistId);
+        }
+
         return view;
     }
 
@@ -127,7 +154,6 @@ public class PlaylistDialog extends DialogFragment {
             @Override
             protected void onPostExecute(Playlist playlist) {
                 updatePlaylist(playlist);
-                loadingProgress.setVisibility(View.GONE);
             }
         }.execute();
     }
@@ -136,6 +162,7 @@ public class PlaylistDialog extends DialogFragment {
         if (!isAdded()) {
             return;
         }
+        loadingProgress.setVisibility(View.GONE);
         if (playlist == null || playlist.hasError()) {
             djNameView.setText(R.string.status_playlist_unavailable);
             return;

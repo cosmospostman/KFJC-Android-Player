@@ -70,7 +70,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private View.OnClickListener showPlaylist = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            PlaylistDialog.newInstance(show.getAirName(), show.getTimestampString(), show.getPlaylistId())
+            PlaylistDialog.newInstance(show.getAirName(), show.getTimestamp(), show.getPlaylistId())
                     .show(getFragmentManager(), "playlist");
         }
     };
