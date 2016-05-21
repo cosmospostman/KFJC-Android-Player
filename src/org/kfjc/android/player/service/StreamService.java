@@ -81,7 +81,14 @@ public class StreamService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-                stop();
+                switch (mediaSource.type) {
+                    case ARCHIVE:
+                        pause();
+                        break;
+                    case LIVESTREAM:
+                        stop();
+                        break;
+                }
             }
         }
     };
