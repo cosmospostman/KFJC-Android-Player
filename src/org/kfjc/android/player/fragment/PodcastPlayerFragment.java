@@ -19,7 +19,7 @@ import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.dialog.PlaylistDialog;
 import org.kfjc.android.player.dialog.SettingsDialog;
-import org.kfjc.android.player.model.BroadcastShow;
+import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.model.MediaSource;
@@ -36,7 +36,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     public static final String BROADCAST_SHOW_KEY = "broadcastShowKey";
 
-    private BroadcastShow show;
+    private ShowDetails show;
     private DownloadManager downloadManager;
     private long totalShowTime;
     private long[] segmentBounds;

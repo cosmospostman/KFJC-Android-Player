@@ -1,6 +1,6 @@
 package org.kfjc.android.player.activity;
 
-import org.kfjc.android.player.model.BroadcastShow;
+import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.MediaSource;
 
@@ -20,9 +20,9 @@ public interface HomeScreenInterface {
     void setNavigationItemChecked(int navigationItemId);
     void updateBackground();
     void requestExternalWritePermission();
-    void loadPodcastPlayer(BroadcastShow show, boolean animate);
+    void loadPodcastPlayer(ShowDetails show, boolean animate);
     void loadPodcastListFragment(boolean animate);
-    void registerDownload(long downloadId, BroadcastShow show);
+    void registerDownload(long downloadId, ShowDetails show);
     long getPlayerPosition();
     void seekPlayer(long positionMillis);
     void syncState();

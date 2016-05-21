@@ -6,20 +6,17 @@ import android.util.Log;
 
 import com.google.common.io.Files;
 
-import org.kfjc.android.player.model.BroadcastShow;
+import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.model.Playlist;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 
 public class ExternalStorageUtil {
 
@@ -41,7 +38,7 @@ public class ExternalStorageUtil {
      */
 
     /** Create a directory for an archive show. Return true if successful */
-    public static boolean createShowDir(BroadcastShow show, Playlist playlist) {
+    public static boolean createShowDir(ShowDetails show, Playlist playlist) {
         if (!isExternalStorageWritable()) {
             return false;
         }
@@ -99,15 +96,15 @@ public class ExternalStorageUtil {
         return false;
     }
 
-    public static List<BroadcastShow> getSavedShows() {
-        List<BroadcastShow> shows = new LinkedList<>();
+    public static List<ShowDetails> getSavedShows() {
+        List<ShowDetails> shows = new LinkedList<>();
         File podcastDir = getPodcastDir();
         if (podcastDir.listFiles() == null) {
             return Collections.emptyList();
         }
         for (File f : podcastDir.listFiles()) {
             File index = new File(f, KFJC_INDEX_FILENAME);
-            BroadcastShow show = new BroadcastShow(readFile(index));
+            ShowDetails show = new ShowDetails(readFile(index));
             if (show.hasError()) {
                 Log.i(LOG_TAG, "Show has error");
             } else {
@@ -125,7 +122,7 @@ public class ExternalStorageUtil {
         }
     }
 
-    public static boolean hasAllContent(BroadcastShow show) {
+    public static boolean hasAllContent(ShowDetails show) {
         File podcastDir = getPodcastDir(show.getPlaylistId());
         if (! (new File(podcastDir, KFJC_INDEX_FILENAME).exists())
                 && new File(podcastDir, KFJC_PLAYLIST_FILENAME).exists()) {
@@ -141,7 +138,7 @@ public class ExternalStorageUtil {
         return true;
     }
 
-    public static List<File> getSavedArchivesForShow(BroadcastShow show) {
+    public static List<File> getSavedArchivesForShow(ShowDetails show) {
         List<File> files = new ArrayList<>();
         File podcastDir = getPodcastDir(show.getPlaylistId());
         if (hasAllContent(show)) {

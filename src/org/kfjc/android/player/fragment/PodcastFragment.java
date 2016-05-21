@@ -19,10 +19,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.model.BroadcastArchive;
+import org.kfjc.android.player.model.ShowListBuilder;
 import org.kfjc.android.player.model.BroadcastHour;
 import org.kfjc.android.player.model.BroadcastHourJsonImpl;
-import org.kfjc.android.player.model.BroadcastShow;
+import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
@@ -39,7 +39,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     private RecyclerView recentShowsView;
     private RecyclerView savedShowsView;
     private PodcastRecyclerAdapter recentShowsAdapter;
-    private List<BroadcastShow> shows = Collections.emptyList();
+    private List<ShowDetails> shows = Collections.emptyList();
     private TextView nowPlayingLabel;
     private TextView clockLabel;
     private FloatingActionButton fab;
@@ -101,7 +101,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
                 shows, PodcastRecyclerAdapter.Type.HORIZONTAL, PodcastFragment.this);
         recentShowsView.setAdapter(recentShowsAdapter);
 
-        List<BroadcastShow> savedShows = ExternalStorageUtil.getSavedShows();
+        List<ShowDetails> savedShows = ExternalStorageUtil.getSavedShows();
         PodcastRecyclerAdapter adapter = new PodcastRecyclerAdapter(
                 savedShows, PodcastRecyclerAdapter.Type.VERTICAL, PodcastFragment.this);
         savedShowsView.setAdapter(adapter);
@@ -127,7 +127,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     }
 
     @Override
-    public void onClick(BroadcastShow show) {
+    public void onClick(ShowDetails show) {
         homeScreen.loadPodcastPlayer(show, true);
     }
 
@@ -168,33 +168,33 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         playProgress.setVisibility(View.GONE);
     }
 
-    private class GetArchivesTask extends AsyncTask<Void, Void, List<BroadcastShow>> {
+    private class GetArchivesTask extends AsyncTask<Void, Void, List<ShowDetails>> {
         @Override
-        protected List<BroadcastShow> doInBackground(Void... params) {
-            BroadcastArchive archive = new BroadcastArchive();
+        protected List<ShowDetails> doInBackground(Void... params) {
+            ShowListBuilder archiveBuilder = ShowListBuilder.newInstance();
             try {
                 String archiveJson = HttpUtil.getUrl(Constants.ARCHIVES_URL);
                 JSONArray archiveHours = new JSONArray(archiveJson);
                 for (int i = 0; i < archiveHours.length(); i++) {
                     BroadcastHour hour = new BroadcastHourJsonImpl(archiveHours.getJSONObject(i));
-                    archive.addHour(hour);
+                    archiveBuilder.addHour(hour);
                 }
             } catch (JSONException | IOException e) {}
-            return archive.getShows();
+            return archiveBuilder.build();
         }
 
         @Override
-        protected void onPostExecute(List<BroadcastShow> broadcastShows) {
-            setArchives(broadcastShows);
+        protected void onPostExecute(List<ShowDetails> showDetailses) {
+            setArchives(showDetailses);
         }
     }
 
-    private void setArchives(List<BroadcastShow> broadcastShows) {
-        if (broadcastShows == null || shows != null && shows.equals(broadcastShows)) {
+    private void setArchives(List<ShowDetails> showDetailses) {
+        if (showDetailses == null || shows != null && shows.equals(showDetailses)) {
             Log.i(TAG, "No new shows to add");
             return;
         }
-        shows = broadcastShows;
+        shows = showDetailses;
         recentShowsAdapter = new PodcastRecyclerAdapter(
                 shows, PodcastRecyclerAdapter.Type.HORIZONTAL, PodcastFragment.this);
         recentShowsView.setAdapter(recentShowsAdapter);

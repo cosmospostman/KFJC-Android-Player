@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.model.BroadcastShow;
+import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.util.DateUtil;
 
 import java.text.SimpleDateFormat;
@@ -16,7 +16,7 @@ import java.util.Date;
 public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     public interface PodcastClickDelegate {
-        void onClick(BroadcastShow show);
+        void onClick(ShowDetails show);
     }
 
     private PodcastRecyclerAdapter.Type layoutType;
@@ -26,7 +26,7 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
     private TextView airName;
     private TextView timestamp;
     private PodcastClickDelegate clickDelegate;
-    private BroadcastShow show;
+    private ShowDetails show;
 
     public PodcastViewHolder(View itemView, PodcastClickDelegate clickDelegate,
                              PodcastRecyclerAdapter.Type type) {
@@ -40,7 +40,7 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
         timestamp = (TextView) itemView.findViewById(R.id.timestamp);
     }
 
-    public void setShow(BroadcastShow show) {
+    public void setShow(ShowDetails show) {
         this.show = show;
         int color = getColor(show.getTimestamp());
         if (show.getAirName().toUpperCase().contains("SPLIFF")) {

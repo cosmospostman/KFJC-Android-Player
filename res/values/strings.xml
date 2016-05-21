@@ -73,5 +73,5 @@
         From KFJC: %1$s - %2$s (%3$s)</string>
     <string name="format_archive_file"
         translation_description="DJ name, plus which archive file (of total hours for that show)">
-        %1$s, part %d of %d</string>
+        %1$s, part %2$d of %3$d</string>
 </resources>

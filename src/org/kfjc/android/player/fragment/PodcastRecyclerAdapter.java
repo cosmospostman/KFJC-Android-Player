@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.model.BroadcastShow;
+import org.kfjc.android.player.model.ShowDetails;
 
 import java.util.List;
 
@@ -17,11 +17,11 @@ public class PodcastRecyclerAdapter extends RecyclerView.Adapter<PodcastViewHold
         VERTICAL
     }
 
-    private List<BroadcastShow> shows;
+    private List<ShowDetails> shows;
     private PodcastViewHolder.PodcastClickDelegate clickDelegate;
     private Type layoutType;
 
-    public PodcastRecyclerAdapter(List<BroadcastShow> shows, Type type,
+    public PodcastRecyclerAdapter(List<ShowDetails> shows, Type type,
                                   PodcastViewHolder.PodcastClickDelegate clickDelegate) {
         this.shows = shows;
         this.clickDelegate = clickDelegate;

@@ -26,7 +26,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +42,7 @@ import org.kfjc.android.player.fragment.PlayerFragment;
 import org.kfjc.android.player.fragment.PlaylistFragment;
 import org.kfjc.android.player.fragment.PodcastFragment;
 import org.kfjc.android.player.fragment.PodcastPlayerFragment;
-import org.kfjc.android.player.model.BroadcastShow;
+import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.model.MediaSource;
@@ -93,7 +92,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private ActionBarDrawerToggle drawerToggle;
     private View view;
     private Snackbar snackbar;
-    private Map<Long, BroadcastShow> activeDownloads;
+    private Map<Long, ShowDetails> activeDownloads;
     private boolean askPermissionsAgain = true;
     private long[] segmentBounds;
     private long totalPlayTime;
@@ -405,7 +404,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     }
 
     @Override
-    public void loadPodcastPlayer(BroadcastShow show, boolean animate) {
+    public void loadPodcastPlayer(ShowDetails show, boolean animate) {
         if (activeFragmentId == R.id.nav_podcast_player) {
             return;
         }
@@ -493,7 +492,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
     }
 
-    public void registerDownload(long downloadId, BroadcastShow show) {
+    public void registerDownload(long downloadId, ShowDetails show) {
         activeDownloads.put(downloadId, show);
     }
 

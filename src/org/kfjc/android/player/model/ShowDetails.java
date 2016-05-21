@@ -3,8 +3,6 @@ package org.kfjc.android.player.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.common.collect.Lists;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,10 +10,11 @@ import org.kfjc.android.player.util.DateUtil;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class BroadcastShow implements Parcelable {
+public class ShowDetails implements Parcelable {
 
     private static final String KEY_PLAYLIST_ID = "playlistId";
     private static final String KEY_AIRNAME = "airName";
@@ -24,10 +23,10 @@ public class BroadcastShow implements Parcelable {
     private static final String KEY_PLAYTIME = "playtime";
     private static final String KEY_PADDING = "padding";
 
-    private final String playlistId;
-    private final String airName;
+    private String playlistId;
+    private String airName;
     private long timestamp;
-    private final List<String> urls;
+    private List<String> urls;
     private List<File> files;
     private boolean hasError;
 
@@ -35,18 +34,23 @@ public class BroadcastShow implements Parcelable {
     private long hourPlayTimeMillis;
     private long hourPaddingTimeMillis;
 
-    BroadcastShow(BroadcastHour hour) {
+    ShowDetails(Collection<BroadcastHour> hours) {
         urls = new ArrayList<>();
-        this.playlistId = hour.getPlaylistId();
-        this.airName = hour.getAirName();
-        this.timestamp = hour.getTimestamp();
-        this.hourPaddingTimeMillis = hour.getPaddingTimeMillis();
-        this.hourPlayTimeMillis = hour.getPlayTimeMillis();
-        urls.add(hour.getUrl());
+        for (BroadcastHour hour : hours) {
+            this.playlistId = hour.getPlaylistId();
+            this.airName = hour.getAirName();
+            // Use earliest timestamp as start of show.
+            timestamp = (timestamp == 0)
+                ? hour.getTimestamp()
+                : Math.min(timestamp, hour.getTimestamp());
+            this.hourPaddingTimeMillis = hour.getPaddingTimeMillis();
+            this.hourPlayTimeMillis = hour.getPlayTimeMillis();
+            urls.add(hour.getUrl());
+        }
         Collections.sort(urls);
     }
 
-    public BroadcastShow(String jsonString) {
+    public ShowDetails(String jsonString) {
         // TODO: ripe for a unit test!
         urls = new ArrayList<>();
         String playlistId = "";
@@ -77,7 +81,7 @@ public class BroadcastShow implements Parcelable {
         this.hourPaddingTimeMillis = hourPaddingTime;
     }
 
-    public BroadcastShow(Parcel in) {
+    public ShowDetails(Parcel in) {
         urls = new ArrayList<>();
         playlistId = in.readString();
         airName = in.readString();
@@ -85,18 +89,6 @@ public class BroadcastShow implements Parcelable {
         hourPaddingTimeMillis = in.readLong();
         hourPlayTimeMillis = in.readLong();
         in.readStringList(urls);
-        Collections.sort(urls);
-    }
-
-    void addHour(BroadcastHour hour) {
-        if (!hour.getPlaylistId().equals(playlistId)) {
-            return;
-        }
-        // Use earliest timestamp as start of show.
-        timestamp = Math.min(timestamp, hour.getTimestamp());
-        hourPaddingTimeMillis = hour.getPaddingTimeMillis();
-        hourPlayTimeMillis = hour.getPlayTimeMillis();
-        urls.add(hour.getUrl());
         Collections.sort(urls);
     }
 
@@ -163,12 +155,12 @@ public class BroadcastShow implements Parcelable {
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-        public BroadcastShow createFromParcel(Parcel in) {
-            return new BroadcastShow(in);
+        public ShowDetails createFromParcel(Parcel in) {
+            return new ShowDetails(in);
         }
 
-        public BroadcastShow[] newArray(int size) {
-            return new BroadcastShow[size];
+        public ShowDetails[] newArray(int size) {
+            return new ShowDetails[size];
         }
     };
 
@@ -177,10 +169,10 @@ public class BroadcastShow implements Parcelable {
         if (that == this) {
             return true;
         }
-        if (!(that instanceof BroadcastShow)) {
+        if (!(that instanceof ShowDetails)) {
             return false;
         }
-        BroadcastShow thatShow = (BroadcastShow) that;
+        ShowDetails thatShow = (ShowDetails) that;
 
         return thatShow.playlistId.equals(this.playlistId)
                 && thatShow.airName.equals(this.airName)

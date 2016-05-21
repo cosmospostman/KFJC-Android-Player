@@ -11,7 +11,7 @@ public class MediaSource {
     public final String description;
     public final Format format;
     public final int sequenceNumber;
-    public final BroadcastShow show;
+    public final ShowDetails show;
 
     public MediaSource(Type type, String url, Format format, int sequenceNumber, String name, String description) {
         this.url = url;
@@ -23,7 +23,7 @@ public class MediaSource {
         this.show = null;
     }
 
-    public MediaSource(Type type, String url, Format format, int sequenceNumber, BroadcastShow show) {
+    public MediaSource(Type type, String url, Format format, int sequenceNumber, ShowDetails show) {
         this.url = url;
         this.format = format;
         this.type = type;
