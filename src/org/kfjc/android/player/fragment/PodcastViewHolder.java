@@ -19,6 +19,14 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
         void onClick(ShowDetails show);
     }
 
+    private static final float[] OPACITIES = {
+            1f, 1f, 1f, 1f, 1f, 1f, //12a-5a
+            0.44f, 0.44f, 0.44f, 0.16f, 0.16f, 0.16f, //6-11a
+            0.16f, 0.16f, 0.16f, 0.16f, 0.16f, 0.16f, //12-5p
+            0.58f, 0.72f, 0.86f, 0.86f, 1f, 1f //6-11p
+        };
+
+
     private PodcastRecyclerAdapter.Type layoutType;
 
     private View iconBackground;
@@ -84,10 +92,8 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
     }
 
     private int getColor(long timestamp) {
-        final float[] opacities = {1f, 0.86f, 0.72f, 0.58f, 0.44f, 0.30f, 0.16f, 0.30f, 0.44f, 0.58f, 0.72f, 0.86f};
-        int hour = getClockHour(timestamp) / 2;
-        float alpha = (hour < opacities.length) ? opacities[hour] : 1f;
-        return Color.argb((int)(alpha*255), 46, 52, 54);
+        int hour = getClockHour(timestamp);
+        return Color.argb((int)(OPACITIES[hour]*255), 46, 52, 54);
     }
 
     @Override
