@@ -470,6 +470,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void onBackPressed() {
+        if (activeFragmentId == R.id.nav_podcast_player) {
+            loadPodcastListFragment(true);
+            return;
+        }
         // Don't pop back to no active fragment
         if (getSupportFragmentManager().getBackStackEntryCount() > 1 ){
             getSupportFragmentManager().popBackStack();
