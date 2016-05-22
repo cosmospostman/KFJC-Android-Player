@@ -1,7 +1,9 @@
 package org.kfjc.android.player.util;
 
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.os.StatFs;
 import android.util.Log;
 
 import com.google.common.io.Files;
@@ -139,9 +141,17 @@ public class ExternalStorageUtil {
     }
 
     public static File getSavedArchive(String playlistId, String hourUrl) {
-        List<File> files = new ArrayList<>();
         File podcastDir = getPodcastDir(playlistId);
         String expectedFilename = Uri.parse(hourUrl).getLastPathSegment();
         return new File(podcastDir, expectedFilename);
+    }
+
+    public static boolean bytesAvailable(long forFileSize) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            // Sorry, can't be bothered implementing. Your download might fail.
+            return true;
+        }
+        StatFs stat = new StatFs(getPodcastDir().getPath());
+        return stat.getAvailableBytes() > forFileSize;
     }
 }

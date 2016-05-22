@@ -244,7 +244,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     }
 
     @Override
-    public void requestExternalWritePermission() {
+    public void startDownload() {
         if (!hasWritePermission()) {
             requestAndroidWritePermissions();
         } else {

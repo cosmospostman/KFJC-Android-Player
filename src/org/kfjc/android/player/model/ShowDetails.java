@@ -158,8 +158,8 @@ public class ShowDetails implements Parcelable {
         return timestamp;
     }
 
-    public long getHourPlayTimeMillis() {
-        return hourPlayTimeMillis;
+    public long getTotalFileSizeBytes() {
+        return totalFileSizeBytes;
     }
 
     public long getHourPaddingTimeMillis() {

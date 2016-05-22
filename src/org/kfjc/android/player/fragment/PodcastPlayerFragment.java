@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
+import org.kfjc.android.player.dialog.OfflineDialog;
 import org.kfjc.android.player.dialog.PlaylistDialog;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.ShowDetails;
@@ -81,7 +82,11 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private View.OnClickListener downloadClicklistener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            homeScreen.requestExternalWritePermission();
+            OfflineDialog offlineDialog = OfflineDialog.newInstance(
+                    show.getTotalFileSizeBytes(),
+                    ExternalStorageUtil.hasAllContent(show));
+            offlineDialog.show(getFragmentManager(), "offline");
+
         }
     };
 
