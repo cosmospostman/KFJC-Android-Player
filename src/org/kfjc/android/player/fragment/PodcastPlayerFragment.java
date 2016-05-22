@@ -83,10 +83,16 @@ public class PodcastPlayerFragment extends PlayerFragment {
         @Override
         public void onClick(View v) {
             OfflineDialog offlineDialog = OfflineDialog.newInstance(
+                    show.getPlaylistId(),
                     show.getTotalFileSizeBytes(),
                     ExternalStorageUtil.hasAllContent(show));
+            offlineDialog.setOnDismissListener(new OfflineDialog.OnDismissListener() {
+                @Override
+                public void onDismiss() {
+                    updateDownloadState();
+                }
+            });
             offlineDialog.show(getFragmentManager(), "offline");
-
         }
     };
 
@@ -188,14 +194,11 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     void updateClock() {
         updateClockHelper(homeScreen.getPlayerPosition());
-
     }
 
     private void updateClockHelper(long playerPos) {
         long totalShowTime = homeScreen.getPlayerSource().show.getTotalShowTimeMillis();
-
         podcastDetails.setText(DateUtil.formatTime(playerPos - show.getHourPaddingTimeMillis()));
-
         playtimeSeekBar.setMax((int)totalShowTime/100);
         playtimeSeekBar.setProgress((int)playerPos/100);
     }
@@ -274,12 +277,14 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void setPauseState() {
+        playtimeSeekBar.setEnabled(true);
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
         updateClock();
         displayState = PlayerState.PAUSE;
     }
 
     private void setStopState() {
+        playtimeSeekBar.setEnabled(false);
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
             loadingProgress.setVisibility(View.INVISIBLE);
         handler.removeCallbacks(playClockUpdater);
@@ -287,6 +292,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void setBufferState() {
+        playtimeSeekBar.setEnabled(true);
         loadingProgress.setVisibility(View.VISIBLE);
         fab.setImageResource(R.drawable.ic_stop_white_48dp);
         displayState = PlayerState.PLAY;

@@ -13,7 +13,7 @@
             translation_description="DJ name to show if nobody is signed into spidey">
             George Foothill</string>
     <string name="dialog_podcast_can_download">This show can be saved to your device.</string>
-    <string name="dialog_podcast_is_downloaded">This show is saved to your device for offline playback.</string>
+    <string name="dialog_podcast_is_downloaded">This show is saved on your device.</string>
 
     <string name="empty_string"
             translation_description="No need to translate nothingness">
@@ -51,6 +51,8 @@
         stop playback when your phone is in use. We don\'t snoop!</string>
     <string name="podcast_label_recent_archives">Hot (off the) air</string>
     <string name="podcast_label_saved_archives">Available offline</string>
+    <string name="podcast_delete_warning">You can\'t download this show again if it\'s been more than
+        two weeks since it went to air.</string>
 
     <string name="setting_audio_quality">Live stream audio quality</string>
     <string name="setting_backgrounds">Hourly backgrounds</string>

@@ -82,21 +82,12 @@
         android:visibility="gone"
         android:background="@color/kfjc_transparent_black">
 
-        <ImageView
-            android:id="@+id/expandNowPlaying"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_centerVertical="true"
-            android:background="@drawable/ic_expand_less_white_48dp"/>
-
         <TextView
             android:id="@+id/nowPlayingLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/expandNowPlaying"
+            android:layout_alignParentLeft="true"
             android:padding="4dp"
             android:textSize="18sp"
             android:fontFamily="sans-serif-light"
@@ -108,8 +99,7 @@
             android:layout_height="40dp"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_play_arrow_white_48dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@+id/expandNowPlaying"
             app:fabSize="mini"
             app:backgroundTint="@color/kfjc_red_solid"
             app:rippleColor="@color/kfjc_mute"
@@ -126,6 +116,16 @@
             android:textSize="14sp"
             android:fontFamily="sans-serif-light"
             android:textColor="@color/white" />
+
+        <ImageView
+            android:id="@+id/expandNowPlaying"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="8dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/ic_chevron_right_white_48dp"/>
 
     </RelativeLayout>
 

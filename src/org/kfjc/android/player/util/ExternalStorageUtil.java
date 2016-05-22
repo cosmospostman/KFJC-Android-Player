@@ -89,6 +89,36 @@ public class ExternalStorageUtil {
         return podcastDir;
     }
 
+    public static void deletePodcastDir(String playlistId) {
+        File podcastDir = getPodcastDir(playlistId);
+        deleteRecursively(podcastDir);
+    }
+
+    public static long folderSize(String playlistId) {
+        return folderSize(getPodcastDir(playlistId));
+    }
+
+    private static long folderSize(File directory) {
+        long length = 0;
+        for (File file : directory.listFiles()) {
+            if (file.isFile())
+                length += file.length();
+            else
+                length += folderSize(file);
+        }
+        return length;
+    }
+
+    private static void deleteRecursively(File path) {
+        File[] contents = path.listFiles();
+        if (contents != null) {
+            for (File f : contents) {
+                deleteRecursively(f);
+            }
+        }
+        path.delete();
+    }
+
     /* Checks if external storage is available for read and write */
     static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
