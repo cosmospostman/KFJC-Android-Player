@@ -33,6 +33,8 @@ import java.util.List;
 
 public class SettingsDialog extends KfjcDialog {
 
+    public static final String KEY_ONLY_VOLUME = "onlyVolume";
+
     public interface StreamUrlPreferenceChangeHandler {
         void onStreamUrlPreferenceChange();
     }
@@ -46,37 +48,56 @@ public class SettingsDialog extends KfjcDialog {
     private ContextThemeWrapper themeWrapper;
     private HomeScreenInterface home;
 
+    public static SettingsDialog newInstance(boolean onlyVolume) {
+        Bundle args = new Bundle();
+        args.putBoolean(KEY_ONLY_VOLUME, onlyVolume);
+
+        SettingsDialog fragment = new SettingsDialog();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         previousPreference = PreferenceControl.getStreamPreference();
 
         themeWrapper = new ContextThemeWrapper(getActivity(), R.style.KfjcDialog);
         View view = View.inflate(themeWrapper, R.layout.layout_settings, null);
-
-        spinner = (Spinner) view.findViewById(R.id.streamPreferenceSpinner);
-        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                MediaSource mediaSource = (MediaSource) parent.getItemAtPosition(position);
-                PreferenceControl.setStreamPreference(mediaSource);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-        backgroundSwitch = (SwitchCompat) view.findViewById(R.id.backgroundSwitch);
-        backgroundSwitch.setChecked(PreferenceControl.areBackgroundsEnabled());
-        backgroundSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                PreferenceControl.setEnableBackgrounds(isChecked);
-                home.updateBackground();
-            }
-        });
-
         initVolumeBar(view);
-        initStreamOptions();
+
+        boolean onlyVolumeMode = getArguments().getBoolean(KEY_ONLY_VOLUME, false);
+        if (!onlyVolumeMode) {
+            View divider = view.findViewById(R.id.settingDivider);
+            View quality = view.findViewById(R.id.settingQuality);
+            View backgrounds = view.findViewById(R.id.settingBackgrounds);
+            divider.setVisibility(View.VISIBLE);
+            quality.setVisibility(View.VISIBLE);
+            backgrounds.setVisibility(View.VISIBLE);
+
+            spinner = (Spinner) view.findViewById(R.id.streamPreferenceSpinner);
+            spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    MediaSource mediaSource = (MediaSource) parent.getItemAtPosition(position);
+                    PreferenceControl.setStreamPreference(mediaSource);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+            backgroundSwitch = (SwitchCompat) view.findViewById(R.id.backgroundSwitch);
+            backgroundSwitch.setChecked(PreferenceControl.areBackgroundsEnabled());
+            backgroundSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    PreferenceControl.setEnableBackgrounds(isChecked);
+                    home.updateBackground();
+                }
+            });
+
+            initStreamOptions();
+        }
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity(), R.style.KfjcDialog);
         dialog.setView(view);

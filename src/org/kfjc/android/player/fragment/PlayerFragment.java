@@ -1,10 +1,13 @@
 package org.kfjc.android.player.fragment;
 
 import android.os.Handler;
+import android.util.Log;
 
 import org.kfjc.android.player.model.MediaSource;
 
 public abstract class PlayerFragment extends KfjcFragment {
+
+    private static final String TAG = PlayerFragment.class.getSimpleName();
 
     protected PlayerState playerState;
     protected PlayerState displayState;
@@ -16,14 +19,6 @@ public abstract class PlayerFragment extends KfjcFragment {
         PAUSE,
         STOP,
         BUFFER
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (playerState != null && playerSource != null) {
-            onStateChanged(playerState, playerSource);
-        }
     }
 
     @Override
@@ -44,8 +39,12 @@ public abstract class PlayerFragment extends KfjcFragment {
 
     protected Runnable playClockUpdater = new Runnable() {
         @Override public void run() {
-            updateClock();
-            handler.postDelayed(this, 1000);
+            if (isAdded()) {
+                updateClock();
+                handler.postDelayed(this, 1000);
+            } else {
+                Log.i(TAG, "Not updating clock (not added)");
+            }
         }
     };
 

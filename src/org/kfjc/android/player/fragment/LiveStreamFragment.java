@@ -122,11 +122,12 @@ public class LiveStreamFragment extends PlayerFragment {
     }
 
     private void showSettings() {
-        SettingsDialog settingsDialog = new SettingsDialog();
+        SettingsDialog settingsDialog = SettingsDialog.newInstance(false);
         settingsDialog.setUrlPreferenceChangeHandler(
                 new SettingsDialog.StreamUrlPreferenceChangeHandler() {
             @Override public void onStreamUrlPreferenceChange() {
-                if (homeScreen.isStreamServicePlaying()) {
+                if (MediaSource.Type.LIVESTREAM == homeScreen.getPlayerSource().type
+                        && homeScreen.isStreamServicePlaying()) {
                     homeScreen.restartStream();
                 }
             }
@@ -144,6 +145,7 @@ public class LiveStreamFragment extends PlayerFragment {
                     setStopState();
                 }
                 break;
+            case PAUSE:
             case STOP:
                 setStopState();
                 break;

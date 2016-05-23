@@ -106,6 +106,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
                 savedShows, PodcastRecyclerAdapter.Type.VERTICAL, PodcastFragment.this);
         savedShowsView.setAdapter(adapter);
         setArchives(shows);
+        homeScreen.syncState();
 
         new GetArchivesTask().execute();
     }

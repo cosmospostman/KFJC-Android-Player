@@ -68,7 +68,6 @@ public class StreamService extends Service {
     private ExoPlayer player;
     private boolean becomingNoisyReceiverRegistered = false;
     private boolean onControlReceiverRegistered = false;
-    private boolean isPaused = false;
 
     private int activeSourceNumber = -1;
 
@@ -135,7 +134,7 @@ public class StreamService extends Service {
             return PlayerFragment.PlayerState.BUFFER;
         }
         if (player.getPlaybackState() == ExoPlayer.STATE_READY) {
-            return isPaused
+            return isPaused()
                     ? PlayerFragment.PlayerState.PAUSE
                     : PlayerFragment.PlayerState.PLAY;
         }
@@ -147,6 +146,11 @@ public class StreamService extends Service {
                player.getPlaybackState() == ExoPlayer.STATE_READY ||
                player.getPlaybackState() == ExoPlayer.STATE_BUFFERING);
 	}
+
+    private boolean isPaused() {
+        return player.getPlaybackState() == ExoPlayer.STATE_READY
+                && !player.getPlayWhenReady();
+    }
 
 	public void setMediaEventListener(MediaListener listener) {
 		this.mediaListener = listener;
@@ -206,17 +210,15 @@ public class StreamService extends Service {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
         notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_UNPAUSE));
-        isPaused = true;
     }
 
     public void unpause() {
-        if (isPaused) {
+        if (isPaused()) {
             Log.i(TAG, "Unpausing");
             player.setPlayWhenReady(true);
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
             notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_PAUSE));
-            isPaused = false;
             return;
         }
     }
@@ -326,6 +328,9 @@ public class StreamService extends Service {
     }
 
     public long getPlayerPosition() {
+        if (mediaSource.show == null) {
+            return 0;
+        }
         long segmentOffset = (activeSourceNumber == 0)
                 ? 0 : mediaSource.show.getSegmentBounds()[activeSourceNumber - 1];
         long extra = (activeSourceNumber == 0)

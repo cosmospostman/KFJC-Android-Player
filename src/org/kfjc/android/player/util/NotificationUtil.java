@@ -75,6 +75,7 @@ public class NotificationUtil {
     }
 
     public static Notification kfjcNotification(Context context, String title, String text, String action) {
+        // TODO: make bitmap resources once
         Intent i = new Intent(context, HomeScreenDrawerActivity.class);
         i.putExtra(HomeScreenDrawerActivity.INTENT_FROM_NOTIFICATION, true);
         PendingIntent kfjcPlayerIntent = PendingIntent.getActivity(

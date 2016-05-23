@@ -2,12 +2,10 @@ package org.kfjc.android.player.fragment;
 
 import android.app.DownloadManager;
 import android.content.Context;
-import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,10 +21,10 @@ import org.kfjc.android.player.R;
 import org.kfjc.android.player.dialog.OfflineDialog;
 import org.kfjc.android.player.dialog.PlaylistDialog;
 import org.kfjc.android.player.dialog.SettingsDialog;
-import org.kfjc.android.player.model.ShowDetails;
+import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
-import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
@@ -67,7 +65,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private View.OnClickListener settingsButtonClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            SettingsDialog settingsFragment = new SettingsDialog();
+            SettingsDialog settingsFragment = SettingsDialog.newInstance(true);
             settingsFragment.show(getFragmentManager(), "settings");        }
     };
 
@@ -159,6 +157,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
             bottomControls.setVisibility(View.VISIBLE);
             loadingProgress.setVisibility(View.INVISIBLE);
         }
+        homeScreen.syncState();
     }
 
     private void updateDownloadState() {
@@ -251,6 +250,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         switch (state) {
             case PLAY:
                 if (source.type == MediaSource.Type.ARCHIVE
+                        && show != null
                         && source.show.getPlaylistId().equals(show.getPlaylistId())) {
                     setPlayState();
                 } else {
@@ -258,7 +258,12 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 }
                 break;
             case PAUSE:
-                setPauseState();
+                if (source.type == MediaSource.Type.ARCHIVE
+                        && source.show.getPlaylistId().equals(show.getPlaylistId())) {
+                    setPauseState();
+                } else {
+                    setStopState();
+                }
                 break;
             case STOP:
                 setStopState();
