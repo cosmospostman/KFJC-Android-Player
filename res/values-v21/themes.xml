@@ -4,6 +4,11 @@
     <style name="KfjcCompat" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@color/black</item>
         <item name="android:statusBarColor">@color/kfjc_transparent_black</item>
+
+        <item name="android:textColor">@android:color/black</item>
+        <item name="colorPrimary">@color/kfjc_red_solid</item>
+        <item name="colorPrimaryDark">@color/kfjc_transparent_black</item>
+        <item name="colorAccent">@color/kfjc_red_solid</item>
     </style>
 
 </resources>

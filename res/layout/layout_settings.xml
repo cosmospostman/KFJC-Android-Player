@@ -8,6 +8,7 @@
     android:paddingTop="24dp" >
 
     <RelativeLayout
+		android:id="@+id/settingVolume"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 		<ImageView
@@ -25,12 +26,16 @@
 	</RelativeLayout>
 
 	<View
+		android:id="@+id/settingDivider"
+        android:visibility="gone"
 		android:layout_width="match_parent"
 		android:layout_marginTop="16dp"
 		android:layout_height="0.5dp"
 		android:background="@color/kfjc_divider"/>
 
 	<RelativeLayout
+		android:id="@+id/settingQuality"
+        android:visibility="gone"
 		android:layout_marginTop="16dp"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
@@ -48,6 +53,8 @@
 	</RelativeLayout>
 
 	<RelativeLayout
+		android:id="@+id/settingBackgrounds"
+        android:visibility="gone"
 		android:layout_marginTop="8dp"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
@@ -63,7 +70,5 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"/>
 	</RelativeLayout>
-
-
 
 </LinearLayout>

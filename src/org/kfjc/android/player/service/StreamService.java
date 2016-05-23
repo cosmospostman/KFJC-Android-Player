@@ -1,6 +1,7 @@
 package org.kfjc.android.player.service;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -24,26 +25,35 @@ import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
 import org.kfjc.android.player.Constants;
-import org.kfjc.android.player.fragment.LiveStreamFragment;
-import org.kfjc.android.player.model.Stream;
+import org.kfjc.android.player.fragment.PlayerFragment;
+import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.util.NotificationUtil;
 
+import java.io.File;
+import java.util.List;
+
 public class StreamService extends Service {
+
+    public static final String INTENT_CONTROL = "controlIntent";
+    public static final String INTENT_CONTROL_ACTION = "controlIntentAction";
+    public static final String INTENT_STOP = "action_stop";
+    public static final String INTENT_PAUSE = "action_pause";
+    public static final String INTENT_UNPAUSE = "action_unpause";
 
     private static final String TAG = StreamService.class.getSimpleName();
     private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
     private static final int BUFFER_SEGMENT_COUNT = 256;
     private static final IntentFilter becomingNoisyIntentFilter =
             new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+    private static final IntentFilter onStopIntentFilter =
+            new IntentFilter(INTENT_CONTROL);
 
     private static final int MIN_BUFFER_MS = 5000;
     private static final int MIN_REBUFFER_MS = 5000;
 
     public interface MediaListener {
-        void onBuffer();
-        void onPlay();
+        void onStateChange(PlayerFragment.PlayerState state, MediaSource source);
         void onError(String message);
-        void onEnd();
     }
 
 	public class LiveStreamBinder extends Binder {
@@ -52,10 +62,14 @@ public class StreamService extends Service {
 		}
 	}
 
+    private MediaSource mediaSource;
 	private MediaListener mediaListener;
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
     private ExoPlayer player;
     private boolean becomingNoisyReceiverRegistered = false;
+    private boolean onControlReceiverRegistered = false;
+
+    private int activeSourceNumber = -1;
 
     /**
      * The Becoming Noisy broadcast intent is sent when audio output hardware changes, perhaps
@@ -66,7 +80,29 @@ public class StreamService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-                stop();
+                switch (mediaSource.type) {
+                    case ARCHIVE:
+                        pause();
+                        break;
+                    case LIVESTREAM:
+                        stop();
+                        break;
+                }
+            }
+        }
+    };
+
+    private BroadcastReceiver onControlReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (INTENT_CONTROL.equals(intent.getAction())) {
+                if (INTENT_STOP.equals(intent.getStringExtra(INTENT_CONTROL_ACTION))) {
+                    stop();
+                } else if (INTENT_PAUSE.equals(intent.getStringExtra(INTENT_CONTROL_ACTION))) {
+                    pause();
+                } else if (INTENT_UNPAUSE.equals(intent.getStringExtra(INTENT_CONTROL_ACTION))) {
+                    unpause();
+                }
             }
         }
     };
@@ -90,17 +126,19 @@ public class StreamService extends Service {
         }
     }
 
-    public LiveStreamFragment.PlayerState getPlayerState() {
+    public PlayerFragment.PlayerState getPlayerState() {
         if (player == null) {
-            return LiveStreamFragment.PlayerState.STOP;
+            return PlayerFragment.PlayerState.STOP;
         }
         if (player.getPlaybackState() == ExoPlayer.STATE_BUFFERING) {
-            return LiveStreamFragment.PlayerState.BUFFER;
+            return PlayerFragment.PlayerState.BUFFER;
         }
         if (player.getPlaybackState() == ExoPlayer.STATE_READY) {
-            return LiveStreamFragment.PlayerState.PLAY;
+            return isPaused()
+                    ? PlayerFragment.PlayerState.PAUSE
+                    : PlayerFragment.PlayerState.PLAY;
         }
-        return LiveStreamFragment.PlayerState.STOP;
+        return PlayerFragment.PlayerState.STOP;
     }
 
     public boolean isPlaying() {
@@ -109,21 +147,37 @@ public class StreamService extends Service {
                player.getPlaybackState() == ExoPlayer.STATE_BUFFERING);
 	}
 
+    private boolean isPaused() {
+        return player.getPlaybackState() == ExoPlayer.STATE_READY
+                && !player.getPlayWhenReady();
+    }
+
 	public void setMediaEventListener(MediaListener listener) {
 		this.mediaListener = listener;
 	}
 
-    public void play(Context context, Stream stream) {
-        String streamUrl = stream.url;
+    public void play(MediaSource mediaSource) {
+        this.mediaSource = mediaSource;
+        stop();
+        if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
+            Notification n = NotificationUtil.bufferingNotification(getApplicationContext());
+            startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
+            play(mediaSource.url);
+        } else if (mediaSource.type == MediaSource.Type.ARCHIVE) {
+            startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_PAUSE));
+            activeSourceNumber = -1;
+            playArchiveHour(0);
+        }
+    }
+
+    private void play(String streamUrl) {
         Log.i(TAG, "Playing stream " + streamUrl);
-        player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
-        player.addListener(exoPlayerListener);
-
-        Notification n = NotificationUtil.bufferingNotification(context);
-        startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
-
+        if (player == null) {
+            player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
+            player.addListener(exoPlayerListener);
+        }
         Extractor extractor = null;
-        switch (stream.format) {
+        switch (mediaSource.format) {
             case AAC:
                 extractor = new AdtsExtractor();
                 break;
@@ -133,7 +187,7 @@ public class StreamService extends Service {
         }
         ExtractorSampleSource sampleSource = new ExtractorSampleSource(
                 Uri.parse(streamUrl),
-                new DefaultUriDataSource(context, Constants.USER_AGENT),
+                new DefaultUriDataSource(getApplicationContext(), Constants.USER_AGENT),
                 new DefaultAllocator(BUFFER_SEGMENT_SIZE),
                 BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE,
                 5,
@@ -146,22 +200,61 @@ public class StreamService extends Service {
         player.setPlayWhenReady(true);
     }
 
-	public void stop() {
+    private Notification buildNotification(String action) {
+        return NotificationUtil.kfjcNotification(
+                this, mediaSource.show.getAirName(), mediaSource.show.getTimestampString(), action);
+    }
+
+    public void pause() {
+        player.setPlayWhenReady(false);
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
+        notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_UNPAUSE));
+    }
+
+    public void unpause() {
+        if (isPaused()) {
+            Log.i(TAG, "Unpausing");
+            player.setPlayWhenReady(true);
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
+            notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_PAUSE));
+            return;
+        }
+    }
+
+    public void stop() {
+        stop(true);
+	}
+
+    private void stop(boolean alsoReset) {
         if (player != null) {
             player.stop();
-            mediaListener.onEnd();
+            Log.i(TAG, "Player stopped");
+        }
+        if (alsoReset) {
+            reset();
+        }
+    }
+
+    private void reset() {
+        if (player != null) {
+            player.release();
+            player = null;
+            mediaListener.onStateChange(PlayerFragment.PlayerState.STOP, mediaSource);
         }
         unregisterReceivers();
         becomingNoisyReceiverRegistered = false;
+        onControlReceiverRegistered = false;
         stopForeground(true);
         Log.i(TAG, "Service stopped");
-	}
+    }
 
-    public void reload(Context context, Stream stream) {
+    public void reload(MediaSource mediaSource) {
         if (player != null) {
             player.stop();
         }
-        play(context, stream);
+        play(mediaSource);
     }
 
     private void unregisterReceivers() {
@@ -172,6 +265,11 @@ public class StreamService extends Service {
         } catch (IllegalArgumentException e) {
             // receiver was already unregistered.
         }
+        try {
+            if (onControlReceiverRegistered) {
+                unregisterReceiver(onControlReceiver);
+            }
+        } catch (IllegalArgumentException e) {}
     }
 
     private ExoPlayer.Listener exoPlayerListener = new ExoPlayer.Listener() {
@@ -180,22 +278,27 @@ public class StreamService extends Service {
             switch (state) {
                 case ExoPlayer.STATE_READY:
                     if (playWhenReady) {
-                        mediaListener.onPlay();
+                        mediaListener.onStateChange(PlayerFragment.PlayerState.PLAY, mediaSource);
                         registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
+                        registerReceiver(onControlReceiver, onStopIntentFilter);
                         becomingNoisyReceiverRegistered = true;
+                        onControlReceiverRegistered = true;
+                    } else {
+                         mediaListener.onStateChange(PlayerFragment.PlayerState.PAUSE, mediaSource);
                     }
                     break;
                 case ExoPlayer.STATE_PREPARING:
-                    mediaListener.onBuffer();
+                    mediaListener.onStateChange(PlayerFragment.PlayerState.BUFFER, mediaSource);
                     break;
                 case ExoPlayer.STATE_BUFFERING:
                     if (!isPlaying()) {
-                        mediaListener.onBuffer();
+                        mediaListener.onStateChange(PlayerFragment.PlayerState.BUFFER, mediaSource);
                     }
                     break;
                 case ExoPlayer.STATE_ENDED:
-                    mediaListener.onEnd();
+                    mediaListener.onStateChange(PlayerFragment.PlayerState.STOP, mediaSource);
                     unregisterReceivers();
+                    playNextArchiveHour();
                     break;
                 case ExoPlayer.STATE_IDLE:
                     break;
@@ -212,4 +315,65 @@ public class StreamService extends Service {
         }
     };
 
+    /**
+     * @return true if a next hour was started.
+     */
+    private boolean playNextArchiveHour() {
+        if (mediaSource.show.getUrls().size() > activeSourceNumber) {
+            playArchiveHour(activeSourceNumber + 1);
+            seek(2 * mediaSource.show.getHourPaddingTimeMillis());
+            return true;
+        }
+        return false;
+    }
+
+    public long getPlayerPosition() {
+        if (mediaSource.show == null) {
+            return 0;
+        }
+        long segmentOffset = (activeSourceNumber == 0)
+                ? 0 : mediaSource.show.getSegmentBounds()[activeSourceNumber - 1];
+        long extra = (activeSourceNumber == 0)
+                ? 0 : mediaSource.show.getHourPaddingTimeMillis();
+        return player.getCurrentPosition() + segmentOffset - extra;
+    }
+
+    public void seek(long positionMillis) {
+        player.seekTo(positionMillis);
+    }
+
+    public MediaSource getSource() {
+        return mediaSource;
+    }
+
+    public void seekOverEntireShow(long seekToMillis) {
+        long[] segmentBounds = mediaSource.show.getSegmentBounds();
+        for (int i = 0; i < segmentBounds.length; i++) {
+            if (seekToMillis < segmentBounds[i]) {
+                // load segment i
+                playArchiveHour(i);
+                //seek to adjusted position
+                long thisSegmentStart = (i == 0) ? 0 : segmentBounds[i-1];
+                long extraSeek = (i == 0) ? 0 : mediaSource.show.getHourPaddingTimeMillis();
+                long localSeekTo = seekToMillis - thisSegmentStart + extraSeek;
+                seek(localSeekTo);
+                return;
+            }
+        }
+    }
+
+    private void playArchiveHour(int hour) {
+        if (activeSourceNumber == hour) {
+            return;
+        }
+        activeSourceNumber = hour;
+        File expectedSavedHour = mediaSource.show.getSavedHourUrl(hour);
+        stop(false);
+        if (expectedSavedHour.exists()) {
+            play(expectedSavedHour.getPath());
+        } else {
+            play(mediaSource.show.getUrls().get(hour));
+        }
+        seek(mediaSource.show.getHourPaddingTimeMillis());
+    }
 }

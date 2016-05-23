@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">
-            KFJC</string>
+
+    <string name="action_pause">Pause</string>
+    <string name="action_play">Play</string>
+    <string name="action_stop">Stop</string>
+    <string name="app_name">KFJC</string>
+
+    <string name="button_close">Close</string>
+    <string name="button_download">Download</string>
+    <string name="button_delete">Delete</string>
 
     <string name="default_dj_name"
             translation_description="DJ name to show if nobody is signed into spidey">
             George Foothill</string>
+    <string name="dialog_podcast_can_download">This show can be saved to your device.</string>
+    <string name="dialog_podcast_is_downloaded">This show is saved on your device.</string>
 
     <string name="empty_string"
             translation_description="No need to translate nothingness">
@@ -25,17 +34,29 @@
             translation_description="UI title for the playlist screen">
             Playlist</string>
 
-    <string name="nav_item_livestream">Live stream</string>
-    <string name="nav_item_playlists">Playlist</string>
-    <string name="navigation_drawer_title">KFJC Radio</string>
+    <string name="fragment_title_podcast"
+        translation_description="UI title for the podcast screen">
+            On Demand</string>
+
+    <string name="lava_download">Downloading Lava&#8230;</string>
+    <string name="lava_download_format">Downloading Lava (%1$sMB)&#8230;</string>
+
+    <string name="nav_livestream">Live stream</string>
+    <string name="nav_playlists">Playlist</string>
+    <string name="nav_podcast">On Demand</string>
     <string name="navigation_drawer_open">Open navigation</string>
     <string name="navigation_drawer_close">Close navigation</string>
+    <string name="navigation_drawer_title">KFJC Radio</string>
 
     <string name="permission_phone_title">Phone permissions</string>
     <string name="permission_phone_rationale">KFJC only uses phone permissions to automatically
         stop playback when your phone is in use. We don\'t snoop!</string>
+    <string name="podcast_label_recent_archives">Hot (off the) air</string>
+    <string name="podcast_label_saved_archives">Available offline</string>
+    <string name="podcast_delete_warning">You can\'t download this show again if it\'s been more than
+        two weeks since it went to air.</string>
 
-    <string name="setting_audio_quality">Audio quality</string>
+    <string name="setting_audio_quality">Live stream audio quality</string>
     <string name="setting_backgrounds">Hourly backgrounds</string>
     <string name="status_connecting">Connecting to KFJC...</string>
     <string name="status_default_stream">Using default stream</string>
@@ -54,7 +75,20 @@
     <string name="format_artist_track"
             translation_description="String combining artist (%1s) and track (%2$s)">
          	%1$s - %2$s</string>
+
+    <string name="format_file_size_download"
+        translation_description="File size used">
+         	%1$sMb download</string>
+    <string name="format_file_size_download_no_space"
+        translation_description="File size used">
+         	%1$sMb download (Not enough space on device)</string>
+    <string name="format_file_size_saved"
+        translation_description="File size used">
+         	%1$sMb of device storage used</string>
     <string name="format_share_track_details"
         translation_description="String for sharing, combining artist (%1s), track (%2$s) and album (%3$s)">
         From KFJC: %1$s - %2$s (%3$s)</string>
+    <string name="format_archive_file"
+        translation_description="DJ name, plus which archive file (of total hours for that show)">
+        %1$s, part %2$d of %3$d</string>
 </resources>

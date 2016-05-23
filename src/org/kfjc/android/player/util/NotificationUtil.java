@@ -5,24 +5,27 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.text.TextUtils;
 
 import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.R;
+import org.kfjc.android.player.service.StreamService;
 
 public class NotificationUtil {
 
     public static final int KFJC_NOTIFICATION_ID = 1;
 
     private Context context;
-    private NotificationManager notificationManager;
+    private static NotificationManager notificationManager;
 
     public NotificationUtil(Context context) {
         this.context = context;
-        this.notificationManager = (NotificationManager)
+        notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
@@ -34,11 +37,13 @@ public class NotificationUtil {
             cancelNowPlayNotification();
             postNotification(
                     context.getString(R.string.app_name),
-                    context.getString(R.string.empty_string));
+                    context.getString(R.string.empty_string),
+                    StreamService.INTENT_STOP);
         } else {
             postNotification(
                     playlist.getDjName(),
-                    artistTrackStringNotification(playlist.getLastTrackEntry()));
+                    artistTrackStringNotification(playlist.getLastTrackEntry()),
+                    StreamService.INTENT_STOP);
         }
     }
 
@@ -65,29 +70,56 @@ public class NotificationUtil {
         return kfjcNotification(context,
                 context.getString(R.string.app_name),
                 context.getString(R.string.format_buffering,
-                        PreferenceControl.getStreamPreference().name));
+                        PreferenceControl.getStreamPreference().description),
+                StreamService.INTENT_STOP);
     }
 
-    public static Notification kfjcNotification(Context context, String title, String text) {
+    public static Notification kfjcNotification(Context context, String title, String text, String action) {
+        // TODO: make bitmap resources once
+        Intent i = new Intent(context, HomeScreenDrawerActivity.class);
+        i.putExtra(HomeScreenDrawerActivity.INTENT_FROM_NOTIFICATION, true);
         PendingIntent kfjcPlayerIntent = PendingIntent.getActivity(
-                context, 0,
-                new Intent(context, HomeScreenDrawerActivity.class),
-                Notification.FLAG_ONGOING_EVENT);
+                context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        return new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_kfjc_notification)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setOngoing(true)
-                .setWhen(0)
-                .setContentIntent(kfjcPlayerIntent)
-                .setPriority(Notification.PRIORITY_HIGH)
-                .build();
+        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.radiodevil);
+        Notification.Builder builder = new Notification.Builder(context)
+            .setSmallIcon(R.drawable.ic_kfjc_notification)
+            .setLargeIcon(icon)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setOngoing(true)
+            .setWhen(0)
+            .setContentIntent(kfjcPlayerIntent)
+            .setPriority(Notification.PRIORITY_HIGH);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (action.equals(StreamService.INTENT_STOP)) {
+                // Should instead build action with Icon.fromResource (but only for Api 23+)
+                builder.addAction(R.drawable.ic_stop_white_48dp,
+                        context.getString(R.string.action_stop), buildControlIntent(context, action));
+            } else if (action.equals(StreamService.INTENT_PAUSE)) {
+                builder.addAction(R.drawable.ic_pause_white_48dp,
+                        context.getString(R.string.action_pause), buildControlIntent(context, action));
+            } else if (action.equals(StreamService.INTENT_UNPAUSE)) {
+                builder.addAction(R.drawable.ic_play_arrow_white_48dp,
+                        context.getString(R.string.action_play), buildControlIntent(context, action));
+            }
+            builder.setVisibility(Notification.VISIBILITY_PUBLIC)
+            .setStyle(new Notification.MediaStyle()
+                .setShowActionsInCompactView(0));
+        }
+        return builder.build();
     }
 
-    public void postNotification(String title, String text) {
+    private static PendingIntent buildControlIntent(Context context, String action) {
+        Intent stopIntent = new Intent(StreamService.INTENT_CONTROL);
+        stopIntent.putExtra(StreamService.INTENT_CONTROL_ACTION, action);
+        return PendingIntent.getBroadcast(context, 0, stopIntent,
+                PendingIntent.FLAG_ONE_SHOT|PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    public void postNotification(String title, String text, String action) {
         notificationManager.notify(
-                KFJC_NOTIFICATION_ID, kfjcNotification(context, title, text));
+                KFJC_NOTIFICATION_ID, kfjcNotification(context, title, text, action));
     }
 
     public void cancelNowPlayNotification() {

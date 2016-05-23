@@ -25,7 +25,7 @@ public class EventHandlerFactory {
 				switch (focusChange) {
 				case AudioManager.AUDIOFOCUS_LOSS:
                     volumeBeforeLoss = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                    control.stopStream();
+                    control.stopPlayer();
 					audioManager.abandonAudioFocus(this);
 					break;
 				case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
@@ -62,7 +62,7 @@ public class EventHandlerFactory {
                     case TelephonyManager.CALL_STATE_RINGING:
                     case TelephonyManager.CALL_STATE_OFFHOOK:
                         if (control.isStreamServicePlaying()) {
-                            control.stopStream();
+                            control.stopPlayer();
                             isStoppedDueToPhone = true;
                         }
                         break;

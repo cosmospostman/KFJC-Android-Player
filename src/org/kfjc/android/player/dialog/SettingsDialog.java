@@ -27,11 +27,13 @@ import android.widget.TextView;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.control.PreferenceControl;
-import org.kfjc.android.player.model.Stream;
+import org.kfjc.android.player.model.MediaSource;
 
 import java.util.List;
 
 public class SettingsDialog extends KfjcDialog {
+
+    public static final String KEY_ONLY_VOLUME = "onlyVolume";
 
     public interface StreamUrlPreferenceChangeHandler {
         void onStreamUrlPreferenceChange();
@@ -41,10 +43,19 @@ public class SettingsDialog extends KfjcDialog {
     private AudioManager audioManager;
     private Spinner spinner;
     private SwitchCompat backgroundSwitch;
-    private Stream previousPreference;
+    private MediaSource previousPreference;
     private StreamUrlPreferenceChangeHandler urlPreferenceChangeHandler;
     private ContextThemeWrapper themeWrapper;
     private HomeScreenInterface home;
+
+    public static SettingsDialog newInstance(boolean onlyVolume) {
+        Bundle args = new Bundle();
+        args.putBoolean(KEY_ONLY_VOLUME, onlyVolume);
+
+        SettingsDialog fragment = new SettingsDialog();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -52,31 +63,41 @@ public class SettingsDialog extends KfjcDialog {
 
         themeWrapper = new ContextThemeWrapper(getActivity(), R.style.KfjcDialog);
         View view = View.inflate(themeWrapper, R.layout.layout_settings, null);
-
-        spinner = (Spinner) view.findViewById(R.id.streamPreferenceSpinner);
-        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Stream stream = (Stream) parent.getItemAtPosition(position);
-                PreferenceControl.setStreamPreference(stream);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-        backgroundSwitch = (SwitchCompat) view.findViewById(R.id.backgroundSwitch);
-        backgroundSwitch.setChecked(PreferenceControl.areBackgroundsEnabled());
-        backgroundSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                PreferenceControl.setEnableBackgrounds(isChecked);
-                home.updateBackground();
-            }
-        });
-
         initVolumeBar(view);
-        initStreamOptions();
+
+        boolean onlyVolumeMode = getArguments().getBoolean(KEY_ONLY_VOLUME, false);
+        if (!onlyVolumeMode) {
+            View divider = view.findViewById(R.id.settingDivider);
+            View quality = view.findViewById(R.id.settingQuality);
+            View backgrounds = view.findViewById(R.id.settingBackgrounds);
+            divider.setVisibility(View.VISIBLE);
+            quality.setVisibility(View.VISIBLE);
+            backgrounds.setVisibility(View.VISIBLE);
+
+            spinner = (Spinner) view.findViewById(R.id.streamPreferenceSpinner);
+            spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    MediaSource mediaSource = (MediaSource) parent.getItemAtPosition(position);
+                    PreferenceControl.setStreamPreference(mediaSource);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+            backgroundSwitch = (SwitchCompat) view.findViewById(R.id.backgroundSwitch);
+            backgroundSwitch.setChecked(PreferenceControl.areBackgroundsEnabled());
+            backgroundSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    PreferenceControl.setEnableBackgrounds(isChecked);
+                    home.updateBackground();
+                }
+            });
+
+            initStreamOptions();
+        }
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity(), R.style.KfjcDialog);
         dialog.setView(view);
@@ -107,11 +128,11 @@ public class SettingsDialog extends KfjcDialog {
     }
 
     private void initStreamOptions() {
-        List<Stream> streams = PreferenceControl.getStreams();
+        List<MediaSource> mediaSources = PreferenceControl.getMediaSources();
         StreamAdapter streamAdapter = new StreamAdapter(
-                themeWrapper, android.R.layout.simple_spinner_item, streams);
+                themeWrapper, android.R.layout.simple_spinner_item, mediaSources);
         spinner.setAdapter(streamAdapter);
-        int selectedIndex = streams.indexOf(PreferenceControl.getStreamPreference());
+        int selectedIndex = mediaSources.indexOf(PreferenceControl.getStreamPreference());
         spinner.setSelection(Math.max(0, selectedIndex));
     }
 
@@ -132,8 +153,7 @@ public class SettingsDialog extends KfjcDialog {
             }
 
             @Override
-            public void onProgressChanged(
-                    SeekBar arg0, int progress, boolean arg2) {
+            public void onProgressChanged(SeekBar arg0, int progress, boolean arg2) {
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
             }
         });
@@ -151,13 +171,13 @@ public class SettingsDialog extends KfjcDialog {
                 android.provider.Settings.System.CONTENT_URI, true, mSettingsContentObserver);
     }
 
-    private class StreamAdapter extends ArrayAdapter<Stream> {
-        private List<Stream> streams;
+    private class StreamAdapter extends ArrayAdapter<MediaSource> {
+        private List<MediaSource> mediaSources;
         private Context context;
-        public StreamAdapter(Context context, int resource, List<Stream> streams) {
-            super(context, resource, streams);
+        public StreamAdapter(Context context, int resource, List<MediaSource> mediaSources) {
+            super(context, resource, mediaSources);
             this.context = context;
-            this.streams = streams;
+            this.mediaSources = mediaSources;
         }
 
         @Override
@@ -165,7 +185,7 @@ public class SettingsDialog extends KfjcDialog {
             View view = LayoutInflater.from(context).inflate(
                     android.R.layout.simple_spinner_item, parent, false);
             TextView streamName = (TextView) view.findViewById(android.R.id.text1);
-            streamName.setText(streams.get(position).name);
+            streamName.setText(mediaSources.get(position).name);
             return view;
         }
 
@@ -175,8 +195,8 @@ public class SettingsDialog extends KfjcDialog {
                     android.R.layout.simple_list_item_2, parent, false);
             TextView streamName = (TextView) view.findViewById(android.R.id.text1);
             TextView streamDesc = (TextView) view.findViewById(android.R.id.text2);
-            streamName.setText(streams.get(position).name);
-            streamDesc.setText(streams.get(position).description);
+            streamName.setText(mediaSources.get(position).name);
+            streamDesc.setText(mediaSources.get(position).description);
             streamDesc.setTextColor(ContextCompat.getColor(context, R.color.kfjc_secondary_text));
             return view;
         }

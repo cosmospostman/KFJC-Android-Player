@@ -1,6 +1,9 @@
 package org.kfjc.android.player.activity;
 
 import android.Manifest;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,7 +18,6 @@ import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -24,6 +26,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,20 +38,31 @@ import org.kfjc.android.player.KfjcApplication;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
-import org.kfjc.android.player.fragment.PlaylistFragment;
+import org.kfjc.android.player.fragment.PlayerFragment;
+import org.kfjc.android.player.fragment.PodcastFragment;
+import org.kfjc.android.player.fragment.PodcastPlayerFragment;
+import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
+import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.HttpUtil;
 import org.kfjc.android.player.util.NotificationUtil;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeScreenInterface {
 
+    public static final String INTENT_FROM_NOTIFICATION = "fromNotification";
+    public static final String INTENT_DOWNLOAD_CLICKED = "downloadClicked";
+    public static final String INTENT_DOWNLOAD_IDS = "downloadIds";
+
     private static final String KEY_ACTIVE_FRAGMENT = "active-fragment";
     private static final int KFJC_PERM_READ_PHONE_STATE = 0;
+    private static final int KFJC_PERM_WRITE_EXTERNAL = 1;
 
     private KfjcApplication application;
 
@@ -66,14 +80,18 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private TelephonyManager telephonyManager;
     private AudioManager.OnAudioFocusChangeListener audioFocusListener;
     private PhoneStateListener phoneStateListener;
+    private BroadcastReceiver downloadClickedReceiver;
 
     private LiveStreamFragment liveStreamFragment;
-    private PlaylistFragment playlistFragment;
+    private PodcastFragment podcastFragment;
+    private PodcastPlayerFragment podcastPlayerFragment;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private View view;
     private Snackbar snackbar;
+    private Map<Long, ShowDetails> activeDownloads;
+    private boolean askPermissionsAgain = true;
 
     private boolean isForegroundActivity = false;
     private int activeFragmentId = R.id.nav_livestream;
@@ -96,9 +114,11 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupPlaylistService();
         streamServiceIntent = new Intent(this, StreamService.class);
         startService(streamServiceIntent);
+        activeDownloads = new HashMap<>();
 
         this.liveStreamFragment = new LiveStreamFragment();
-        this.playlistFragment = new PlaylistFragment();
+        this.podcastFragment = new PodcastFragment();
+        this.podcastPlayerFragment = new PodcastPlayerFragment();
 
         setupDrawer();
         setupStreamService();
@@ -126,10 +146,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                         @Override
                         public void onPlaylistUpdate(Playlist playlist) {
                             liveStreamFragment.updatePlaylist(playlist);
-                            playlistFragment.updatePlaylist(playlist);
-                            if (streamService != null && streamService.isPlaying()) {
-                                notificationUtil.updateNowPlayNotification(playlist);
-                            }
                         }
                     });
                 }
@@ -152,7 +168,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     StreamService.LiveStreamBinder binder = (StreamService.LiveStreamBinder) service;
                     streamService = binder.getService();
                     streamService.setMediaEventListener(mediaEventHandler);
-                    liveStreamFragment.setState(streamService.getPlayerState());
+                    syncState();
                 }
 
                 @Override
@@ -162,31 +178,40 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
     }
 
-    private StreamService.MediaListener mediaEventHandler = new StreamService.MediaListener() {
-        @Override
-        public void onBuffer() {
-            liveStreamFragment.setState(LiveStreamFragment.PlayerState.BUFFER);
+    public void syncState() {
+        if (streamService != null) {
+            mediaEventHandler.onStateChange(streamService.getPlayerState(), streamService.getSource());
         }
+    }
+
+    @Override
+    public MediaSource getPlayerSource() {
+        return streamService.getSource();
+    }
+
+    private StreamService.MediaListener mediaEventHandler = new StreamService.MediaListener() {
 
         @Override
-        public void onPlay() {
-            liveStreamFragment.setState(LiveStreamFragment.PlayerState.PLAY);
-            notificationUtil.updateNowPlayNotification(playlistService.getPlaylist());
+        public void onStateChange(PlayerFragment.PlayerState state, MediaSource source) {
+            liveStreamFragment.setState(state, source);
+            podcastPlayerFragment.setState(state, source);
+            podcastFragment.setState(state, source);
+            if (source != null && source.type == MediaSource.Type.LIVESTREAM) {
+                // TODO: refactor the logic
+                if (state != PlayerFragment.PlayerState.STOP) {
+                    notificationUtil.updateNowPlayNotification(playlistService.getPlaylist());
+                }
+            }
         }
 
         @Override
         public void onError(String info) {
-            stopStream();
+            stopPlayer();
             String message = getString(R.string.error_generic);
             if (info.contains("HttpDataSourceException")) {
                 message = getString(R.string.error_unable_to_connect);
             }
             snack(message, Snackbar.LENGTH_LONG);
-        }
-
-        @Override
-        public void onEnd() {
-            liveStreamFragment.setState(LiveStreamFragment.PlayerState.STOP);
         }
     };
 
@@ -211,6 +236,20 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private boolean hasPhonePermission() {
         return ContextCompat.checkSelfPermission(
                 this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean hasWritePermission() {
+        return ContextCompat.checkSelfPermission(
+                this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void startDownload() {
+        if (!hasWritePermission()) {
+            requestAndroidWritePermissions();
+        } else {
+            onWritePermissionGranted(true);
+        }
     }
 
     private void requestPhonePermission() {
@@ -239,7 +278,13 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 KFJC_PERM_READ_PHONE_STATE);
     }
 
-    private boolean askPermissionsAgain = true;
+    private void requestAndroidWritePermissions() {
+        ActivityCompat.requestPermissions(
+                HomeScreenDrawerActivity.this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                KFJC_PERM_WRITE_EXTERNAL);
+    }
+
     @Override
     public void onRequestPermissionsResult(
             int requestCode, String[] permissions, int[] grantResults) {
@@ -257,6 +302,19 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     }
                 }
                 return;
+            case KFJC_PERM_WRITE_EXTERNAL:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    onWritePermissionGranted(true);
+                } else {
+                    onWritePermissionGranted(false);
+                }
+        }
+    }
+
+    private void onWritePermissionGranted(boolean wasGranted) {
+        if (podcastPlayerFragment != null) {
+            podcastPlayerFragment.onWritePermissionResult(wasGranted);
         }
     }
 
@@ -279,43 +337,97 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close
         );
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawerToggle.isDrawerIndicatorEnabled()) {
+                    drawerLayout.openDrawer(Gravity.LEFT);
+                } else {
+                    if (activeFragmentId == R.id.nav_podcast_player) {
+                        loadPodcastListFragment(true);
+                    }
+                }
+            }
+        });
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        drawerLayout.addDrawerListener(drawerToggle);
+    }
 
-        drawerToggle.setDrawerIndicatorEnabled(true);
-        drawerLayout.setDrawerListener(drawerToggle);
-        loadFragment(activeFragmentId);
+    @Override
+    public void setActionBarBackArrow(boolean isBackArrow) {
+        if (isBackArrow) {
+            drawerToggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            drawerToggle.setDrawerIndicatorEnabled(true);
+        }
     }
 
     public void setNavigationItemChecked(int navigationItemId) {
         navigationView.setCheckedItem(navigationItemId);
     }
 
-    private void loadFragment(int navItemId) {
-        switch (navItemId) {
+    private void loadFragment(int fragmentId) {
+        activeFragmentId = fragmentId;
+        switch (fragmentId) {
             case R.id.nav_livestream:
                 replaceFragment(liveStreamFragment);
                 if (playlistService != null) {
                     liveStreamFragment.updatePlaylist(playlistService.getPlaylist());
                 }
-                // streamService is null while still connecting at application launch
-                if (streamService != null) {
-                    liveStreamFragment.setState(streamService.getPlayerState());
-                }
                 break;
-            case R.id.nav_playlist:
-                replaceFragment(playlistFragment);
-                if (playlistService != null) {
-                    playlistFragment.updatePlaylist(playlistService.getPlaylist());
+            case R.id.nav_podcast:
+                loadPodcastListFragment(false);
+                break;
+            case R.id.nav_podcast_player:
+                if (streamService.getSource() != null) {
+                    loadPodcastPlayer(streamService.getSource().show, false);
+                } else {
+                    loadPodcastPlayer(null, false);
                 }
                 break;
         }
-        activeFragmentId = navItemId;
+    }
+
+    @Override
+    public void loadPodcastPlayer(ShowDetails show, boolean animate) {
+        if (activeFragmentId == R.id.nav_podcast_player) {
+            return;
+        }
+        setActionBarBackArrow(true);
+        activeFragmentId = R.id.nav_podcast_player;
+        podcastPlayerFragment = new PodcastPlayerFragment();
+        if (show != null) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(PodcastPlayerFragment.BROADCAST_SHOW_KEY, show);
+            podcastPlayerFragment.setArguments(bundle);
+        }
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (animate) {
+            ft.setCustomAnimations(R.animator.fade_in_to_left, R.animator.fade_out_to_left);
+        }
+        ft.replace(R.id.home_screen_main_fragment, podcastPlayerFragment)
+            .addToBackStack(null)
+            .commit();
+    }
+
+    @Override
+    public void loadPodcastListFragment(boolean animate) {
+        activeFragmentId = R.id.nav_podcast;
+        setActionBarBackArrow(false);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (animate) {
+            ft.setCustomAnimations(R.animator.fade_in_to_right, R.animator.fade_out_to_right);
+        }
+        ft.replace(R.id.home_screen_main_fragment, podcastFragment)
+            .addToBackStack(null)
+            .commit();
     }
 
     private void replaceFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
+        setActionBarBackArrow(false);
+        getFragmentManager().beginTransaction()
                 .replace(R.id.home_screen_main_fragment, fragment)
                 .addToBackStack(null)
                 .commit();
@@ -358,6 +470,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void onBackPressed() {
+        if (activeFragmentId == R.id.nav_podcast_player) {
+            loadPodcastListFragment(true);
+            return;
+        }
         // Don't pop back to no active fragment
         if (getSupportFragmentManager().getBackStackEntryCount() > 1 ){
             getSupportFragmentManager().popBackStack();
@@ -367,6 +483,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
     }
 
+    public void registerDownload(long downloadId, ShowDetails show) {
+        activeDownloads.put(downloadId, show);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -374,6 +494,31 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         PreferenceControl.updateStreams();
         isForegroundActivity = true;
         updateBackground();
+        loadFragment(activeFragmentId);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        if (intent.getBooleanExtra(INTENT_FROM_NOTIFICATION, false) && streamService.getSource() != null) {
+            switch (streamService.getSource().type) {
+                case LIVESTREAM:
+                    loadFragment(R.id.nav_livestream);
+                    return;
+                case ARCHIVE:
+                    loadPodcastPlayer(streamService.getSource().show, false);
+                    return;
+            }
+        }
+        long[] downloadIds = intent.getLongArrayExtra(INTENT_DOWNLOAD_IDS);
+        if (downloadIds != null && downloadIds.length > 0) {
+            for (long id : downloadIds) {
+                if (activeDownloads.containsKey(id)) {
+                    loadPodcastPlayer(activeDownloads.get(id), false);
+                    return;
+                }
+            }
+            loadFragment(R.id.nav_podcast);
+        }
     }
 
     @Override
@@ -415,17 +560,29 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void playStream() {
+        playSource(PreferenceControl.getStreamPreference());
+    }
+
+    @Override
+    public void playSource(MediaSource source) {
+        if (streamService.getSource() != null
+                && streamService.getSource().equals(source)
+                && streamService.isPlaying()) {
+            return;
+        }
+        streamService.stop();
         audioManager.requestAudioFocus(
                 audioFocusListener,
                 AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN);
-        streamService.play(getApplicationContext(), PreferenceControl.getStreamPreference());
+        streamService.play(source);
     }
 
     @Override
-    public void stopStream() {
-        liveStreamFragment.setState(LiveStreamFragment.PlayerState.STOP);
-        streamService.stop();
+    public void stopPlayer() {
+        if (streamService != null) {
+            streamService.stop();
+        }
         audioManager.abandonAudioFocus(audioFocusListener);
         notificationUtil.cancelNowPlayNotification();
         if (!isForegroundActivity) {
@@ -435,14 +592,14 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void restartStream() {
-        streamService.reload(getApplicationContext(), PreferenceControl.getStreamPreference());
+        streamService.reload(PreferenceControl.getStreamPreference());
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         notificationUtil.cancelNowPlayNotification();
-        stopStream();
+        stopPlayer();
         stopService(streamServiceIntent);
         stopService(playlistServiceIntent);
         if (telephonyManager != null) {
@@ -452,10 +609,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public boolean isStreamServicePlaying() {
-        if (streamService == null) {
-            return false;
-        }
-        return streamService.isPlaying();
+        return streamService != null && streamService.isPlaying();
     }
 
     @Override
@@ -479,4 +633,25 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
         return playlistService.getPlaylist();
     }
+
+    @Override
+    public long getPlayerPosition() {
+        return streamService.getPlayerPosition();
+    }
+
+    @Override
+    public void seekPlayer(long positionMillis) {
+        streamService.seekOverEntireShow(positionMillis);
+    }
+
+    @Override
+    public void pausePlayer() {
+        streamService.pause();
+    }
+
+    @Override
+    public void unpausePlayer() {
+        streamService.unpause();
+    }
+
 }

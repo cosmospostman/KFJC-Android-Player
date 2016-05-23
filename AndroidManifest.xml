@@ -43,6 +43,12 @@
         <service
             android:name="org.kfjc.android.player.service.PlaylistService"
             android:exported="false" />
+
+        <receiver android:name=".receiver.DownloadReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

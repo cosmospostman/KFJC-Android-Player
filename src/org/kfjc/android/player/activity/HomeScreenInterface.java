@@ -1,13 +1,17 @@
 package org.kfjc.android.player.activity;
 
+import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.model.Playlist;
-import org.kfjc.android.player.model.Resources;
+import org.kfjc.android.player.model.MediaSource;
 
 public interface HomeScreenInterface {
     void setActionbarTitle(String title);
     void playStream();
-    void stopStream();
+    void stopPlayer();
+    void pausePlayer();
+    void unpausePlayer();
     void restartStream();
+    void playSource(MediaSource source);
     boolean isStreamServicePlaying();
     String getString(int resId);
     void snack(String message, int duration);
@@ -15,4 +19,13 @@ public interface HomeScreenInterface {
     Playlist getLatestPlaylist();
     void setNavigationItemChecked(int navigationItemId);
     void updateBackground();
+    void startDownload();
+    void loadPodcastPlayer(ShowDetails show, boolean animate);
+    void loadPodcastListFragment(boolean animate);
+    void registerDownload(long downloadId, ShowDetails show);
+    long getPlayerPosition();
+    void seekPlayer(long positionMillis);
+    void syncState();
+    MediaSource getPlayerSource();
+    void setActionBarBackArrow(boolean isBackArrorw);
 }

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:baselineAligned="false"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/podcastDateTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/kfjc_transparent_black"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#ffffff"
+            android:paddingTop="0dp"
+            android:paddingBottom="16dp"
+            android:paddingLeft="60dp"
+            android:paddingRight="4dp"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomControls"
+        android:orientation="vertical"
+        android:layout_gravity="bottom"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/kfjc_transparent_black"
+        android:paddingTop="8dp"
+        android:visibility="invisible">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="8dp"
+            android:layout_centerVertical="true">
+
+            <ImageButton
+                android:id="@+id/settingsButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:layout_margin="0dp"
+                android:scaleType="fitCenter"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_volume_up_white_48dp"/>
+
+            <ImageButton
+                android:id="@+id/playlist"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:layout_margin="0dp"
+                android:scaleType="fitCenter"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_book_white_48dp"/>
+
+            <ImageButton
+                android:id="@+id/downloadButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:layout_margin="0dp"
+                android:scaleType="fitCenter"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_file_download_white_48dp"/>
+
+            <TextView
+                android:id="@+id/playtimeDisplay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:fontFamily="sans-serif-light"
+                android:layout_gravity="center_vertical|end"
+
+                android:textColor="#ffffff"
+                android:padding="4dp"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/playtimeSeekBar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:layout_centerVertical="true"/>
+
+        <ProgressBar
+            android:id="@+id/loadingProgress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/LinearProgress"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_marginBottom="-8dp"
+            android:layout_marginTop="-4dp"
+            android:indeterminate="true"/>
+
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="24dp"
+        app:layout_anchor="@+id/bottomControls"
+        app:layout_anchorGravity="top|center|end"
+        app:backgroundTint="@color/kfjc_red_solid"
+        app:rippleColor="@color/kfjc_mute"
+        app:elevation="2dp"/>
+
+</android.support.design.widget.CoordinatorLayout>

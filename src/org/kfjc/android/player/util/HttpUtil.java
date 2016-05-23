@@ -28,15 +28,19 @@ public class HttpUtil {
             Log.i(TAG, "HTTP response cache installation failed:" + e);
         }
     }
+
+    public static String getUrl(String urlString) throws IOException {
+        return getUrl(urlString, false);
+    }
 	
 	/**
 	 * Fetches a URL over HTTP and returns content as a String.
 	 */
-	public static String getUrl(String urlString) throws IOException {
+	public static String getUrl(String urlString, boolean useCache) throws IOException {
         URL url = new URL(urlString);
         String result = "";
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setUseCaches(false);
+        urlConnection.setUseCaches(useCache);
         try {
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             result = convertInputStreamToString(in);

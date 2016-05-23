@@ -1,6 +1,6 @@
 package org.kfjc.android.player.dialog;
 
-import android.support.v4.app.DialogFragment;
+import android.app.DialogFragment;
 import android.widget.LinearLayout;
 
 public class KfjcDialog extends DialogFragment {

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_gravity="top"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ScrollView
+        android:background="@color/white"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- TODO: abstract styles -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/kfjc_secondary_text"
+                android:fontFamily="sans-serif-light"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/podcast_label_recent_archives"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/podcastRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="150dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/kfjc_secondary_text"
+                android:textAllCaps="true"
+                android:fontFamily="sans-serif-light"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/podcast_label_saved_archives"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/savedRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/playProgress"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/LinearProgress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_marginBottom="-7dp"
+        android:layout_marginTop="-6dp" />
+
+    <RelativeLayout
+        android:id="@+id/nowPlayingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:visibility="gone"
+        android:background="@color/kfjc_transparent_black">
+
+        <TextView
+            android:id="@+id/nowPlayingLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:padding="4dp"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@color/white"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_play_arrow_white_48dp"
+            android:layout_toLeftOf="@+id/expandNowPlaying"
+            app:fabSize="mini"
+            app:backgroundTint="@color/kfjc_red_solid"
+            app:rippleColor="@color/kfjc_mute"
+            app:elevation="0dp" />
+
+        <TextView
+            android:id="@+id/clockLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/fab"
+            android:padding="4dp"
+            android:layout_marginRight="8dp"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@color/white" />
+
+        <ImageView
+            android:id="@+id/expandNowPlaying"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="8dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/ic_chevron_right_white_48dp"/>
+
+    </RelativeLayout>
+
+</LinearLayout>
