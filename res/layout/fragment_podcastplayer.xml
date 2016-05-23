@@ -92,7 +92,8 @@
             android:id="@+id/playtimeSeekBar"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="12dp"
             android:layout_centerVertical="true"/>
 
         <ProgressBar

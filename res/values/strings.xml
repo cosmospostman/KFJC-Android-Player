@@ -55,6 +55,7 @@
     <string name="podcast_label_saved_archives">Available offline</string>
     <string name="podcast_delete_warning">You can\'t download this show again if it\'s been more than
         two weeks since it went to air.</string>
+    <string name="podcast_no_saved_shows">You haven\'t saved any shows to this device.</string>
 
     <string name="setting_audio_quality">Live stream audio quality</string>
     <string name="setting_backgrounds">Hourly backgrounds</string>

@@ -40,6 +40,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     private RecyclerView savedShowsView;
     private PodcastRecyclerAdapter recentShowsAdapter;
     private List<ShowDetails> shows = Collections.emptyList();
+    private View noSavedShows;
     private TextView nowPlayingLabel;
     private TextView clockLabel;
     private FloatingActionButton fab;
@@ -56,6 +57,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         recentShowsView.addItemDecoration(new PodcastRecyclerDecorator(getActivity()));
         recentShowsView.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        noSavedShows = view.findViewById(R.id.noSavedShows);
         savedShowsView = (RecyclerView) view.findViewById(R.id.savedRecyclerView);
         savedShowsView.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
@@ -102,6 +104,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         recentShowsView.setAdapter(recentShowsAdapter);
 
         List<ShowDetails> savedShows = ExternalStorageUtil.getSavedShows();
+        noSavedShows.setVisibility(savedShows.size() == 0 ? View.VISIBLE : View.GONE);
         PodcastRecyclerAdapter adapter = new PodcastRecyclerAdapter(
                 savedShows, PodcastRecyclerAdapter.Type.VERTICAL, PodcastFragment.this);
         savedShowsView.setAdapter(adapter);

@@ -53,6 +53,18 @@
                 android:layout_marginBottom="8dp"
                 android:text="@string/podcast_label_saved_archives"/>
 
+            <TextView
+                android:id="@+id/noSavedShows"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:textSize="16sp"
+                android:textStyle="italic"
+                android:text="@string/podcast_no_saved_shows"/>
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/savedRecyclerView"
                 android:layout_width="match_parent"

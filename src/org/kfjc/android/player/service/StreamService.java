@@ -331,7 +331,7 @@ public class StreamService extends Service {
     }
 
     public long getPlayerPosition() {
-        if (mediaSource.show == null) {
+        if (mediaSource.show == null || player == null) {
             return 0;
         }
         long segmentOffset = (activeSourceNumber == 0)
