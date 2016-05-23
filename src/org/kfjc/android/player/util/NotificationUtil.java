@@ -92,28 +92,33 @@ public class NotificationUtil {
             .setContentIntent(kfjcPlayerIntent)
             .setPriority(Notification.PRIORITY_HIGH);
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
             if (action.equals(StreamService.INTENT_STOP)) {
                 // Should instead build action with Icon.fromResource (but only for Api 23+)
                 builder.addAction(R.drawable.ic_stop_white_48dp,
-                        context.getString(R.string.action_stop), buildControlIntent(context, action));
+                        context.getString(R.string.action_stop), buildControlIntent(context, StreamService.INTENT_STOP));
+                builder.setStyle(new Notification.MediaStyle()
+                        .setShowActionsInCompactView(0));
             } else if (action.equals(StreamService.INTENT_PAUSE)) {
+                builder.addAction(R.drawable.ic_stop_white_48dp,
+                        context.getString(R.string.action_stop), buildControlIntent(context, StreamService.INTENT_STOP));
                 builder.addAction(R.drawable.ic_pause_white_48dp,
-                        context.getString(R.string.action_pause), buildControlIntent(context, action));
-            } else if (action.equals(StreamService.INTENT_UNPAUSE)) {
+                        context.getString(R.string.action_pause), buildControlIntent(context, StreamService.INTENT_PAUSE));
+                builder.setStyle(new Notification.MediaStyle()
+                        .setShowActionsInCompactView(0, 1));
+            }else if (action.equals(StreamService.INTENT_UNPAUSE)) {
                 builder.addAction(R.drawable.ic_play_arrow_white_48dp,
-                        context.getString(R.string.action_play), buildControlIntent(context, action));
+                        context.getString(R.string.action_play), buildControlIntent(context, StreamService.INTENT_UNPAUSE));
+                builder.setStyle(new Notification.MediaStyle()
+                        .setShowActionsInCompactView(0));
             }
-            builder.setVisibility(Notification.VISIBILITY_PUBLIC)
-            .setStyle(new Notification.MediaStyle()
-                .setShowActionsInCompactView(0));
         }
         return builder.build();
     }
 
     private static PendingIntent buildControlIntent(Context context, String action) {
-        Intent stopIntent = new Intent(StreamService.INTENT_CONTROL);
-        stopIntent.putExtra(StreamService.INTENT_CONTROL_ACTION, action);
-        return PendingIntent.getBroadcast(context, 0, stopIntent,
+        Intent intent = new Intent(action);
+        return PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT|PendingIntent.FLAG_UPDATE_CURRENT);
     }
 

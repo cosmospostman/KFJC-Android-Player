@@ -34,8 +34,7 @@ import java.util.List;
 
 public class StreamService extends Service {
 
-    public static final String INTENT_CONTROL = "controlIntent";
-    public static final String INTENT_CONTROL_ACTION = "controlIntentAction";
+//    public static final String INTENT_CONTROL = "controlIntent";
     public static final String INTENT_STOP = "action_stop";
     public static final String INTENT_PAUSE = "action_pause";
     public static final String INTENT_UNPAUSE = "action_unpause";
@@ -45,8 +44,14 @@ public class StreamService extends Service {
     private static final int BUFFER_SEGMENT_COUNT = 256;
     private static final IntentFilter becomingNoisyIntentFilter =
             new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-    private static final IntentFilter onStopIntentFilter =
-            new IntentFilter(INTENT_CONTROL);
+    private static final IntentFilter onControlIntentFilter;
+    static {
+        onControlIntentFilter = new IntentFilter();
+        onControlIntentFilter.addAction(INTENT_STOP);
+        onControlIntentFilter.addAction(INTENT_PAUSE);
+        onControlIntentFilter.addAction(INTENT_UNPAUSE);
+
+    }
 
     private static final int MIN_BUFFER_MS = 5000;
     private static final int MIN_REBUFFER_MS = 5000;
@@ -95,14 +100,12 @@ public class StreamService extends Service {
     private BroadcastReceiver onControlReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (INTENT_CONTROL.equals(intent.getAction())) {
-                if (INTENT_STOP.equals(intent.getStringExtra(INTENT_CONTROL_ACTION))) {
-                    stop();
-                } else if (INTENT_PAUSE.equals(intent.getStringExtra(INTENT_CONTROL_ACTION))) {
-                    pause();
-                } else if (INTENT_UNPAUSE.equals(intent.getStringExtra(INTENT_CONTROL_ACTION))) {
-                    unpause();
-                }
+            if (INTENT_STOP.equals(intent.getAction())) {
+                stop();
+            } else if (INTENT_PAUSE.equals(intent.getAction())) {
+                pause();
+            } else if (INTENT_UNPAUSE.equals(intent.getAction())) {
+                unpause();
             }
         }
     };
@@ -280,7 +283,7 @@ public class StreamService extends Service {
                     if (playWhenReady) {
                         mediaListener.onStateChange(PlayerFragment.PlayerState.PLAY, mediaSource);
                         registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
-                        registerReceiver(onControlReceiver, onStopIntentFilter);
+                        registerReceiver(onControlReceiver, onControlIntentFilter);
                         becomingNoisyReceiverRegistered = true;
                         onControlReceiverRegistered = true;
                     } else {
