@@ -54,7 +54,7 @@ public class BroadcastHourJsonImpl implements BroadcastHour  {
 
     @Override
     public long getPlayTimeMillis() {
-        durationMs
+        return durationMs;
     }
 
     @Override

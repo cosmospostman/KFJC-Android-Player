@@ -173,12 +173,28 @@ public class StreamService extends Service {
         }
     }
 
+    private void requestAudioFocus() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.requestAudioFocus(
+                audioFocusListener,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN);
+    }
+
+    private void abandonAudioFocus() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.abandonAudioFocus(audioFocusListener);
+
+    }
+
     private void play(String streamUrl) {
         Log.i(TAG, "Playing stream " + streamUrl);
         if (player == null) {
             player = ExoPlayer.Factory.newInstance(1, MIN_BUFFER_MS, MIN_REBUFFER_MS);
             player.addListener(exoPlayerListener);
         }
+        requestAudioFocus();
+
         Extractor extractor = null;
         switch (mediaSource.format) {
             case AAC:
@@ -210,6 +226,7 @@ public class StreamService extends Service {
 
     public void pause() {
         player.setPlayWhenReady(false);
+        abandonAudioFocus();
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
         notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_UNPAUSE));
@@ -218,6 +235,7 @@ public class StreamService extends Service {
     public void unpause() {
         if (isPaused()) {
             Log.i(TAG, "Unpausing");
+            requestAudioFocus();
             player.setPlayWhenReady(true);
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
@@ -231,6 +249,7 @@ public class StreamService extends Service {
 	}
 
     private void stop(boolean alsoReset) {
+        abandonAudioFocus();
         if (player != null) {
             player.stop();
             Log.i(TAG, "Player stopped");
@@ -379,4 +398,46 @@ public class StreamService extends Service {
         }
         seek(mediaSource.show.getHourPaddingTimeMillis());
     }
+
+    /**
+     * Audio Focus changes when another app requests access to the audio output stream. It could be
+     * total access (eg. another music player) or transient (eg. spoken directions from maps). In
+     * the latter case, we dip the volume for the other app and raise it again when the other app is
+     * done.
+     */
+    private AudioManager.OnAudioFocusChangeListener audioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
+
+        private static final String TAG = "kfjc.AudioFocusChange";
+
+        private int volumeBeforeLoss;
+        private static final String AUDIOFOCUS_KEY =
+                "org.kfjc.android.player.control_AUDIO_FOCUS_CHANGE_LISTENER";
+
+        @Override public void onAudioFocusChange(int focusChange) {
+            Log.i(TAG, "focus changed to " + focusChange);
+            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    volumeBeforeLoss = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                    stop();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    volumeBeforeLoss = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeBeforeLoss / 2, 0);
+                    break;
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeBeforeLoss, 0);
+                    break;
+            }
+        }
+
+        // Objects are recreated after activity resume. Audio focus is requested and released
+        // by reference to an OnAudioFocusChangeListener, and subsequently its toString()
+        // method. By returning a constant string, we can consistently refer to the audio
+        // focus we requested before the app was paused and resumed.
+        @Override public String toString() {
+            return AUDIOFOCUS_KEY;
+        }
+    };
+
 }

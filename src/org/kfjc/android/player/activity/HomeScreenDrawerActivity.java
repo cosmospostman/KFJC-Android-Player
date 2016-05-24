@@ -78,7 +78,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     private AudioManager audioManager;
     private TelephonyManager telephonyManager;
-    private AudioManager.OnAudioFocusChangeListener audioFocusListener;
     private PhoneStateListener phoneStateListener;
     private BroadcastReceiver downloadClickedReceiver;
 
@@ -217,10 +216,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     private void setupListenersAndManagers() {
         this.notificationUtil = new NotificationUtil(this);
-        this.audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
         maybeAddPhoneStateListener();
-        this.audioFocusListener = EventHandlerFactory.onAudioFocusChange(this, audioManager);
     }
 
     private void maybeAddPhoneStateListener() {
@@ -571,10 +567,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             return;
         }
         streamService.stop();
-        audioManager.requestAudioFocus(
-                audioFocusListener,
-                AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN);
         streamService.play(source);
     }
 
@@ -583,7 +575,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         if (streamService != null) {
             streamService.stop();
         }
-        audioManager.abandonAudioFocus(audioFocusListener);
         notificationUtil.cancelNowPlayNotification();
         if (!isForegroundActivity) {
             playlistService.stop();
