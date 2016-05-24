@@ -30,7 +30,6 @@ import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.util.NotificationUtil;
 
 import java.io.File;
-import java.util.List;
 
 public class StreamService extends Service {
 
@@ -184,7 +183,6 @@ public class StreamService extends Service {
     private void abandonAudioFocus() {
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.abandonAudioFocus(audioFocusListener);
-
     }
 
     private void play(String streamUrl) {
@@ -407,25 +405,29 @@ public class StreamService extends Service {
      */
     private AudioManager.OnAudioFocusChangeListener audioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
 
-        private static final String TAG = "kfjc.AudioFocusChange";
-
         private int volumeBeforeLoss;
         private static final String AUDIOFOCUS_KEY =
                 "org.kfjc.android.player.control_AUDIO_FOCUS_CHANGE_LISTENER";
 
         @Override public void onAudioFocusChange(int focusChange) {
-            Log.i(TAG, "focus changed to " + focusChange);
             AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             switch (focusChange) {
                 case AudioManager.AUDIOFOCUS_LOSS:
+                    Log.i(TAG, "Lost audio focus");
                     volumeBeforeLoss = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                    stop();
+                    if (mediaSource != null && mediaSource.type == MediaSource.Type.ARCHIVE) {
+                        pause();
+                    } else {
+                        stop();
+                    }
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    Log.i(TAG, "Ducking audio focus");
                     volumeBeforeLoss = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeBeforeLoss / 2, 0);
                     break;
                 case AudioManager.AUDIOFOCUS_GAIN:
+                    Log.i(TAG, "Gained audio focus");
                     audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeBeforeLoss, 0);
                     break;
             }

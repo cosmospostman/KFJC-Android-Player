@@ -20,6 +20,7 @@ public class BroadcastHourJsonImpl implements BroadcastHour  {
     private String playlistId;
     private long fileSize;
     private long durationMs;
+    private long paddingMs;
 
     public BroadcastHourJsonImpl(JSONObject jsonHour) {
         try {
@@ -29,6 +30,7 @@ public class BroadcastHourJsonImpl implements BroadcastHour  {
             playlistId = jsonHour.getString("playlist_num");
             fileSize = jsonHour.getLong("file_size");
             durationMs = jsonHour.getLong("duration_ms");
+            paddingMs = jsonHour.getLong("padding_ms");
         } catch (JSONException e) {}
     }
 
@@ -59,7 +61,7 @@ public class BroadcastHourJsonImpl implements BroadcastHour  {
 
     @Override
     public long getPaddingTimeMillis() {
-        return 300000L; //5mins
+        return paddingMs;
     }
 
     @Override
