@@ -377,10 +377,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 loadPodcastListFragment(false);
                 break;
             case R.id.nav_podcast_player:
-                if (streamService.getSource() != null) {
-                    loadPodcastPlayer(streamService.getSource().show, false);
-                } else {
+                if (streamService == null || streamService.getSource() == null) {
                     loadPodcastPlayer(null, false);
+                } else {
+                    loadPodcastPlayer(streamService.getSource().show, false);
                 }
                 break;
         }
