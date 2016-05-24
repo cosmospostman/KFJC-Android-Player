@@ -30,6 +30,12 @@ Build
 
 Changelog
 ---------
+v6 (23 May 2016)
+ - Can play from broadcast archive
+ - Can save from broadcast archive to play later
+ - Side panel selection bug fix
+ - Updated dependencies
+
 v5 (9 April 2016)
  - Fix embarrassing NPE when playlist is empty (occurs at start of new shift)
 
