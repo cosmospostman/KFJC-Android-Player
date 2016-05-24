@@ -126,7 +126,8 @@ public class LiveStreamFragment extends PlayerFragment {
         settingsDialog.setUrlPreferenceChangeHandler(
                 new SettingsDialog.StreamUrlPreferenceChangeHandler() {
             @Override public void onStreamUrlPreferenceChange() {
-                if (MediaSource.Type.LIVESTREAM == homeScreen.getPlayerSource().type
+                if (homeScreen.getPlayerSource() != null
+                        && MediaSource.Type.LIVESTREAM == homeScreen.getPlayerSource().type
                         && homeScreen.isStreamServicePlaying()) {
                     homeScreen.restartStream();
                 }
