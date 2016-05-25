@@ -36,6 +36,7 @@
             
             <RelativeLayout
                 android:id="@+id/podcastLoading"
+                android:visibility="invisible"
                 android:layout_width="match_parent"
                 android:layout_height="150dp">
                 <ProgressBar
