@@ -38,9 +38,6 @@
         translation_description="UI title for the podcast screen">
             On Demand</string>
 
-    <string name="lava_download">Downloading Lava&#8230;</string>
-    <string name="lava_download_format">Downloading Lava (%1$sMB)&#8230;</string>
-
     <string name="nav_livestream">Live stream</string>
     <string name="nav_playlists">Playlist</string>
     <string name="nav_podcast">On Demand</string>

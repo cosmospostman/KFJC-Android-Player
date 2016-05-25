@@ -181,7 +181,12 @@ public class ExternalStorageUtil {
             // Sorry, can't be bothered implementing. Your download might fail.
             return true;
         }
-        StatFs stat = new StatFs(getPodcastDir().getPath());
-        return stat.getAvailableBytes() > forFileSize;
+        try {
+            StatFs stat = new StatFs(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS).getPath());
+            return stat.getAvailableBytes() > forFileSize;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }

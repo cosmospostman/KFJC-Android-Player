@@ -37,6 +37,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     private static final String TAG = PodcastFragment.class.getSimpleName();
 
     private RecyclerView recentShowsView;
+    private View recentShowsLoadingView;
     private RecyclerView savedShowsView;
     private PodcastRecyclerAdapter recentShowsAdapter;
     private List<ShowDetails> shows = Collections.emptyList();
@@ -53,6 +54,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_podcast));
         homeScreen.setNavigationItemChecked(R.id.nav_podcast);
         View view = inflater.inflate(R.layout.fragment_podcast, container, false);
+        recentShowsLoadingView = view.findViewById(R.id.podcastLoading);
         recentShowsView = (RecyclerView) view.findViewById(R.id.podcastRecyclerView);
         recentShowsView.addItemDecoration(new PodcastRecyclerDecorator(getActivity()));
         recentShowsView.setLayoutManager(
@@ -170,6 +172,12 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
 
     private class GetArchivesTask extends AsyncTask<Void, Void, List<ShowDetails>> {
         @Override
+        protected void onPreExecute() {
+            recentShowsLoadingView.setVisibility(View.VISIBLE);
+            recentShowsView.setVisibility(View.GONE);
+        }
+
+        @Override
         protected List<ShowDetails> doInBackground(Void... params) {
             ShowListBuilder archiveBuilder = ShowListBuilder.newInstance();
             try {
@@ -185,6 +193,8 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
 
         @Override
         protected void onPostExecute(List<ShowDetails> showDetailses) {
+            recentShowsLoadingView.setVisibility(View.GONE);
+            recentShowsView.setVisibility(View.VISIBLE);
             setArchives(showDetailses);
         }
     }

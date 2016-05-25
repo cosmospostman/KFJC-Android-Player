@@ -33,9 +33,22 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/podcast_label_recent_archives"/>
+            
+            <RelativeLayout
+                android:id="@+id/podcastLoading"
+                android:layout_width="match_parent"
+                android:layout_height="150dp">
+                <ProgressBar
+                    style="@style/Widget.AppCompat.ProgressBar"
+                    android:indeterminate="true"
+                    android:layout_centerInParent="true"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp" />
+            </RelativeLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/podcastRecyclerView"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="150dp" />
 
