@@ -59,6 +59,8 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         recentShowsView.addItemDecoration(new PodcastRecyclerDecorator(getActivity()));
         recentShowsView.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        recentShowsLoadingView.setVisibility(View.VISIBLE);
+        recentShowsView.setVisibility(View.GONE);
         noSavedShows = view.findViewById(R.id.noSavedShows);
         savedShowsView = (RecyclerView) view.findViewById(R.id.savedRecyclerView);
         savedShowsView.setLayoutManager(
@@ -171,12 +173,6 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     }
 
     private class GetArchivesTask extends AsyncTask<Void, Void, List<ShowDetails>> {
-        @Override
-        protected void onPreExecute() {
-            recentShowsLoadingView.setVisibility(View.VISIBLE);
-            recentShowsView.setVisibility(View.GONE);
-        }
-
         @Override
         protected List<ShowDetails> doInBackground(Void... params) {
             ShowListBuilder archiveBuilder = ShowListBuilder.newInstance();
