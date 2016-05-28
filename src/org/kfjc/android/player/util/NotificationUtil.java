@@ -22,11 +22,13 @@ public class NotificationUtil {
 
     private Context context;
     private static NotificationManager notificationManager;
+    private static Bitmap icon;
 
     public NotificationUtil(Context context) {
         this.context = context;
         notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
+        icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.radiodevil);
     }
 
     public void updateNowPlayNotification(Playlist playlist) {
@@ -66,7 +68,7 @@ public class NotificationUtil {
         return artistTrackString;
     }
 
-    public static Notification bufferingNotification(Context context) {
+    public Notification bufferingNotification(Context context) {
         return kfjcNotification(context,
                 context.getString(R.string.app_name),
                 context.getString(R.string.format_buffering,
@@ -74,20 +76,18 @@ public class NotificationUtil {
                 StreamService.INTENT_STOP);
     }
 
-    public static Notification kfjcNotification(Context context, String title, String text, String action) {
-        // TODO: make bitmap resources once
+    public Notification kfjcNotification(Context context, String title, String text, String action) {
         Intent i = new Intent(context, HomeScreenDrawerActivity.class);
         i.putExtra(HomeScreenDrawerActivity.INTENT_FROM_NOTIFICATION, true);
         PendingIntent kfjcPlayerIntent = PendingIntent.getActivity(
                 context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.radiodevil);
         Notification.Builder builder = new Notification.Builder(context)
             .setSmallIcon(R.drawable.ic_kfjc_notification)
             .setLargeIcon(icon)
             .setContentTitle(title)
             .setContentText(text)
-            .setOngoing(true)
+            .setOngoing(false)
             .setWhen(0)
             .setContentIntent(kfjcPlayerIntent)
             .setPriority(Notification.PRIORITY_HIGH);

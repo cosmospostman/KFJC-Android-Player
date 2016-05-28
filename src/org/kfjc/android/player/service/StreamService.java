@@ -73,7 +73,7 @@ public class StreamService extends Service {
     private ExoPlayer player;
     private boolean becomingNoisyReceiverRegistered = false;
     private boolean onControlReceiverRegistered = false;
-
+    private NotificationUtil notificationUtil;
     private int activeSourceNumber = -1;
 
     /**
@@ -109,8 +109,14 @@ public class StreamService extends Service {
             }
         }
     };
-	
-	@Override
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        notificationUtil = new NotificationUtil(this);
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
 	public IBinder onBind(Intent intent) {
         return liveStreamBinder;
 	}
@@ -164,7 +170,7 @@ public class StreamService extends Service {
         this.mediaSource = mediaSource;
         stop();
         if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
-            Notification n = NotificationUtil.bufferingNotification(getApplicationContext());
+            Notification n = notificationUtil.bufferingNotification(getApplicationContext());
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             play(mediaSource.url);
         } else if (mediaSource.type == MediaSource.Type.ARCHIVE) {
@@ -221,10 +227,10 @@ public class StreamService extends Service {
 
     private Notification buildNotification(String action) {
         if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
-            return NotificationUtil.kfjcNotification(
+            return notificationUtil.kfjcNotification(
                     this, getString(R.string.fragment_title_stream), "", action);
         } else {
-            return NotificationUtil.kfjcNotification(
+            return notificationUtil.kfjcNotification(
                 this, mediaSource.show.getAirName(), mediaSource.show.getTimestampString(), action);
         }
     }
