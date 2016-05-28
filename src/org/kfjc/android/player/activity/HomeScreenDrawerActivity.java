@@ -222,7 +222,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private void maybeAddPhoneStateListener() {
         if (hasPhonePermission()) {
             this.telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            this.phoneStateListener = EventHandlerFactory.onPhoneStateChange(this);
+            this.phoneStateListener = new KfjcPhoneStateListener(this);
             telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
         } else {
             requestPhonePermission();

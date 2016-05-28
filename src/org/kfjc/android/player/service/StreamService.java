@@ -25,6 +25,7 @@ import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
 import org.kfjc.android.player.Constants;
+import org.kfjc.android.player.R;
 import org.kfjc.android.player.fragment.PlayerFragment;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.util.NotificationUtil;
@@ -218,8 +219,13 @@ public class StreamService extends Service {
     }
 
     private Notification buildNotification(String action) {
-        return NotificationUtil.kfjcNotification(
+        if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
+            return NotificationUtil.kfjcNotification(
+                    this, getString(R.string.fragment_title_stream), "", action);
+        } else {
+            return NotificationUtil.kfjcNotification(
                 this, mediaSource.show.getAirName(), mediaSource.show.getTimestampString(), action);
+        }
     }
 
     public void pause() {
@@ -231,7 +237,10 @@ public class StreamService extends Service {
     }
 
     public void unpause() {
-        if (isPaused()) {
+        if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
+            play(mediaSource);
+        }
+        else if (isPaused()) {
             Log.i(TAG, "Unpausing");
             requestAudioFocus();
             player.setPlayWhenReady(true);
