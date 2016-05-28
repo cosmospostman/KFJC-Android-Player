@@ -37,7 +37,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
     public static final String BROADCAST_SHOW_KEY = "broadcastShowKey";
 
     private ShowDetails show;
-    private DownloadManager downloadManager;
 
     private View playlistButton;
     private TextView dateTime;
@@ -52,7 +51,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        downloadManager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
     }
 
     private View.OnClickListener fabClickListener = new View.OnClickListener() {
@@ -236,10 +234,11 @@ public class PodcastPlayerFragment extends PlayerFragment {
             String filename = uri.getLastPathSegment();
             File downloadFile = new File(podcastDir, filename);
             if (! (downloadFile.exists() && downloadFile.length() > 0)) {
+                DownloadManager dm = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
                 DownloadManager.Request req = new DownloadManager.Request(uri)
                         .setTitle(getString(R.string.format_archive_file, show.getAirName(), i+1, show.getUrls().size()))
                         .setDestinationUri(Uri.fromFile(downloadFile));
-                long referenceId = downloadManager.enqueue(req);
+                long referenceId = dm.enqueue(req);
                 homeScreen.registerDownload(referenceId, show);
             }
         }
