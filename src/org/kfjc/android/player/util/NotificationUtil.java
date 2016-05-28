@@ -87,7 +87,7 @@ public class NotificationUtil {
             .setLargeIcon(icon)
             .setContentTitle(title)
             .setContentText(text)
-            .setOngoing(false)
+            .setOngoing(true)
             .setWhen(0)
             .setContentIntent(kfjcPlayerIntent)
             .setPriority(Notification.PRIORITY_HIGH);
