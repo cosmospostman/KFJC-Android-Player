@@ -349,7 +349,7 @@ public class StreamService extends Service {
      * @return true if a next hour was started.
      */
     private boolean playNextArchiveHour() {
-        if (mediaSource.show.getUrls().size() > activeSourceNumber) {
+        if (mediaSource.show.getUrls().size() - 1 > activeSourceNumber) {
             playArchiveHour(activeSourceNumber + 1);
             seek(2 * mediaSource.show.getHourPaddingTimeMillis());
             return true;
@@ -379,7 +379,7 @@ public class StreamService extends Service {
     public void seekOverEntireShow(long seekToMillis) {
         long[] segmentBounds = mediaSource.show.getSegmentBounds();
         for (int i = 0; i < segmentBounds.length; i++) {
-            if (seekToMillis < segmentBounds[i]) {
+            if (seekToMillis <= segmentBounds[i]) {
                 // load segment i
                 playArchiveHour(i);
                 //seek to adjusted position
