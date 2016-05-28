@@ -146,6 +146,7 @@ public class StreamService extends Service {
 
     public boolean isPlaying() {
         return player != null && (
+               player.getPlayWhenReady() &&
                player.getPlaybackState() == ExoPlayer.STATE_READY ||
                player.getPlaybackState() == ExoPlayer.STATE_BUFFERING);
 	}
