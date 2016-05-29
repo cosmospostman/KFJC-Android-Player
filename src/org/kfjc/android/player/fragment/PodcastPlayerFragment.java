@@ -237,6 +237,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 DownloadManager dm = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
                 DownloadManager.Request req = new DownloadManager.Request(uri)
                         .setTitle(getString(R.string.format_archive_file, show.getAirName(), i+1, show.getUrls().size()))
+                        .setVisibleInDownloadsUi(false)
                         .setDestinationUri(Uri.fromFile(downloadFile));
                 long referenceId = dm.enqueue(req);
                 homeScreen.registerDownload(referenceId, show);
