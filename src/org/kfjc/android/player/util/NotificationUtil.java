@@ -36,7 +36,7 @@ public class NotificationUtil {
             return;
         }
         if (playlist.hasError()) {
-            cancelNowPlayNotification();
+            cancelKfjcNotification();
             postNotification(
                     context.getString(R.string.app_name),
                     context.getString(R.string.empty_string),
@@ -127,7 +127,7 @@ public class NotificationUtil {
                 KFJC_NOTIFICATION_ID, kfjcNotification(context, title, text, action));
     }
 
-    public void cancelNowPlayNotification() {
+    public void cancelKfjcNotification() {
         notificationManager.cancel(KFJC_NOTIFICATION_ID);
     }
 }

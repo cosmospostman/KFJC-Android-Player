@@ -575,7 +575,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         if (streamService != null) {
             streamService.stop();
         }
-        notificationUtil.cancelNowPlayNotification();
+        notificationUtil.cancelKfjcNotification();
         if (!isForegroundActivity) {
             playlistService.stop();
         }
@@ -589,7 +589,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        notificationUtil.cancelNowPlayNotification();
+        notificationUtil.cancelKfjcNotification();
         stopPlayer();
         stopService(streamServiceIntent);
         stopService(playlistServiceIntent);

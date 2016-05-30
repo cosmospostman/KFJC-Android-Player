@@ -129,6 +129,7 @@ public class StreamService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        notificationUtil.cancelKfjcNotification();
         if (player != null) {
             player.stop();
             player.release();
