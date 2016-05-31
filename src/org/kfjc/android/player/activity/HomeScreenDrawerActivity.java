@@ -501,6 +501,9 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     loadFragment(R.id.nav_livestream);
                     return;
                 case ARCHIVE:
+                    if (streamService == null || streamService.getSource() == null) {
+                        loadPodcastListFragment(false);
+                    }
                     loadPodcastPlayer(streamService.getSource().show, false);
                     return;
             }
