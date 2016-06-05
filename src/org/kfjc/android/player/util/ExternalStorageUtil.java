@@ -68,8 +68,12 @@ public class ExternalStorageUtil {
     }
 
     private static File getPodcastDir() {
-        return new File(Environment.getExternalStoragePublicDirectory(
+        File podcastDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PODCASTS), KFJC_DIRECTORY_NAME);
+        if (!podcastDir.exists()) {
+            podcastDir.mkdirs();
+        }
+        return podcastDir;
     }
 
     public static File getPodcastDir(String playlistId) {
@@ -182,8 +186,7 @@ public class ExternalStorageUtil {
             return true;
         }
         try {
-            StatFs stat = new StatFs(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS).getPath());
+            StatFs stat = new StatFs(getPodcastDir().getPath());
             return stat.getAvailableBytes() > forFileSize;
         } catch (IllegalArgumentException e) {
             return false;
