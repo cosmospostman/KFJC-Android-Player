@@ -143,6 +143,8 @@ public class ExternalStorageUtil {
             ShowDetails show = new ShowDetails(readFile(index));
             if (show.hasError()) {
                 Log.i(LOG_TAG, "Show has error");
+            } else if (!hasAllContent(show)) {
+                Log.i(LOG_TAG, "Missing some content");
             } else {
                 shows.add(show);
             }
