@@ -47,6 +47,18 @@
                     android:layout_height="40dp" />
             </RelativeLayout>
 
+            <TextView
+                android:id="@+id/cannotConnect"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:fontFamily="sans-serif-light"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:textSize="16sp"
+                android:textStyle="italic"
+                android:text="@string/error_unable_to_connect"/>
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/podcastRecyclerView"
                 android:visibility="gone"

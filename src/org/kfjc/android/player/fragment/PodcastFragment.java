@@ -42,6 +42,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     private PodcastRecyclerAdapter recentShowsAdapter;
     private List<ShowDetails> shows = Collections.emptyList();
     private View noSavedShows;
+    private View getListError;
     private TextView nowPlayingLabel;
     private TextView clockLabel;
     private FloatingActionButton fab;
@@ -60,6 +61,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         recentShowsView.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         noSavedShows = view.findViewById(R.id.noSavedShows);
+        getListError = view.findViewById(R.id.cannotConnect);
         savedShowsView = (RecyclerView) view.findViewById(R.id.savedRecyclerView);
         savedShowsView.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
@@ -106,6 +108,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         recentShowsView.setAdapter(recentShowsAdapter);
 
         List<ShowDetails> savedShows = ExternalStorageUtil.getSavedShows();
+        getListError.setVisibility(View.GONE);
         noSavedShows.setVisibility(savedShows.size() == 0 ? View.VISIBLE : View.GONE);
         PodcastRecyclerAdapter adapter = new PodcastRecyclerAdapter(
                 savedShows, PodcastRecyclerAdapter.Type.VERTICAL, PodcastFragment.this);
@@ -173,6 +176,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     private class GetArchivesTask extends AsyncTask<Void, Void, List<ShowDetails>> {
         @Override
         protected void onPreExecute() {
+            getListError.setVisibility(View.GONE);
             if (shows.size() == 0) {
                 recentShowsLoadingView.setVisibility(View.VISIBLE);
                 recentShowsView.setVisibility(View.GONE);
@@ -199,8 +203,12 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         @Override
         protected void onPostExecute(List<ShowDetails> showDetailses) {
             recentShowsLoadingView.setVisibility(View.GONE);
-            recentShowsView.setVisibility(View.VISIBLE);
-            setArchives(showDetailses);
+            if (showDetailses == null || showDetailses.size() == 0) {
+                getListError.setVisibility(View.VISIBLE);
+            } else {
+                recentShowsView.setVisibility(View.VISIBLE);
+                setArchives(showDetailses);
+            }
         }
     }
 
