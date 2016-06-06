@@ -1,5 +1,7 @@
 package org.kfjc.android.player;
 
+import android.os.Build;
+
 import org.kfjc.android.player.model.MediaSource;
 
 import java.util.TimeZone;
@@ -11,7 +13,7 @@ public class Constants {
 
     public static final String PLAYLIST_URL = "http://kfjc.org/api/playlists/?i="; // 50723
     public static final int CURRENT_TRACK_POLL_DELAY_MS = 30000;
-    public static final String USER_AGENT = "kfjc4droid-v8";
+    public static final String USER_AGENT = "kfjc4droid-v" + BuildConfig.VERSION_CODE;
 
     public static final String RESOURCES_URL = "http://www.kfjc.org/api/resources.json";
     public static final String ARCHIVES_URL = "http://kfjc.org/api/archives.php";
