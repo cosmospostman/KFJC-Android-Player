@@ -50,7 +50,6 @@ public class StreamService extends Service {
         onControlIntentFilter.addAction(INTENT_STOP);
         onControlIntentFilter.addAction(INTENT_PAUSE);
         onControlIntentFilter.addAction(INTENT_UNPAUSE);
-
     }
 
     private static final int MIN_BUFFER_MS = 5000;

@@ -107,6 +107,8 @@ public class NotificationUtil {
                 builder.setStyle(new Notification.MediaStyle()
                         .setShowActionsInCompactView(0, 1));
             }else if (action.equals(StreamService.INTENT_UNPAUSE)) {
+                builder.addAction(R.drawable.ic_stop_white_48dp,
+                        context.getString(R.string.action_stop), buildControlIntent(context, StreamService.INTENT_STOP));
                 builder.addAction(R.drawable.ic_play_arrow_white_48dp,
                         context.getString(R.string.action_play), buildControlIntent(context, StreamService.INTENT_UNPAUSE));
                 builder.setStyle(new Notification.MediaStyle()
