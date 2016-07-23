@@ -293,6 +293,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
             loadingProgress.setVisibility(View.INVISIBLE);
         handler.removeCallbacks(playClockUpdater);
+        playtimeSeekBar.setProgress(0);
+        podcastDetails.setText("");
         displayState = PlayerState.STOP;
     }
 
