@@ -173,6 +173,9 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void onPlayStopButtonClick() {
+        if (displayState == null) {
+            displayState = PlayerState.STOP;
+        }
         switch (displayState) {
             case PAUSE:
                 if (playerSource.type == MediaSource.Type.ARCHIVE
