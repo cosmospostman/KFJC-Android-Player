@@ -48,6 +48,7 @@ import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.HttpUtil;
+import org.kfjc.android.player.util.Intents;
 import org.kfjc.android.player.util.NotificationUtil;
 
 import java.util.Calendar;
@@ -55,10 +56,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeScreenInterface {
-
-    public static final String INTENT_FROM_NOTIFICATION = "fromNotification";
-    public static final String INTENT_DOWNLOAD_CLICKED = "downloadClicked";
-    public static final String INTENT_DOWNLOAD_IDS = "downloadIds";
 
     private static final String KEY_ACTIVE_FRAGMENT = "active-fragment";
     private static final int KFJC_PERM_READ_PHONE_STATE = 0;
@@ -76,10 +73,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     private NotificationUtil notificationUtil;
 
-    private AudioManager audioManager;
     private TelephonyManager telephonyManager;
     private PhoneStateListener phoneStateListener;
-    private BroadcastReceiver downloadClickedReceiver;
 
     private LiveStreamFragment liveStreamFragment;
     private PodcastFragment podcastFragment;
@@ -495,7 +490,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     protected void onNewIntent(Intent intent) {
-        if (intent.getBooleanExtra(INTENT_FROM_NOTIFICATION, false) && streamService.getSource() != null) {
+        if (intent.getBooleanExtra(Intents.INTENT_FROM_NOTIFICATION, false) && streamService.getSource() != null) {
             switch (streamService.getSource().type) {
                 case LIVESTREAM:
                     loadFragment(R.id.nav_livestream);
@@ -508,7 +503,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     return;
             }
         }
-        long[] downloadIds = intent.getLongArrayExtra(INTENT_DOWNLOAD_IDS);
+        long[] downloadIds = intent.getLongArrayExtra(Intents.INTENT_DOWNLOAD_IDS);
         if (downloadIds != null && downloadIds.length > 0) {
             for (long id : downloadIds) {
                 if (activeDownloads.containsKey(id)) {

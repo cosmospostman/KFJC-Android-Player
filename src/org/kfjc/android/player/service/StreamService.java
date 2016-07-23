@@ -28,16 +28,12 @@ import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.fragment.PlayerFragment;
 import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.util.Intents;
 import org.kfjc.android.player.util.NotificationUtil;
 
 import java.io.File;
 
 public class StreamService extends Service {
-
-//    public static final String INTENT_CONTROL = "controlIntent";
-    public static final String INTENT_STOP = "action_stop";
-    public static final String INTENT_PAUSE = "action_pause";
-    public static final String INTENT_UNPAUSE = "action_unpause";
 
     private static final String TAG = StreamService.class.getSimpleName();
     private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
@@ -47,9 +43,9 @@ public class StreamService extends Service {
     private static final IntentFilter onControlIntentFilter;
     static {
         onControlIntentFilter = new IntentFilter();
-        onControlIntentFilter.addAction(INTENT_STOP);
-        onControlIntentFilter.addAction(INTENT_PAUSE);
-        onControlIntentFilter.addAction(INTENT_UNPAUSE);
+        onControlIntentFilter.addAction(Intents.INTENT_STOP);
+        onControlIntentFilter.addAction(Intents.INTENT_PAUSE);
+        onControlIntentFilter.addAction(Intents.INTENT_UNPAUSE);
     }
 
     private static final int MIN_BUFFER_MS = 5000;
@@ -99,11 +95,11 @@ public class StreamService extends Service {
     private BroadcastReceiver onControlReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (INTENT_STOP.equals(intent.getAction())) {
+            if (Intents.INTENT_STOP.equals(intent.getAction())) {
                 stop();
-            } else if (INTENT_PAUSE.equals(intent.getAction())) {
+            } else if (Intents.INTENT_PAUSE.equals(intent.getAction())) {
                 pause();
-            } else if (INTENT_UNPAUSE.equals(intent.getAction())) {
+            } else if (Intents.INTENT_UNPAUSE.equals(intent.getAction())) {
                 unpause();
             }
         }
@@ -174,7 +170,7 @@ public class StreamService extends Service {
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             play(mediaSource.url);
         } else if (mediaSource.type == MediaSource.Type.ARCHIVE) {
-            startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_PAUSE));
+            startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(Intents.INTENT_PAUSE));
             activeSourceNumber = -1;
             playArchiveHour(0);
         }
@@ -240,7 +236,7 @@ public class StreamService extends Service {
         abandonAudioFocus();
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
-        notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_UNPAUSE));
+        notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(Intents.INTENT_UNPAUSE));
     }
 
     public void unpause() {
@@ -253,7 +249,7 @@ public class StreamService extends Service {
             player.setPlayWhenReady(true);
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
-            notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(INTENT_PAUSE));
+            notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(Intents.INTENT_PAUSE));
             return;
         }
     }
