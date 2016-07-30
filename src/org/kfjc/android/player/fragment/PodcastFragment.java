@@ -205,7 +205,9 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
             recentShowsLoadingView.setVisibility(View.GONE);
             if (showDetailses == null || showDetailses.size() == 0) {
                 getListError.setVisibility(View.VISIBLE);
+                recentShowsView.setVisibility(View.GONE);
             } else {
+                getListError.setVisibility(View.GONE);
                 recentShowsView.setVisibility(View.VISIBLE);
                 setArchives(showDetailses);
             }

@@ -3,7 +3,6 @@ package org.kfjc.android.player.activity;
 import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,7 +11,6 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.NavigationView;
@@ -41,10 +39,10 @@ import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.fragment.PlayerFragment;
 import org.kfjc.android.player.fragment.PodcastFragment;
 import org.kfjc.android.player.fragment.PodcastPlayerFragment;
-import org.kfjc.android.player.model.ShowDetails;
+import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
-import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.HttpUtil;
@@ -485,34 +483,47 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         PreferenceControl.updateStreams();
         isForegroundActivity = true;
         updateBackground();
-        loadFragment(activeFragmentId);
+        Intent intent = getIntent();
+        if (intent != null) {
+            boolean intentFromNotification = intent.getBooleanExtra(Intents.INTENT_FROM_NOTIFICATION, false);
+            if (intentFromNotification) {
+                if (streamService.getSource() != null) {
+                    // TODO: consider adding source to intent.
+                    loadFragment(R.id.nav_livestream);
+                    return;
+                }
+                switch (streamService.getSource().type) {
+                    case LIVESTREAM:
+                        loadFragment(R.id.nav_livestream);
+                        return;
+                    case ARCHIVE:
+                        if (streamService == null || streamService.getSource() == null) {
+                            loadPodcastListFragment(false);
+                        }
+                        loadPodcastPlayer(streamService.getSource().show, false);
+                        return;
+                }
+            }
+            long[] downloadIds = intent.getLongArrayExtra(Intents.INTENT_DOWNLOAD_IDS);
+            if (downloadIds != null && downloadIds.length > 0) {
+                for (long id : downloadIds) {
+                    if (activeDownloads.containsKey(id)) {
+                        loadPodcastPlayer(activeDownloads.get(id), false);
+                        return;
+                    }
+                }
+                loadFragment(R.id.nav_podcast);
+                return;
+            }
+        } else {
+            loadFragment(activeFragmentId);
+            return;
+        }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        if (intent.getBooleanExtra(Intents.INTENT_FROM_NOTIFICATION, false) && streamService.getSource() != null) {
-            switch (streamService.getSource().type) {
-                case LIVESTREAM:
-                    loadFragment(R.id.nav_livestream);
-                    return;
-                case ARCHIVE:
-                    if (streamService == null || streamService.getSource() == null) {
-                        loadPodcastListFragment(false);
-                    }
-                    loadPodcastPlayer(streamService.getSource().show, false);
-                    return;
-            }
-        }
-        long[] downloadIds = intent.getLongArrayExtra(Intents.INTENT_DOWNLOAD_IDS);
-        if (downloadIds != null && downloadIds.length > 0) {
-            for (long id : downloadIds) {
-                if (activeDownloads.containsKey(id)) {
-                    loadPodcastPlayer(activeDownloads.get(id), false);
-                    return;
-                }
-            }
-            loadFragment(R.id.nav_podcast);
-        }
+        setIntent(intent);
     }
 
     @Override
