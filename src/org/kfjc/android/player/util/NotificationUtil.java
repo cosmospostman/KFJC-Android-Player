@@ -113,7 +113,7 @@ public class NotificationUtil {
                         context.getString(R.string.action_play),
                         Intents.controlIntent(context, Intents.INTENT_UNPAUSE));
                 builder.setStyle(new Notification.MediaStyle()
-                        .setShowActionsInCompactView(0));
+                        .setShowActionsInCompactView(0, 1));
             }
         }
         return builder.build();
