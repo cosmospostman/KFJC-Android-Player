@@ -487,7 +487,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         if (intent != null) {
             boolean intentFromNotification = intent.getBooleanExtra(Intents.INTENT_FROM_NOTIFICATION, false);
             if (intentFromNotification) {
-                if (streamService.getSource() != null) {
+                if (streamService.getSource() == null) {
                     // TODO: consider adding source to intent.
                     loadFragment(R.id.nav_livestream);
                     return;
@@ -515,6 +515,9 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 loadFragment(R.id.nav_podcast);
                 return;
             }
+            // Neither from notification nor download notification.
+            loadFragment(R.id.nav_livestream);
+            return;
         } else {
             loadFragment(activeFragmentId);
             return;

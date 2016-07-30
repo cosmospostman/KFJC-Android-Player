@@ -1,7 +1,5 @@
 package org.kfjc.android.player;
 
-import android.os.Build;
-
 import org.kfjc.android.player.model.MediaSource;
 
 import java.util.TimeZone;
