@@ -62,29 +62,28 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private KfjcApplication application;
 
     private ServiceConnection streamServiceConnection;
+    private ServiceConnection playlistServiceConnection;
     private StreamService streamService;
     private Intent streamServiceIntent;
-
-    private ServiceConnection playlistServiceConnection;
     private PlaylistService playlistService;
     private Intent playlistServiceIntent;
 
     private NotificationUtil notificationUtil;
-
     private TelephonyManager telephonyManager;
     private PhoneStateListener phoneStateListener;
 
     private LiveStreamFragment liveStreamFragment;
     private PodcastFragment podcastFragment;
     private PodcastPlayerFragment podcastPlayerFragment;
+
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private View view;
     private Snackbar snackbar;
     private Map<Long, ShowDetails> activeDownloads;
-    private boolean askPermissionsAgain = true;
 
+    private boolean askPermissionsAgain = true;
     private boolean isForegroundActivity = false;
     private int activeFragmentId = R.id.nav_livestream;
 
