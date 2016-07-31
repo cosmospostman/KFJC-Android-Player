@@ -514,13 +514,11 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 loadFragment(R.id.nav_podcast);
                 return;
             }
-            // Neither from notification nor download notification.
-            loadFragment(R.id.nav_livestream);
-            return;
-        } else {
-            loadFragment(activeFragmentId);
-            return;
+
         }
+        // Neither from notification nor download notification.
+        loadFragment(activeFragmentId);
+        return;
     }
 
     @Override
