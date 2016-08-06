@@ -17,13 +17,8 @@ public class Intents {
     public static final String INTENT_PAUSE = "action_pause";
     public static final String INTENT_UNPAUSE = "action_unpause";
 
-    static Intent notificationIntent(Context context) {
-        Intent i = new Intent(context, HomeScreenDrawerActivity.class);
-        return i;
-    }
-
     static Intent notificationIntent(Context context, MediaSource source) {
-        Intent i = notificationIntent(context);
+        Intent i = new Intent(context, HomeScreenDrawerActivity.class);
         i.putExtra(INTENT_SOURCE, source);
         return i;
     }

@@ -79,26 +79,20 @@ public class NotificationUtil {
                 .setPriority(Notification.PRIORITY_HIGH);
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+            // Should instead build action with Icon.fromResource (but only for Api 23+)
+            builder.addAction(R.drawable.ic_stop_white_48dp,
+                    context.getString(R.string.action_stop),
+                    Intents.controlIntent(context, Intents.INTENT_STOP));
             if (action.equals(Intents.INTENT_STOP)) {
-                // Should instead build action with Icon.fromResource (but only for Api 23+)
-                builder.addAction(R.drawable.ic_stop_white_48dp,
-                        context.getString(R.string.action_stop),
-                        Intents.controlIntent(context, Intents.INTENT_STOP));
                 builder.setStyle(new Notification.MediaStyle()
                         .setShowActionsInCompactView(0));
             } else if (action.equals(Intents.INTENT_PAUSE)) {
-                builder.addAction(R.drawable.ic_stop_white_48dp,
-                        context.getString(R.string.action_stop),
-                        Intents.controlIntent(context, Intents.INTENT_STOP));
                 builder.addAction(R.drawable.ic_pause_white_48dp,
                         context.getString(R.string.action_pause),
                         Intents.controlIntent(context, Intents.INTENT_PAUSE));
                 builder.setStyle(new Notification.MediaStyle()
                         .setShowActionsInCompactView(0, 1));
-            }else if (action.equals(Intents.INTENT_UNPAUSE)) {
-                builder.addAction(R.drawable.ic_stop_white_48dp,
-                        context.getString(R.string.action_stop),
-                        Intents.controlIntent(context, Intents.INTENT_STOP));
+            } else if (action.equals(Intents.INTENT_UNPAUSE)) {
                 builder.addAction(R.drawable.ic_play_arrow_white_48dp,
                         context.getString(R.string.action_play),
                         Intents.controlIntent(context, Intents.INTENT_UNPAUSE));
@@ -109,20 +103,15 @@ public class NotificationUtil {
         return builder;
     }
 
-    public Notification bufferingNotification(Context context) {
-        Notification.Builder builder = kfjcBaseNotification(
-                context, Intents.notificationIntent(context), Intents.INTENT_STOP);
-        builder.setContentTitle(context.getString(R.string.app_name));
-        builder.setContentText(context.getString(R.string.format_buffering,
-                PreferenceControl.getStreamPreference().description));
-        return builder.build();
-    }
-
-    public static Notification kfjcStreamNotification(Context context, MediaSource source, String action) {
+    public static Notification kfjcStreamNotification(Context context, MediaSource source, String action, boolean isBuffering) {
         Intent i = Intents.notificationIntent(context, source);
         Notification.Builder builder = kfjcBaseNotification(context, i, action);
-
-        if (source.type == MediaSource.Type.LIVESTREAM) {
+        if (isBuffering) {
+            builder.setContentTitle(context.getString(R.string.app_name));
+            builder.setContentText(context.getString(R.string.format_buffering,
+                    PreferenceControl.getStreamPreference().description));
+        }
+        else if (source.type == MediaSource.Type.LIVESTREAM) {
             builder.setContentTitle(context.getString(R.string.fragment_title_stream));
             builder.setContentText("");
         } else if (source.type == MediaSource.Type.ARCHIVE) {

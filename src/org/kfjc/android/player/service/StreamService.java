@@ -25,7 +25,6 @@ import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
 import org.kfjc.android.player.Constants;
-import org.kfjc.android.player.R;
 import org.kfjc.android.player.fragment.PlayerFragment;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.util.Intents;
@@ -166,12 +165,19 @@ public class StreamService extends Service {
         this.mediaSource = mediaSource;
         stop();
         if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
-            Notification n = notificationUtil.bufferingNotification(getApplicationContext());
+            Notification n = notificationUtil.kfjcStreamNotification(
+                    getApplicationContext(),
+                    getSource(),
+                    Intents.INTENT_STOP,
+                    true);
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             play(mediaSource.url);
         } else if (mediaSource.type == MediaSource.Type.ARCHIVE) {
             Notification n = notificationUtil.kfjcStreamNotification(
-                    getApplicationContext(), getSource(), Intents.INTENT_PAUSE);
+                    getApplicationContext(),
+                    getSource(),
+                    Intents.INTENT_PAUSE,
+                    false);
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             activeSourceNumber = -1;
             playArchiveHour(0);
@@ -229,7 +235,10 @@ public class StreamService extends Service {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
         Notification n = NotificationUtil.kfjcStreamNotification(
-                getApplicationContext(), getSource(), Intents.INTENT_UNPAUSE);
+                getApplicationContext(),
+                getSource(),
+                Intents.INTENT_UNPAUSE,
+                false);
         notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, n);
     }
 
@@ -244,7 +253,10 @@ public class StreamService extends Service {
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
             Notification n = NotificationUtil.kfjcStreamNotification(
-                    getApplicationContext(), getSource(), Intents.INTENT_PAUSE);
+                    getApplicationContext(),
+                    getSource(),
+                    Intents.INTENT_PAUSE,
+                    false);
             notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             return;
         }
@@ -308,8 +320,6 @@ public class StreamService extends Service {
                     if (playWhenReady) {
                         mediaListener.onStateChange(PlayerFragment.PlayerState.PLAY, mediaSource);
                         registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
-                        registerReceiver(onControlReceiver, onControlIntentFilter);
-                        becomingNoisyReceiverRegistered = true;
                         onControlReceiverRegistered = true;
                     } else {
                          mediaListener.onStateChange(PlayerFragment.PlayerState.PAUSE, mediaSource);
@@ -317,6 +327,8 @@ public class StreamService extends Service {
                     break;
                 case ExoPlayer.STATE_PREPARING:
                     mediaListener.onStateChange(PlayerFragment.PlayerState.BUFFER, mediaSource);
+                    registerReceiver(onControlReceiver, onControlIntentFilter);
+                    becomingNoisyReceiverRegistered = true;
                     break;
                 case ExoPlayer.STATE_BUFFERING:
                     if (!isPlaying()) {
