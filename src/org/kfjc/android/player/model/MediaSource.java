@@ -64,7 +64,9 @@ public class MediaSource implements Parcelable {
         out.writeString(name);
         out.writeString(description);
         out.writeString(url);
-        out.writeParcelable(show, show.describeContents());
+        if (show != null) {
+            out.writeParcelable(show, show.describeContents());
+        }
     }
 
     @Override

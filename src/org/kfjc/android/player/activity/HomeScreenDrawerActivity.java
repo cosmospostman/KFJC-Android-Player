@@ -188,9 +188,9 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             podcastPlayerFragment.setState(state, source);
             podcastFragment.setState(state, source);
             if (source != null && source.type == MediaSource.Type.LIVESTREAM) {
-                // TODO: refactor the logic
                 if (state != PlayerFragment.PlayerState.STOP) {
-                    notificationUtil.updateNowPlayNotification(playlistService.getPlaylist());
+                    notificationUtil.updateNowPlayNotification(
+                            playlistService.getPlaylist(), getPlayerSource());
                 }
             }
         }

@@ -30,12 +30,12 @@ public class NotificationUtil {
         icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.radiodevil);
     }
 
-    public void updateNowPlayNotification(Playlist playlist) {
+    public void updateNowPlayNotification(Playlist playlist, MediaSource source) {
         if (playlist == null) {
             return;
         }
         Notification.Builder builder = kfjcBaseNotification(
-                context, Intents.notificationIntent(context), Intents.INTENT_STOP);
+                context, Intents.notificationIntent(context, source), Intents.INTENT_STOP);
         if (playlist.hasError()) {
             cancelKfjcNotification();
             builder.setContentTitle(context.getString(R.string.app_name));

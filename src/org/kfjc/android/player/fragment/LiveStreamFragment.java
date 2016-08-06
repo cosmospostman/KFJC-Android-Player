@@ -103,7 +103,7 @@ public class LiveStreamFragment extends PlayerFragment {
         if (homeScreen != null
                 && homeScreen.isStreamServicePlaying()
                 && homeScreen.getPlayerSource().type == MediaSource.Type.LIVESTREAM) {
-            notificationUtil.updateNowPlayNotification(playlist);
+            notificationUtil.updateNowPlayNotification(playlist, homeScreen.getPlayerSource());
         }
         if (!isAdded()) {
             return;
