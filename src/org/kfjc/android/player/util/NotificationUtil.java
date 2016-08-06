@@ -42,7 +42,6 @@ public class NotificationUtil {
             builder.setContentText(context.getString(R.string.empty_string));
             notificationManager.notify(KFJC_NOTIFICATION_ID, builder.build());
         } else {
-
             builder.setContentTitle(playlist.getDjName());
             builder.setContentText(artistTrackStringNotification(playlist.getLastTrackEntry()));
             notificationManager.notify(KFJC_NOTIFICATION_ID, builder.build());

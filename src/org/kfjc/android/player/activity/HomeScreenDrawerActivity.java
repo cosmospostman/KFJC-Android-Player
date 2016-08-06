@@ -380,7 +380,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void loadPodcastPlayer(ShowDetails show, boolean animate) {
-        if (activeFragmentId == R.id.nav_podcast_player) {
+        if (activeFragmentId == R.id.nav_podcast_player
+                && podcastPlayerFragment.getShow().equals(show)) {
             return;
         }
         setActionBarBackArrow(true);
@@ -484,22 +485,15 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         updateBackground();
         Intent intent = getIntent();
         if (intent != null) {
-            boolean intentFromNotification = intent.getBooleanExtra(Intents.INTENT_FROM_NOTIFICATION, false);
-            if (intentFromNotification) {
-                if (streamService.getSource() == null) {
-                    // TODO: consider adding source to intent.
-                    loadFragment(R.id.nav_livestream);
-                    return;
-                }
-                switch (streamService.getSource().type) {
+//            boolean intentFromNotification = intent.getBooleanExtra(Intents.INTENT_FROM_NOTIFICATION, false);
+            MediaSource source = intent.getParcelableExtra(Intents.INTENT_SOURCE);
+            if (source != null) {
+                switch (source.type) {
                     case LIVESTREAM:
                         loadFragment(R.id.nav_livestream);
                         return;
                     case ARCHIVE:
-                        if (streamService == null || streamService.getSource() == null) {
-                            loadPodcastListFragment(false);
-                        }
-                        loadPodcastPlayer(streamService.getSource().show, false);
+                        loadPodcastPlayer(source.show, false);
                         return;
                 }
             }

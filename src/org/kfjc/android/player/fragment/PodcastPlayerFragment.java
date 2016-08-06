@@ -312,4 +312,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
     }
+
+    public ShowDetails getShow() {
+        return show;
+    }
 }

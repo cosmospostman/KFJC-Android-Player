@@ -9,19 +9,16 @@ import org.kfjc.android.player.model.MediaSource;
 
 public class Intents {
 
-    public static final String INTENT_FROM_NOTIFICATION = "fromNotification";
     public static final String INTENT_SOURCE = "fromNotification";
     public static final String INTENT_DOWNLOAD_CLICKED = "downloadClicked";
     public static final String INTENT_DOWNLOAD_IDS = "downloadIds";
 
-    public static final String INTENT_ACTION = "intent_action";
     public static final String INTENT_STOP = "action_stop";
     public static final String INTENT_PAUSE = "action_pause";
     public static final String INTENT_UNPAUSE = "action_unpause";
 
     static Intent notificationIntent(Context context) {
         Intent i = new Intent(context, HomeScreenDrawerActivity.class);
-        i.putExtra(INTENT_FROM_NOTIFICATION, true);
         return i;
     }
 
