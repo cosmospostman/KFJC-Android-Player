@@ -11,6 +11,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import org.kfjc.android.player.control.PreferenceControl;
+import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.R;
 
@@ -33,17 +34,18 @@ public class NotificationUtil {
         if (playlist == null) {
             return;
         }
+        Notification.Builder builder = kfjcBaseNotification(
+                context, Intents.notificationIntent(context), Intents.INTENT_STOP);
         if (playlist.hasError()) {
             cancelKfjcNotification();
-            postNotification(
-                    context.getString(R.string.app_name),
-                    context.getString(R.string.empty_string),
-                    Intents.INTENT_STOP);
+            builder.setContentTitle(context.getString(R.string.app_name));
+            builder.setContentText(context.getString(R.string.empty_string));
+            notificationManager.notify(KFJC_NOTIFICATION_ID, builder.build());
         } else {
-            postNotification(
-                    playlist.getDjName(),
-                    artistTrackStringNotification(playlist.getLastTrackEntry()),
-                    Intents.INTENT_STOP);
+
+            builder.setContentTitle(playlist.getDjName());
+            builder.setContentText(artistTrackStringNotification(playlist.getLastTrackEntry()));
+            notificationManager.notify(KFJC_NOTIFICATION_ID, builder.build());
         }
     }
 
@@ -66,27 +68,16 @@ public class NotificationUtil {
         return artistTrackString;
     }
 
-    public Notification bufferingNotification(Context context) {
-        return kfjcNotification(context,
-                context.getString(R.string.app_name),
-                context.getString(R.string.format_buffering,
-                        PreferenceControl.getStreamPreference().description),
-                Intents.INTENT_STOP);
-    }
-
-    public Notification kfjcNotification(Context context, String title, String text, String action) {
-        Intent i = Intents.notificationIntent(context);
+    private static Notification.Builder kfjcBaseNotification(Context context, Intent i, String action) {
         PendingIntent kfjcPlayerIntent = Intents.playerIntent(context, i);
 
         Notification.Builder builder = new Notification.Builder(context)
-            .setSmallIcon(R.drawable.ic_kfjc_notification)
-            .setLargeIcon(icon)
-            .setContentTitle(title)
-            .setContentText(text)
-            .setOngoing(true)
-            .setWhen(0)
-            .setContentIntent(kfjcPlayerIntent)
-            .setPriority(Notification.PRIORITY_HIGH);
+                .setSmallIcon(R.drawable.ic_kfjc_notification)
+                .setLargeIcon(icon)
+                .setOngoing(true)
+                .setWhen(0)
+                .setContentIntent(kfjcPlayerIntent)
+                .setPriority(Notification.PRIORITY_HIGH);
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
             if (action.equals(Intents.INTENT_STOP)) {
@@ -116,12 +107,31 @@ public class NotificationUtil {
                         .setShowActionsInCompactView(0, 1));
             }
         }
+        return builder;
+    }
+
+    public Notification bufferingNotification(Context context) {
+        Notification.Builder builder = kfjcBaseNotification(
+                context, Intents.notificationIntent(context), Intents.INTENT_STOP);
+        builder.setContentTitle(context.getString(R.string.app_name));
+        builder.setContentText(context.getString(R.string.format_buffering,
+                PreferenceControl.getStreamPreference().description));
         return builder.build();
     }
 
-    public void postNotification(String title, String text, String action) {
-        notificationManager.notify(
-                KFJC_NOTIFICATION_ID, kfjcNotification(context, title, text, action));
+    public static Notification kfjcStreamNotification(Context context, MediaSource source, String action) {
+        Intent i = Intents.notificationIntent(context, source);
+        Notification.Builder builder = kfjcBaseNotification(context, i, action);
+
+        if (source.type == MediaSource.Type.LIVESTREAM) {
+            builder.setContentTitle(context.getString(R.string.fragment_title_stream));
+            builder.setContentText("");
+        } else if (source.type == MediaSource.Type.ARCHIVE) {
+            builder.setContentTitle(source.show.getAirName());
+            builder.setContentText(source.show.getTimestampString());
+        }
+
+        return builder.build();
     }
 
     public static void cancelKfjcNotification() {

@@ -1,6 +1,9 @@
 package org.kfjc.android.player.model;
 
-public class MediaSource {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class MediaSource implements Parcelable {
 
     public enum Format { MP3, AAC, NONE }
     public enum Type { LIVESTREAM, ARCHIVE }
@@ -28,6 +31,40 @@ public class MediaSource {
         this.name = show.getAirName();
         this.description = show.getTimestampString();
         this.show = show;
+    }
+
+    public MediaSource(Parcel in) {
+        this.type = Type.values()[in.readInt()];
+        this.format = Format.values()[in.readInt()];
+        this.name = in.readString();
+        this.description = in.readString();
+        this.url = in.readString();
+        this.show = in.readParcelable(ShowDetails.class.getClassLoader());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public MediaSource createFromParcel(Parcel in) {
+            return new MediaSource(in);
+        }
+
+        public MediaSource[] newArray(int size) {
+            return new MediaSource[size];
+        }
+    };
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeInt(type.ordinal());
+        out.writeInt(format.ordinal());
+        out.writeString(name);
+        out.writeString(description);
+        out.writeString(url);
+        out.writeParcelable(show, show.describeContents());
     }
 
     @Override

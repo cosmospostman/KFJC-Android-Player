@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
+import org.kfjc.android.player.model.MediaSource;
 
 public class Intents {
 
     public static final String INTENT_FROM_NOTIFICATION = "fromNotification";
+    public static final String INTENT_SOURCE = "fromNotification";
     public static final String INTENT_DOWNLOAD_CLICKED = "downloadClicked";
     public static final String INTENT_DOWNLOAD_IDS = "downloadIds";
 
@@ -20,6 +22,12 @@ public class Intents {
     static Intent notificationIntent(Context context) {
         Intent i = new Intent(context, HomeScreenDrawerActivity.class);
         i.putExtra(INTENT_FROM_NOTIFICATION, true);
+        return i;
+    }
+
+    static Intent notificationIntent(Context context, MediaSource source) {
+        Intent i = notificationIntent(context);
+        i.putExtra(INTENT_SOURCE, source);
         return i;
     }
 

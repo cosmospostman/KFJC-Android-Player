@@ -170,7 +170,9 @@ public class StreamService extends Service {
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             play(mediaSource.url);
         } else if (mediaSource.type == MediaSource.Type.ARCHIVE) {
-            startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(Intents.INTENT_PAUSE));
+            Notification n = notificationUtil.kfjcStreamNotification(
+                    getApplicationContext(), getSource(), Intents.INTENT_PAUSE);
+            startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             activeSourceNumber = -1;
             playArchiveHour(0);
         }
@@ -221,22 +223,14 @@ public class StreamService extends Service {
         player.setPlayWhenReady(true);
     }
 
-    private Notification buildNotification(String action) {
-        if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
-            return notificationUtil.kfjcNotification(
-                    this, getString(R.string.fragment_title_stream), "", action);
-        } else {
-            return notificationUtil.kfjcNotification(
-                this, mediaSource.show.getAirName(), mediaSource.show.getTimestampString(), action);
-        }
-    }
-
     public void pause() {
         player.setPlayWhenReady(false);
         abandonAudioFocus();
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
-        notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(Intents.INTENT_UNPAUSE));
+        Notification n = NotificationUtil.kfjcStreamNotification(
+                getApplicationContext(), getSource(), Intents.INTENT_UNPAUSE);
+        notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, n);
     }
 
     public void unpause() {
@@ -249,7 +243,9 @@ public class StreamService extends Service {
             player.setPlayWhenReady(true);
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
-            notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, buildNotification(Intents.INTENT_PAUSE));
+            Notification n = NotificationUtil.kfjcStreamNotification(
+                    getApplicationContext(), getSource(), Intents.INTENT_PAUSE);
+            notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             return;
         }
     }
