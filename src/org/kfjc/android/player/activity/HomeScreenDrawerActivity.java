@@ -484,6 +484,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         isForegroundActivity = true;
         updateBackground();
         Intent intent = getIntent();
+        setIntent(null);
         if (intent != null) {
             MediaSource source = intent.getParcelableExtra(Intents.INTENT_SOURCE);
             if (source != null) {
