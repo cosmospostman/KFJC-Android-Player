@@ -28,4 +28,5 @@ public interface HomeScreenInterface {
     void syncState();
     MediaSource getPlayerSource();
     void setActionBarBackArrow(boolean isBackArrorw);
+    void requestAndroidWritePermissions();
 }

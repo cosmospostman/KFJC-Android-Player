@@ -1,11 +1,14 @@
 package org.kfjc.android.player.fragment;
 
+import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -75,22 +78,35 @@ public class PodcastPlayerFragment extends PlayerFragment {
         }
     };
 
+    private boolean hasWritePermission() {
+        return ContextCompat.checkSelfPermission(
+                getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
     private View.OnClickListener downloadClicklistener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            OfflineDialog offlineDialog = OfflineDialog.newInstance(
-                    show.getPlaylistId(),
-                    show.getTotalFileSizeBytes(),
-                    ExternalStorageUtil.hasAllContent(show));
-            offlineDialog.setOnDismissListener(new OfflineDialog.OnDismissListener() {
-                @Override
-                public void onDismiss() {
-                    updateDownloadState();
-                }
-            });
-            offlineDialog.show(getFragmentManager(), "offline");
+            if (!hasWritePermission()) {
+                homeScreen.requestAndroidWritePermissions();
+            } else {
+                showOfflineDialog();
+            }
         }
     };
+
+    private void showOfflineDialog() {
+        OfflineDialog offlineDialog = OfflineDialog.newInstance(
+                show.getPlaylistId(),
+                show.getTotalFileSizeBytes(),
+                ExternalStorageUtil.hasAllContent(show));
+        offlineDialog.setOnDismissListener(new OfflineDialog.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                updateDownloadState();
+            }
+        });
+        offlineDialog.show(getFragmentManager(), "offline");
+    }
 
     SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         boolean isTrackingTouch = false;
@@ -207,6 +223,10 @@ public class PodcastPlayerFragment extends PlayerFragment {
         if (!wasGranted) {
             return;
         }
+        showOfflineDialog();
+    }
+
+    public void startDownload() {
         makeEnsureDownloadTask().execute();
     }
 

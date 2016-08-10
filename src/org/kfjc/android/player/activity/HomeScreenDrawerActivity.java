@@ -226,17 +226,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private boolean hasWritePermission() {
-        return ContextCompat.checkSelfPermission(
-                this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-    }
-
     @Override
     public void startDownload() {
-        if (!hasWritePermission()) {
-            requestAndroidWritePermissions();
-        } else {
-            onWritePermissionGranted(true);
+        if (podcastPlayerFragment != null) {
+            podcastPlayerFragment.startDownload();
         }
     }
 
@@ -266,7 +259,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 KFJC_PERM_READ_PHONE_STATE);
     }
 
-    private void requestAndroidWritePermissions() {
+    public void requestAndroidWritePermissions() {
         ActivityCompat.requestPermissions(
                 HomeScreenDrawerActivity.this,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
