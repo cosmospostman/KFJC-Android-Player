@@ -370,7 +370,12 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 break;
             case R.id.nav_podcast_player:
                 if (streamService == null || streamService.getSource() == null) {
-                    loadPodcastPlayer(null, false);
+                    if (podcastPlayerFragment != null) {
+                        replaceFragment(podcastPlayerFragment);
+                    } else {
+                        // Don't load empty podcast player
+                        loadPodcastListFragment(false);
+                    }
                 } else {
                     loadPodcastPlayer(streamService.getSource().show, false);
                 }
@@ -387,11 +392,11 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setActionBarBackArrow(true);
         activeFragmentId = R.id.nav_podcast_player;
         podcastPlayerFragment = new PodcastPlayerFragment();
-        if (show != null) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(PodcastPlayerFragment.BROADCAST_SHOW_KEY, show);
-            podcastPlayerFragment.setArguments(bundle);
-        }
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(PodcastPlayerFragment.BROADCAST_SHOW_KEY, show);
+        podcastPlayerFragment.setArguments(bundle);
+
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         if (animate) {
             ft.setCustomAnimations(R.animator.fade_in_to_left, R.animator.fade_out_to_left);
