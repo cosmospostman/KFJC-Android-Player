@@ -382,7 +382,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 && podcastPlayerFragment.getShow().equals(show)) {
             return;
         }
-        setActionBarBackArrow(true);
         activeFragmentId = R.id.nav_podcast_player;
         podcastPlayerFragment = new PodcastPlayerFragment();
 

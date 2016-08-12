@@ -171,6 +171,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
             bottomControls.setVisibility(View.VISIBLE);
             loadingProgress.setVisibility(View.INVISIBLE);
         }
+        homeScreen.setActionBarBackArrow(true);
         homeScreen.syncState();
     }
 
