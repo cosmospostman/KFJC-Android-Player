@@ -338,7 +338,9 @@ public class StreamService extends Service {
                 case ExoPlayer.STATE_ENDED:
                     mediaListener.onStateChange(PlayerFragment.PlayerState.STOP, mediaSource);
                     unregisterReceivers();
-                    playNextArchiveHour();
+                    if (!playNextArchiveHour()) {
+                        stop(true);
+                    }
                     break;
                 case ExoPlayer.STATE_IDLE:
                     break;
