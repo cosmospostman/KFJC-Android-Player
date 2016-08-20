@@ -89,7 +89,6 @@ public class OfflineDialog extends KfjcDialog {
             ImageView icon = (ImageView) view.findViewById(R.id.offlineActionIcon);
             TextView text = (TextView) view.findViewById(R.id.dialogText);
             TextView fileSizeView = (TextView) view.findViewById(R.id.fileSize);
-            TextView deleteWearningView = (TextView) view.findViewById(R.id.deleteWarning);
 
             icon.setImageResource(isDownloaded
                     ? R.drawable.ic_offline_pin_white_48dp
@@ -97,7 +96,6 @@ public class OfflineDialog extends KfjcDialog {
             text.setText(isDownloaded
                     ? R.string.dialog_podcast_is_downloaded
                     : R.string.dialog_podcast_can_download);
-            deleteWearningView.setVisibility(isDownloaded ? View.VISIBLE : View.GONE);
             if (canDownload) {
                 fileSizeView.setText(isDownloaded
                         ? getString(R.string.format_file_size_saved, filesizeMb)
