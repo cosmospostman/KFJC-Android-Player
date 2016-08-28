@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="action_pause">Pausa</string>
+    <string name="action_play">Spela</string>
+    <string name="action_stop">Stanna</string>
+    <string name="app_name">KFJC</string>
+
+    <string name="button_close">Stäng</string>
+    <string name="button_download">Ladda In</string>
+    <string name="button_delete">Ta Bort</string>
+
+    <string name="default_dj_name"
+            translation_description="DJ name to show if nobody is signed into spidey">
+            George Foothill</string>
+    <string name="dialog_podcast_can_download">Detta program kan sparas på enheten .</string>
+    <string name="dialog_podcast_is_downloaded">Detta program sparades på enheten.</string>
+
+    <string name="empty_string"
+            translation_description="No need to translate nothingness">
+            </string>
+
+    <string name="error_generic">
+            Nåt gick fel</string>
+    <string name="error_unable_to_connect">
+            Kan inte ansluta till KFJC</string>
+    <string name="error_activity_not_found">
+            Hittade ingen relevant application</string>
+
+    <string name="fragment_title_stream"
+            translation_description="UI title for the live stream screen">
+            KFJC Live Stream</string>
+    <string name="fragment_title_playlist"
+            translation_description="UI title for the playlist screen">
+            Spellista</string>
+
+    <string name="fragment_title_podcast"
+        translation_description="UI title for the podcast screen">
+            På begäran</string>
+
+    <string name="nav_livestream">Live stream</string>
+    <string name="nav_playlists">Spellista</string>
+    <string name="nav_podcast">På begäran</string>
+    <string name="navigation_drawer_open">Öppna nagiveringen</string>
+    <string name="navigation_drawer_close">Stäng nagiveringen</string>
+    <string name="navigation_drawer_title">KFJC Radio</string>
+
+    <string name="permission_phone_title">Telefon behörigheter</string>
+    <string name="permission_phone_rationale">KFJC använder endast telefonbehörighet för att automatiskt
+        stoppa uppspelningen när telefonen är i bruk. Vi tjuvlyssnar inte!</string>
+    <string name="podcast_label_recent_archives">Hot (utanför) air</string>
+    <string name="podcast_label_saved_archives">Offline tillgängligt</string>
+    <string name="podcast_delete_warning">Du kan inte ladda ner show:en igen ifall det har varit mera än två veckor sedan show:en was inspelad.</string>
+    <string name="podcast_no_saved_shows">Du har inte sparat program till denna enhet.</string>
+
+    <string name="setting_audio_quality">Live stream audio kvalitet</string>
+    <string name="setting_backgrounds">Backgrounds per timme</string>
+    <string name="status_connecting">Ansluter till KFJC&#8230;</string>
+    <string name="status_default_stream">Använder standard stream</string>
+    <string name="status_playlist_unavailable">Spellista inte tillgänglig :\'(</string>
+    <string name="status_lava_download">Laddar ner Lava&#8230;</string>
+    <string name="status_lava_download_format">Laddade ner Lava (%1$sMB)&#8230;</string>
+
+    <string name="trackdetails_album">Album</string>
+    <string name="trackdetails_artist">Artist</string>
+    <string name="trackdetails_label">Label</string>
+    <string name="trackdetails_track">Låt</string>
+
+    <string name="format_buffering"
+            translation_description="String to show when buffering stream called (%1s)">
+         	Buffer stream: %1$s</string>
+    <string name="format_artist_track"
+            translation_description="String combining artist (%1s) and track (%2$s)">
+         	%1$s - %2$s</string>
+
+    <string name="format_file_size_download"
+        translation_description="File size used">
+         	%1$sMb nerladdning</string>
+    <string name="format_file_size_download_no_space"
+        translation_description="File size used">
+         	%1$sMb nerladdning (inte tillräckligt med utrymme på enheten)</string>
+    <string name="format_file_size_saved"
+        translation_description="File size used">
+         	%1$sMb lagringsutrymme använt</string>
+    <string name="format_share_track_details"
+        translation_description="String for sharing, combining artist (%1s), track (%2$s) and album (%3$s)">
+        Från KFJC: %1$s - %2$s (%3$s)</string>
+    <string name="format_archive_file"
+        translation_description="DJ name, plus which archive file (of total hours for that show)">
+        %1$s, del %2$d av %3$d</string>
+</resources>
