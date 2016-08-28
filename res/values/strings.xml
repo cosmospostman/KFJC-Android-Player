@@ -53,7 +53,7 @@
     <string name="podcast_no_saved_shows">You haven\'t saved any shows to this device.</string>
 
     <string name="setting_audio_quality">Live stream audio quality</string>
-    <string name="setting_backgrounds">Hourly backgrounds</string>
+    <string name="setting_backgrounds">Enable hourly backgrounds</string>
     <string name="status_connecting">Connecting to KFJC&#8230;</string>
     <string name="status_default_stream">Using default stream</string>
     <string name="status_playlist_unavailable">Playlist unavailable :\'(</string>
