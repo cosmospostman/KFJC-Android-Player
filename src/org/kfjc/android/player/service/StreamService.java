@@ -39,13 +39,6 @@ public class StreamService extends Service {
     private static final int BUFFER_SEGMENT_COUNT = 256;
     private static final IntentFilter becomingNoisyIntentFilter =
             new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-    private static final IntentFilter onControlIntentFilter;
-    static {
-        onControlIntentFilter = new IntentFilter();
-        onControlIntentFilter.addAction(Intents.INTENT_STOP);
-        onControlIntentFilter.addAction(Intents.INTENT_PAUSE);
-        onControlIntentFilter.addAction(Intents.INTENT_UNPAUSE);
-    }
 
     private static final int MIN_BUFFER_MS = 5000;
     private static final int MIN_REBUFFER_MS = 5000;
@@ -91,22 +84,18 @@ public class StreamService extends Service {
         }
     };
 
-    private BroadcastReceiver onControlReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (Intents.INTENT_STOP.equals(intent.getAction())) {
-                stop();
-            } else if (Intents.INTENT_PAUSE.equals(intent.getAction())) {
-                pause();
-            } else if (Intents.INTENT_UNPAUSE.equals(intent.getAction())) {
-                unpause();
-            }
-        }
-    };
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         notificationUtil = new NotificationUtil(this);
+
+        if (Intents.INTENT_STOP.equals(intent.getAction())) {
+            stop();
+        } else if (Intents.INTENT_PAUSE.equals(intent.getAction())) {
+            pause();
+        } else if (Intents.INTENT_UNPAUSE.equals(intent.getAction())) {
+            unpause();
+        }
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -305,11 +294,6 @@ public class StreamService extends Service {
         } catch (IllegalArgumentException e) {
             // receiver was already unregistered.
         }
-        try {
-            if (onControlReceiverRegistered) {
-                unregisterReceiver(onControlReceiver);
-            }
-        } catch (IllegalArgumentException e) {}
     }
 
     private ExoPlayer.Listener exoPlayerListener = new ExoPlayer.Listener() {
@@ -327,7 +311,6 @@ public class StreamService extends Service {
                     break;
                 case ExoPlayer.STATE_PREPARING:
                     mediaListener.onStateChange(PlayerFragment.PlayerState.BUFFER, mediaSource);
-                    registerReceiver(onControlReceiver, onControlIntentFilter);
                     becomingNoisyReceiverRegistered = true;
                     break;
                 case ExoPlayer.STATE_BUFFERING:

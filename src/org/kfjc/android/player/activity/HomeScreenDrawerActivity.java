@@ -379,7 +379,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void loadPodcastPlayer(ShowDetails show, boolean animate) {
         if (activeFragmentId == R.id.nav_podcast_player
-                && podcastPlayerFragment.getShow().equals(show)) {
+                && show.equals(podcastPlayerFragment.getShow())) {
             return;
         }
         activeFragmentId = R.id.nav_podcast_player;

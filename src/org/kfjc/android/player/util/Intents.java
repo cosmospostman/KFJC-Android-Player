@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
 import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.service.StreamService;
 
 public class Intents {
 
@@ -29,11 +30,8 @@ public class Intents {
     }
 
     static PendingIntent controlIntent(Context context, String action) {
-        Intent intent = new Intent(action);
-        return PendingIntent.getBroadcast(context, 0, intent,
+        Intent intent = new Intent(action, null, context, StreamService.class);
+        return PendingIntent.getService(context, 1, intent,
                 PendingIntent.FLAG_ONE_SHOT|PendingIntent.FLAG_UPDATE_CURRENT);
-//        Intent intent = new Intent(context, HomeScreenDrawerActivity.class);
-//        intent.putExtra(INTENT_ACTION, action);
-//        return PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, 0);
     }
 }
