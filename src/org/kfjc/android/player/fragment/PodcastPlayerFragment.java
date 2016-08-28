@@ -3,7 +3,6 @@ package org.kfjc.android.player.fragment;
 import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -29,7 +28,6 @@ import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
-import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
@@ -53,11 +51,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private TextView podcastDetails;
     private LinearLayout bottomControls;
     private ProgressBar loadingProgress;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
 
     private View.OnClickListener fabClickListener = new View.OnClickListener() {
         @Override
@@ -163,17 +156,18 @@ public class PodcastPlayerFragment extends PlayerFragment {
     public void onResume() {
         super.onResume();
         Bundle bundle = getArguments();
-        if (bundle != null) {
-            this.show = bundle.getParcelable(BROADCAST_SHOW_KEY);
-            homeScreen.setActionbarTitle(show.getAirName());
-            dateTime.setText(show.getTimestampString());
 
-            updateDownloadState();
-            fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-            homeScreen.syncState();
-            bottomControls.setVisibility(View.VISIBLE);
-            loadingProgress.setVisibility(View.INVISIBLE);
-        }
+        // Don't do null check. Prefer to crash if show is null.
+        this.show = bundle.getParcelable(BROADCAST_SHOW_KEY);
+        homeScreen.setActionbarTitle(show.getAirName());
+        dateTime.setText(show.getTimestampString());
+
+        updateDownloadState();
+        fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+        homeScreen.syncState();
+        bottomControls.setVisibility(View.VISIBLE);
+        loadingProgress.setVisibility(View.INVISIBLE);
+
         homeScreen.setActionBarBackArrow(true);
         homeScreen.syncState();
     }
@@ -204,6 +198,9 @@ public class PodcastPlayerFragment extends PlayerFragment {
                 } // else fall through:
             case STOP:
                 Intents.sendAction(getActivity(), Intents.INTENT_PLAY, new MediaSource(show));
+                break;
+            case BUFFER:
+                Intents.sendAction(getActivity(), Intents.INTENT_STOP);
                 break;
             case PLAY:
                 Intents.sendAction(getActivity(), Intents.INTENT_PAUSE);
@@ -301,6 +298,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void setPlayState() {
+        playtimeSeekBar.setEnabled(true);
         fab.setImageResource(R.drawable.ic_pause_white_48dp);
         loadingProgress.setVisibility(View.INVISIBLE);
         startPlayClockUpdater();
@@ -308,7 +306,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void setPauseState() {
-        playtimeSeekBar.setEnabled(true);
+        playtimeSeekBar.setEnabled(false);
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
         updateClock();
         displayState = PlayerState.PAUSE;
@@ -325,10 +323,10 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void setBufferState() {
-        playtimeSeekBar.setEnabled(true);
+        playtimeSeekBar.setEnabled(false);
         loadingProgress.setVisibility(View.VISIBLE);
         fab.setImageResource(R.drawable.ic_stop_white_48dp);
-        displayState = PlayerState.PLAY;
+        displayState = PlayerState.BUFFER;
     }
 
     @Override

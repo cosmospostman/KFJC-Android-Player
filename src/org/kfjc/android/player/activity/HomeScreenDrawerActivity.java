@@ -97,6 +97,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
         if (savedInstanceState != null) {
             activeFragmentId = savedInstanceState.getInt(KEY_ACTIVE_FRAGMENT);
+            podcastPlayerFragment = (PodcastPlayerFragment)
+                    getFragmentManager().getFragment(savedInstanceState, "PodcastPlayerFragment");
         }
 
         HttpUtil.installCache(getApplicationContext());
@@ -437,6 +439,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(KEY_ACTIVE_FRAGMENT, activeFragmentId);
+        getFragmentManager().putFragment(outState, "PodcastPlayerFragment", podcastPlayerFragment);
         super.onSaveInstanceState(outState);
     }
 
