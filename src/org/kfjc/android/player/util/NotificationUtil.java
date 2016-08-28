@@ -82,20 +82,20 @@ public class NotificationUtil {
             // Should instead build action with Icon.fromResource (but only for Api 23+)
             builder.addAction(R.drawable.ic_stop_white_48dp,
                     context.getString(R.string.action_stop),
-                    Intents.controlIntent(context, Intents.INTENT_STOP));
+                    Intents.controlPendingIntent(context, Intents.INTENT_STOP));
             if (action.equals(Intents.INTENT_STOP)) {
                 builder.setStyle(new Notification.MediaStyle()
                         .setShowActionsInCompactView(0));
             } else if (action.equals(Intents.INTENT_PAUSE)) {
                 builder.addAction(R.drawable.ic_pause_white_48dp,
                         context.getString(R.string.action_pause),
-                        Intents.controlIntent(context, Intents.INTENT_PAUSE));
+                        Intents.controlPendingIntent(context, Intents.INTENT_PAUSE));
                 builder.setStyle(new Notification.MediaStyle()
                         .setShowActionsInCompactView(0, 1));
             } else if (action.equals(Intents.INTENT_UNPAUSE)) {
                 builder.addAction(R.drawable.ic_play_arrow_white_48dp,
                         context.getString(R.string.action_play),
-                        Intents.controlIntent(context, Intents.INTENT_UNPAUSE));
+                        Intents.controlPendingIntent(context, Intents.INTENT_UNPAUSE));
                 builder.setStyle(new Notification.MediaStyle()
                         .setShowActionsInCompactView(0, 1));
             }

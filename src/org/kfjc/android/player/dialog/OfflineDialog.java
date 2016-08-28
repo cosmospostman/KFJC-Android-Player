@@ -13,6 +13,7 @@ import android.widget.TextView;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.util.ExternalStorageUtil;
+import org.kfjc.android.player.util.Intents;
 
 public class OfflineDialog extends KfjcDialog {
 
@@ -120,7 +121,7 @@ public class OfflineDialog extends KfjcDialog {
                     break;
                 case DialogInterface.BUTTON_POSITIVE:
                     if (isDownloaded) {
-                        homeScreen.stopPlayer();
+                        Intents.sendAction(getActivity(), Intents.INTENT_STOP);
                         ExternalStorageUtil.deletePodcastDir(playlistId);
                     } else {
                         homeScreen.startDownload();

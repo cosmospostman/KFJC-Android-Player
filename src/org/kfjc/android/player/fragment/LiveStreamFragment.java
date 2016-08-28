@@ -19,6 +19,7 @@ import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.util.GraphicsUtil;
+import org.kfjc.android.player.util.Intents;
 import org.kfjc.android.player.util.NotificationUtil;
 
 public class LiveStreamFragment extends PlayerFragment {
@@ -71,11 +72,11 @@ public class LiveStreamFragment extends PlayerFragment {
             public void onClick(View v) {
                 switch (displayState) {
                     case STOP:
-                        homeScreen.playStream();
+                        Intents.sendAction(getActivity(), Intents.INTENT_PLAY, PreferenceControl.getStreamPreference());
                         break;
                     case BUFFER:
                     case PLAY:
-                        homeScreen.stopPlayer();
+                        Intents.sendAction(getActivity(), Intents.INTENT_STOP);
                         break;
                 }
             }
@@ -129,7 +130,8 @@ public class LiveStreamFragment extends PlayerFragment {
                 if (homeScreen.getPlayerSource() != null
                         && MediaSource.Type.LIVESTREAM == homeScreen.getPlayerSource().type
                         && homeScreen.isStreamServicePlaying()) {
-                    homeScreen.restartStream();
+                    Intents.sendAction(getActivity(), Intents.INTENT_STOP);
+                    Intents.sendAction(getActivity(), Intents.INTENT_PLAY, PreferenceControl.getStreamPreference());
                 }
             }
         });

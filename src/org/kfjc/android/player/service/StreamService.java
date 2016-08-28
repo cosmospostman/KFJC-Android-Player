@@ -94,8 +94,13 @@ public class StreamService extends Service {
             pause();
         } else if (Intents.INTENT_UNPAUSE.equals(intent.getAction())) {
             unpause();
+        } else if (Intents.INTENT_PLAY.equals(intent.getAction())) {
+            MediaSource source = intent.getParcelableExtra(Intents.INTENT_SOURCE);
+            if (getSource() == null || !getSource().equals(source) || !isPlaying()) {
+                stop();
+                play(source);
+            }
         }
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -150,7 +155,7 @@ public class StreamService extends Service {
 		this.mediaListener = listener;
 	}
 
-    public void play(MediaSource mediaSource) {
+    private void play(MediaSource mediaSource) {
         this.mediaSource = mediaSource;
         stop();
         if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
@@ -218,7 +223,7 @@ public class StreamService extends Service {
         player.setPlayWhenReady(true);
     }
 
-    public void pause() {
+    private void pause() {
         player.setPlayWhenReady(false);
         abandonAudioFocus();
         NotificationManager notificationManager =
@@ -231,7 +236,7 @@ public class StreamService extends Service {
         notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, n);
     }
 
-    public void unpause() {
+    private void unpause() {
         if (mediaSource.type == MediaSource.Type.LIVESTREAM) {
             play(mediaSource);
         }
@@ -251,7 +256,7 @@ public class StreamService extends Service {
         }
     }
 
-    public void stop() {
+    private void stop() {
         stop(true);
 	}
 

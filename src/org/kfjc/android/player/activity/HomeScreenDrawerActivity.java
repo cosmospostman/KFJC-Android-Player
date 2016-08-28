@@ -554,36 +554,14 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         getSupportActionBar().setTitle(title);
     }
 
-    @Override
-    public void playStream() {
-        playSource(PreferenceControl.getStreamPreference());
-    }
-
-    @Override
-    public void playSource(MediaSource source) {
-        if (streamService.getSource() != null
-                && streamService.getSource().equals(source)
-                && streamService.isPlaying()) {
-            return;
-        }
-        streamService.stop();
-        streamService.play(source);
-    }
-
-    @Override
     public void stopPlayer() {
         if (streamService != null) {
-            streamService.stop();
+            Intents.sendAction(this, Intents.INTENT_STOP);
         }
         notificationUtil.cancelKfjcNotification();
         if (!isForegroundActivity) {
             playlistService.stop();
         }
-    }
-
-    @Override
-    public void restartStream() {
-        streamService.reload(PreferenceControl.getStreamPreference());
     }
 
     @Override
@@ -633,16 +611,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void seekPlayer(long positionMillis) {
         streamService.seekOverEntireShow(positionMillis);
-    }
-
-    @Override
-    public void pausePlayer() {
-        streamService.pause();
-    }
-
-    @Override
-    public void unpausePlayer() {
-        streamService.unpause();
     }
 
 }

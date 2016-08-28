@@ -3,6 +3,7 @@ package org.kfjc.android.player.fragment;
 import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -28,9 +29,11 @@ import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
+import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
+import org.kfjc.android.player.util.Intents;
 
 import java.io.File;
 import java.io.IOException;
@@ -197,14 +200,13 @@ public class PodcastPlayerFragment extends PlayerFragment {
             case PAUSE:
                 if (playerSource.type == MediaSource.Type.ARCHIVE
                         && playerSource.show.getPlaylistId().equals(show.getPlaylistId())) {
-                    homeScreen.unpausePlayer();
-                    break;
+                    Intents.sendAction(getActivity(), Intents.INTENT_UNPAUSE);
                 } // else fall through:
             case STOP:
-                homeScreen.playSource(new MediaSource(show));
+                Intents.sendAction(getActivity(), Intents.INTENT_PLAY, new MediaSource(show));
                 break;
             case PLAY:
-                homeScreen.pausePlayer();
+                Intents.sendAction(getActivity(), Intents.INTENT_PAUSE);
                 break;
         }
     }

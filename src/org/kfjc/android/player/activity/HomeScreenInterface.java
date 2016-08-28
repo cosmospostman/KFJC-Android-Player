@@ -6,12 +6,6 @@ import org.kfjc.android.player.model.MediaSource;
 
 public interface HomeScreenInterface {
     void setActionbarTitle(String title);
-    void playStream();
-    void stopPlayer();
-    void pausePlayer();
-    void unpausePlayer();
-    void restartStream();
-    void playSource(MediaSource source);
     boolean isStreamServicePlaying();
     String getString(int resId);
     void snack(String message, int duration);

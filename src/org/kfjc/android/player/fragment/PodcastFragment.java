@@ -27,6 +27,7 @@ import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
+import org.kfjc.android.player.util.Intents;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -88,10 +89,10 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         public void onClick(View v) {
             switch (displayState) {
                 case PAUSE:
-                    homeScreen.unpausePlayer();
+                    Intents.sendAction(getActivity(), Intents.INTENT_UNPAUSE);
                     break;
                 case PLAY:
-                    homeScreen.pausePlayer();
+                    Intents.sendAction(getActivity(), Intents.INTENT_PAUSE);
                     break;
             }
         }
