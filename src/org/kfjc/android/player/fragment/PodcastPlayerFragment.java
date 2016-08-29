@@ -92,10 +92,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     };
 
     private void showOfflineDialog() {
-        OfflineDialog offlineDialog = OfflineDialog.newInstance(
-                show.getPlaylistId(),
-                show.getTotalFileSizeBytes(),
-                ExternalStorageUtil.hasAllContent(show));
+        OfflineDialog offlineDialog = OfflineDialog.newInstance(show);
         offlineDialog.setOnDismissListener(new OfflineDialog.OnDismissListener() {
             @Override
             public void onDismiss() {

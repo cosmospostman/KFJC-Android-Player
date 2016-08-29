@@ -16,7 +16,6 @@ public interface HomeScreenInterface {
     void startDownload(ShowDetails showDetails);
     void loadPodcastPlayer(ShowDetails show, boolean animate);
     void loadPodcastListFragment(boolean animate);
-    void registerDownload(long downloadId, ShowDetails show);
     long getPlayerPosition();
     void seekPlayer(long positionMillis);
     void syncState();

@@ -53,8 +53,6 @@ import org.kfjc.android.player.util.NotificationUtil;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeScreenInterface {
 
@@ -84,7 +82,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private ActionBarDrawerToggle drawerToggle;
     private View view;
     private Snackbar snackbar;
-    private Map<Long, ShowDetails> activeDownloads;
 
     private boolean askPermissionsAgain = true;
     private boolean isForegroundActivity = false;
@@ -110,7 +107,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupPlaylistService();
         streamServiceIntent = new Intent(this, StreamService.class);
         startService(streamServiceIntent);
-        activeDownloads = new HashMap<>();
 
         this.liveStreamFragment = new LiveStreamFragment();
         this.podcastFragment = new PodcastFragment();
@@ -480,10 +476,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
     }
 
-    public void registerDownload(long downloadId, ShowDetails show) {
-        activeDownloads.put(downloadId, show);
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -508,8 +500,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             long[] downloadIds = intent.getLongArrayExtra(Intents.INTENT_DOWNLOAD_IDS);
             if (downloadIds != null && downloadIds.length > 0) {
                 for (long id : downloadIds) {
-                    if (activeDownloads.containsKey(id)) {
-                        loadPodcastPlayer(activeDownloads.get(id), false);
+                    if (DownloadUtil.hasDownloadId(id)) {
+                        loadPodcastPlayer(DownloadUtil.getDownload(id), false);
                         return;
                     }
                 }

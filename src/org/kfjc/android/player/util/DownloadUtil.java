@@ -1,22 +1,26 @@
 package org.kfjc.android.player.util;
 
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.net.Uri;
 
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DownloadUtil {
 
-    public static void ensureDownloaded(HomeScreenDrawerActivity homeScreen, ShowDetails show) throws IOException {
+    private static Map<Long, ShowDetails> activeDownloads = new HashMap<>();
+
+    public static void ensureDownloaded(Activity homeScreen, ShowDetails show) throws IOException {
         File podcastDir = ExternalStorageUtil.getPodcastDir(show.getPlaylistId());
         File podcastPlaylist = ExternalStorageUtil.getPlaylistFile(show.getPlaylistId());
         boolean podcastDirExists = podcastDir.exists();
@@ -38,8 +42,20 @@ public class DownloadUtil {
                         .setVisibleInDownloadsUi(false)
                         .setDestinationUri(Uri.fromFile(downloadFile));
                 long referenceId = dm.enqueue(req);
-                homeScreen.registerDownload(referenceId, show);
+                registerDownload(referenceId, show);
             }
         }
+    }
+
+    private static void registerDownload(long downloadId, ShowDetails show) {
+        activeDownloads.put(downloadId, show);
+    }
+
+    public static boolean hasDownloadId(long id) {
+        return activeDownloads.containsKey(id);
+    }
+
+    public static ShowDetails getDownload(long id) {
+        return activeDownloads.get(id);
     }
 }

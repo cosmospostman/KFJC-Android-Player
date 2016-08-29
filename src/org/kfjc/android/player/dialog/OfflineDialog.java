@@ -22,9 +22,7 @@ public class OfflineDialog extends KfjcDialog {
         void onDismiss();
     }
 
-    public static final String KEY_SIZE = "filesize";
     public static final String KEY_SHOW_DETAILS = "showDetails";
-    public static final String KEY_IS_DOWNLOADED = "isDownloaded";
 
     private HomeScreenInterface homeScreen;
     private ShowDetails showDetails;
@@ -32,11 +30,9 @@ public class OfflineDialog extends KfjcDialog {
 
     private OnDismissListener onDismissListener;
 
-    public static OfflineDialog newInstance(ShowDetails show, long fileSize, boolean isDownloaded) {
+    public static OfflineDialog newInstance(ShowDetails show) {
         Bundle args = new Bundle();
         args.putParcelable(KEY_SHOW_DETAILS, show);
-        args.putLong(KEY_SIZE, fileSize);
-        args.putBoolean(KEY_IS_DOWNLOADED, isDownloaded);
         OfflineDialog fragment = new OfflineDialog();
         fragment.setArguments(args);
         return fragment;
@@ -80,11 +76,10 @@ public class OfflineDialog extends KfjcDialog {
 
         if (bundle != null) {
             showDetails = bundle.getParcelable(KEY_SHOW_DETAILS);
-            isDownloaded = bundle.getBoolean(KEY_IS_DOWNLOADED, false);
-            long filesizeBytes;
-            filesizeBytes = isDownloaded
+            isDownloaded = ExternalStorageUtil.hasAllContent(showDetails);
+            long filesizeBytes = isDownloaded
                     ? ExternalStorageUtil.folderSize(showDetails.getPlaylistId())
-                    : bundle.getLong(KEY_SIZE);
+                    : showDetails.getTotalFileSizeBytes();
             int filesizeMb = (int) filesizeBytes / 1024 / 1024;
             boolean canDownload = ExternalStorageUtil.bytesAvailable(filesizeBytes);
 
