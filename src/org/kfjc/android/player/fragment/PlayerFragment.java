@@ -7,7 +7,7 @@ import org.kfjc.android.player.model.MediaSource;
 
 public abstract class PlayerFragment extends KfjcFragment {
 
-    private static final String TAG = PlayerFragment.class.getSimpleName();
+    public static final String TAG = PlayerFragment.class.getSimpleName();
 
     protected PlayerState playerState;
     protected PlayerState displayState;
@@ -43,7 +43,7 @@ public abstract class PlayerFragment extends KfjcFragment {
                 updateClock();
                 handler.postDelayed(this, 1000);
             } else {
-                Log.i(TAG, "Not updating clock (not added)");
+                Log.i(getTag(), "Not updating clock (not added)");
             }
         }
     };

@@ -24,6 +24,8 @@ import org.kfjc.android.player.util.NotificationUtil;
 
 public class LiveStreamFragment extends PlayerFragment {
 
+    public static final String TAG = LiveStreamFragment.class.getSimpleName();
+
     private GraphicsUtil graphics;
 
     private TextView currentTrackTextView;

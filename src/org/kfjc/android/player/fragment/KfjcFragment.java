@@ -9,6 +9,8 @@ import org.kfjc.android.player.activity.HomeScreenInterface;
 
 public class KfjcFragment extends Fragment {
 
+    public static final String TAG = KfjcFragment.class.getSimpleName();
+
     protected HomeScreenDrawerActivity homeScreen;
 
     @Override
@@ -34,5 +36,9 @@ public class KfjcFragment extends Fragment {
             throw new ClassCastException(activity.getClass().getSimpleName() + " must implement "
                     + HomeScreenDrawerActivity.class.getSimpleName());
         }
+    }
+
+    public String getFragmentTag() {
+        return TAG;
     }
 }

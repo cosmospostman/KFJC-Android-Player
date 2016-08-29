@@ -2,6 +2,7 @@ package org.kfjc.android.player.activity;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Context;
@@ -36,6 +37,7 @@ import com.google.common.util.concurrent.Futures;
 import org.kfjc.android.player.KfjcApplication;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
+import org.kfjc.android.player.fragment.KfjcFragment;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.fragment.PlayerFragment;
 import org.kfjc.android.player.fragment.PodcastFragment;
@@ -417,10 +419,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             .commit();
     }
 
-    private void replaceFragment(Fragment fragment) {
+    private void replaceFragment(KfjcFragment fragment) {
         setActionBarBackArrow(false);
         getFragmentManager().beginTransaction()
-                .replace(R.id.home_screen_main_fragment, fragment)
+                .replace(R.id.home_screen_main_fragment, fragment, fragment.getFragmentTag())
                 .addToBackStack(null)
                 .commit();
     }
@@ -443,7 +445,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(KEY_ACTIVE_FRAGMENT, activeFragmentId);
-        getFragmentManager().putFragment(outState, "PodcastPlayerFragment", podcastPlayerFragment);
+        FragmentManager fm = getFragmentManager();
+        if (fm.findFragmentByTag(podcastPlayerFragment.TAG) != null) {
+            getFragmentManager().putFragment(outState, "PodcastPlayerFragment", podcastPlayerFragment);
+        }
         super.onSaveInstanceState(outState);
     }
 

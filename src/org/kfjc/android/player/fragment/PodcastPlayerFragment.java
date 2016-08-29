@@ -1,11 +1,7 @@
 package org.kfjc.android.player.fragment;
 
 import android.Manifest;
-import android.app.DownloadManager;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -19,26 +15,19 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.dialog.OfflineDialog;
 import org.kfjc.android.player.dialog.PlaylistDialog;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.MediaSource;
-import org.kfjc.android.player.model.Playlist;
-import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.util.DateUtil;
-import org.kfjc.android.player.util.DownloadUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
-import org.kfjc.android.player.util.HttpUtil;
 import org.kfjc.android.player.util.Intents;
-
-import java.io.File;
-import java.io.IOException;
 
 public class PodcastPlayerFragment extends PlayerFragment {
 
+    public static final String TAG = PodcastPlayerFragment.class.getSimpleName();
     public static final String BROADCAST_SHOW_KEY = "broadcastShowKey";
 
     private ShowDetails show;
