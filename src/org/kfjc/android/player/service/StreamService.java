@@ -59,7 +59,6 @@ public class StreamService extends Service {
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
     private ExoPlayer player;
     private boolean becomingNoisyReceiverRegistered = false;
-    private boolean onControlReceiverRegistered = false;
     private NotificationUtil notificationUtil;
     private int activeSourceNumber = -1;
 
@@ -279,7 +278,6 @@ public class StreamService extends Service {
         }
         unregisterReceivers();
         becomingNoisyReceiverRegistered = false;
-        onControlReceiverRegistered = false;
         stopForeground(true);
         Log.i(TAG, "Service stopped");
     }
@@ -309,7 +307,6 @@ public class StreamService extends Service {
                     if (playWhenReady) {
                         mediaListener.onStateChange(PlayerFragment.PlayerState.PLAY, mediaSource);
                         registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
-                        onControlReceiverRegistered = true;
                     } else {
                          mediaListener.onStateChange(PlayerFragment.PlayerState.PAUSE, mediaSource);
                     }

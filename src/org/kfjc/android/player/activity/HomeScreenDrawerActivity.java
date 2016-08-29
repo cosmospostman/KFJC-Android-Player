@@ -11,6 +11,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.NavigationView;
@@ -45,10 +46,12 @@ import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
+import org.kfjc.android.player.util.DownloadUtil;
 import org.kfjc.android.player.util.HttpUtil;
 import org.kfjc.android.player.util.Intents;
 import org.kfjc.android.player.util.NotificationUtil;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -229,10 +232,15 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     }
 
     @Override
-    public void startDownload() {
-        if (podcastPlayerFragment != null) {
-            podcastPlayerFragment.startDownload();
-        }
+    public void startDownload(final ShowDetails show) {
+        new AsyncTask<Void, Void, Void>() {
+            protected Void doInBackground(Void... unusedParams) {
+                try {
+                    DownloadUtil.ensureDownloaded(HomeScreenDrawerActivity.this, show);
+                } catch (IOException e) {}
+                return null;
+            }
+        }.execute();
     }
 
     private void requestPhonePermission() {

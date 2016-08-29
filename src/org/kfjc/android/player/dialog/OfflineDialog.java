@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
+import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.Intents;
 
@@ -22,18 +23,18 @@ public class OfflineDialog extends KfjcDialog {
     }
 
     public static final String KEY_SIZE = "filesize";
-    public static final String KEY_PLAYLIST_ID = "playlistId";
+    public static final String KEY_SHOW_DETAILS = "showDetails";
     public static final String KEY_IS_DOWNLOADED = "isDownloaded";
 
     private HomeScreenInterface homeScreen;
-    private String playlistId;
+    private ShowDetails showDetails;
     private boolean isDownloaded;
 
     private OnDismissListener onDismissListener;
 
-    public static OfflineDialog newInstance(String playlistId, long fileSize, boolean isDownloaded) {
+    public static OfflineDialog newInstance(ShowDetails show, long fileSize, boolean isDownloaded) {
         Bundle args = new Bundle();
-        args.putString(KEY_PLAYLIST_ID, playlistId);
+        args.putParcelable(KEY_SHOW_DETAILS, show);
         args.putLong(KEY_SIZE, fileSize);
         args.putBoolean(KEY_IS_DOWNLOADED, isDownloaded);
         OfflineDialog fragment = new OfflineDialog();
@@ -78,11 +79,11 @@ public class OfflineDialog extends KfjcDialog {
         }
 
         if (bundle != null) {
-            playlistId = bundle.getString(KEY_PLAYLIST_ID);
+            showDetails = bundle.getParcelable(KEY_SHOW_DETAILS);
             isDownloaded = bundle.getBoolean(KEY_IS_DOWNLOADED, false);
             long filesizeBytes;
             filesizeBytes = isDownloaded
-                    ? ExternalStorageUtil.folderSize(playlistId)
+                    ? ExternalStorageUtil.folderSize(showDetails.getPlaylistId())
                     : bundle.getLong(KEY_SIZE);
             int filesizeMb = (int) filesizeBytes / 1024 / 1024;
             boolean canDownload = ExternalStorageUtil.bytesAvailable(filesizeBytes);
@@ -122,9 +123,9 @@ public class OfflineDialog extends KfjcDialog {
                 case DialogInterface.BUTTON_POSITIVE:
                     if (isDownloaded) {
                         Intents.sendAction(getActivity(), Intents.INTENT_STOP);
-                        ExternalStorageUtil.deletePodcastDir(playlistId);
+                        ExternalStorageUtil.deletePodcastDir(showDetails.getPlaylistId());
                     } else {
-                        homeScreen.startDownload();
+                        homeScreen.startDownload(showDetails);
                     }
                     break;
                 default:

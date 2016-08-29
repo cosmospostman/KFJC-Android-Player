@@ -29,6 +29,7 @@ import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.util.DateUtil;
+import org.kfjc.android.player.util.DownloadUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
 import org.kfjc.android.player.util.Intents;
@@ -224,48 +225,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
             return;
         }
         showOfflineDialog();
-    }
-
-    public void startDownload() {
-        makeEnsureDownloadTask().execute();
-    }
-
-    private AsyncTask<Void, Void, Void> makeEnsureDownloadTask() {
-        return new AsyncTask<Void, Void, Void>() {
-            protected Void doInBackground(Void... unusedParams) {
-                try {
-                    ensureDownloaded();
-                } catch (IOException e) {}
-                return null;
-            }
-        };
-    }
-
-    private void ensureDownloaded() throws IOException {
-        File podcastDir = ExternalStorageUtil.getPodcastDir(show.getPlaylistId());
-        File podcastPlaylist = ExternalStorageUtil.getPlaylistFile(show.getPlaylistId());
-        boolean podcastDirExists = podcastDir.exists();
-        boolean podcastPlaylistExistsAndNotEmpty =
-                podcastPlaylist.exists() && podcastPlaylist.length() > 0;
-        if (! (podcastDirExists && podcastPlaylistExistsAndNotEmpty)) {
-            String playlistUrl = Constants.PLAYLIST_URL + show.getPlaylistId();
-            Playlist playlist = new PlaylistJsonImpl(HttpUtil.getUrl(playlistUrl));
-            ExternalStorageUtil.createShowDir(show, playlist);
-        }
-        for (int i = 0; i < show.getUrls().size(); i++) {
-            Uri uri = Uri.parse(show.getUrls().get(i));
-            String filename = uri.getLastPathSegment();
-            File downloadFile = new File(podcastDir, filename);
-            if (! (downloadFile.exists() && downloadFile.length() > 0)) {
-                DownloadManager dm = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
-                DownloadManager.Request req = new DownloadManager.Request(uri)
-                        .setTitle(getString(R.string.format_archive_file, show.getAirName(), i+1, show.getUrls().size()))
-                        .setVisibleInDownloadsUi(false)
-                        .setDestinationUri(Uri.fromFile(downloadFile));
-                long referenceId = dm.enqueue(req);
-                homeScreen.registerDownload(referenceId, show);
-            }
-        }
     }
 
     @Override

@@ -13,7 +13,7 @@ public interface HomeScreenInterface {
     Playlist getLatestPlaylist();
     void setNavigationItemChecked(int navigationItemId);
     void updateBackground();
-    void startDownload();
+    void startDownload(ShowDetails showDetails);
     void loadPodcastPlayer(ShowDetails show, boolean animate);
     void loadPodcastListFragment(boolean animate);
     void registerDownload(long downloadId, ShowDetails show);
