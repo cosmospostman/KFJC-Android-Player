@@ -12,7 +12,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:name=".KfjcApplication"
-        android:theme="@style/KfjcCompat">
+        android:theme="@style/KfjcCompat"
+        android:resizeableActivity="false">
 
         <activity
             android:name="org.kfjc.android.player.activity.HomeScreenDrawerActivity"
