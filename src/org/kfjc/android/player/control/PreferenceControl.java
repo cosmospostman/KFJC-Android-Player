@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
+import com.google.common.collect.ImmutableList;
+
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.KfjcApplication;
 import org.kfjc.android.player.model.MediaSource;
@@ -45,7 +47,7 @@ public class PreferenceControl {
 	}
 
 	public static List<MediaSource> getMediaSources() {
-		return mediaSources;
+		return mediaSources == null ? ImmutableList.of(Constants.FALLBACK_MEDIA_SOURCE) : mediaSources;
 	}
 
 	public static boolean areBackgroundsEnabled() {
