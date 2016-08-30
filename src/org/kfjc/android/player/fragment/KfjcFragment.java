@@ -5,7 +5,6 @@ import android.app.Fragment;
 import android.content.Context;
 
 import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
-import org.kfjc.android.player.activity.HomeScreenInterface;
 
 public class KfjcFragment extends Fragment {
 

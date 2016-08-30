@@ -87,17 +87,19 @@ public class StreamService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         notificationUtil = new NotificationUtil(this);
 
-        if (Intents.INTENT_STOP.equals(intent.getAction())) {
-            stop();
-        } else if (Intents.INTENT_PAUSE.equals(intent.getAction())) {
-            pause();
-        } else if (Intents.INTENT_UNPAUSE.equals(intent.getAction())) {
-            unpause();
-        } else if (Intents.INTENT_PLAY.equals(intent.getAction())) {
-            MediaSource source = intent.getParcelableExtra(Intents.INTENT_SOURCE);
-            if (getSource() == null || !getSource().equals(source) || !isPlaying()) {
+        if (intent != null) {
+            if (Intents.INTENT_STOP.equals(intent.getAction())) {
                 stop();
-                play(source);
+            } else if (Intents.INTENT_PAUSE.equals(intent.getAction())) {
+                pause();
+            } else if (Intents.INTENT_UNPAUSE.equals(intent.getAction())) {
+                unpause();
+            } else if (Intents.INTENT_PLAY.equals(intent.getAction())) {
+                MediaSource source = intent.getParcelableExtra(Intents.INTENT_SOURCE);
+                if (getSource() == null || !getSource().equals(source) || !isPlaying()) {
+                    stop();
+                    play(source);
+                }
             }
         }
         return super.onStartCommand(intent, flags, startId);
