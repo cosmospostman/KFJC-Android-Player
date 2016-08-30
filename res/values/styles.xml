@@ -1,8 +1,9 @@
 <resources>
 
-    <style name="Base.AppTheme" parent="Theme.AppCompat.Light.DarkActionBar"></style>
-
-    <style name="AppTheme" parent="Base.AppTheme">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorAccent">@color/kfjc_red_solid</item>
+        <item name="colorPrimary">@color/kfjc_red_solid</item>
+        <item name="colorPrimaryDark">@color/kfjc_transparent_black</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <item name="colorButtonNormal">@color/kfjc_red_solid</item>
     </style>
@@ -12,15 +13,8 @@
         <item name="color">@android:color/white</item>
     </style>
 
-    <style name="LinearProgress" parent="AppTheme">
-        <item name="colorAccent">@color/kfjc_red_solid</item>
-    </style>
-
     <style name="KfjcDialog" parent="@style/Theme.AppCompat.Light.Dialog">
         <item name="color">@android:color/black</item>
-        <item name="colorPrimary">@color/kfjc_red_solid</item>
-        <item name="colorPrimaryDark">@color/kfjc_transparent_black</item>
-        <item name="colorAccent">@color/kfjc_red_solid</item>
     </style>
 
     <style name="TrackDetailsRow">
