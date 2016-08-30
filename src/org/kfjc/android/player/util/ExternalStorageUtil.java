@@ -22,7 +22,7 @@ import java.util.List;
 
 public class ExternalStorageUtil {
 
-    private static final String KFJC_DIRECTORY_NAME = "kfjc";
+    public static final String KFJC_DIRECTORY_NAME = "kfjc";
     private static final String KFJC_INDEX_FILENAME = "index.json";
     private static final String KFJC_PLAYLIST_FILENAME = "playlist.json";
     private static final String NOMEDIA_FILENAME = ".nomedia";

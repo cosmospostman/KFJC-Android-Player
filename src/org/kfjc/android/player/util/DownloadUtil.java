@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Environment;
 
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
@@ -20,7 +21,7 @@ public class DownloadUtil {
 
     private static Map<Long, ShowDetails> activeDownloads = new HashMap<>();
 
-    public static void ensureDownloaded(Activity homeScreen, ShowDetails show) throws IOException {
+    public static void ensureDownloaded(Activity activity, ShowDetails show) throws IOException {
         File podcastDir = ExternalStorageUtil.getPodcastDir(show.getPlaylistId());
         File podcastPlaylist = ExternalStorageUtil.getPlaylistFile(show.getPlaylistId());
         boolean podcastDirExists = podcastDir.exists();
@@ -36,11 +37,13 @@ public class DownloadUtil {
             String filename = uri.getLastPathSegment();
             File downloadFile = new File(podcastDir, filename);
             if (! (downloadFile.exists() && downloadFile.length() > 0)) {
-                DownloadManager dm = (DownloadManager) homeScreen.getSystemService(Context.DOWNLOAD_SERVICE);
+                DownloadManager dm = (DownloadManager) activity.getSystemService(Context.DOWNLOAD_SERVICE);
                 DownloadManager.Request req = new DownloadManager.Request(uri)
-                        .setTitle(homeScreen.getString(R.string.format_archive_file, show.getAirName(), i+1, show.getUrls().size()))
+                        .setTitle(activity.getString(R.string.format_archive_file, show.getAirName(), i+1, show.getUrls().size()))
                         .setVisibleInDownloadsUi(false)
-                        .setDestinationUri(Uri.fromFile(downloadFile));
+                        .setDestinationInExternalPublicDir(
+                                Environment.DIRECTORY_PODCASTS,
+                                ExternalStorageUtil.KFJC_DIRECTORY_NAME + "/" + show.getPlaylistId() + "/" + uri.getLastPathSegment());
                 long referenceId = dm.enqueue(req);
                 registerDownload(referenceId, show);
             }
@@ -58,4 +61,21 @@ public class DownloadUtil {
     public static ShowDetails getDownload(long id) {
         return activeDownloads.get(id);
     }
+
+//    private List<String> getCompletedDownloads(Activity activity) {
+//        List<String> completedDownloads = new ArrayList<>();
+//        DownloadManager dm = (DownloadManager) activity.getSystemService(Context.DOWNLOAD_SERVICE);
+//        Query query = new Query();
+//
+//        query.setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL);
+//        Cursor c = dm.query(query);
+//        c.moveToFirst();
+//        while (!c.isLast()) {
+//            c.moveToNext();
+//            completedDownloads.add(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)));
+////          DownloadManager.COLUMN_URI;
+//        }
+//
+//        return completedDownloads;
+//    }
 }
