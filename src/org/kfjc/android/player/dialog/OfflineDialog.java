@@ -65,9 +65,9 @@ public class OfflineDialog extends KfjcDialog {
 
     @Override
     public Dialog onCreateDialog(Bundle bundle) {
-        ContextThemeWrapper themeWrapper = new ContextThemeWrapper(getActivity(), R.style.KfjcDialog);
+        ContextThemeWrapper themeWrapper = new ContextThemeWrapper(getActivity(), R.style.AppTheme);
         View view = View.inflate(themeWrapper, R.layout.layout_offline, null);
-        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity(), R.style.KfjcDialog);
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity(), R.style.AppTheme);
         dialog.setView(view);
 
         if (bundle == null) {

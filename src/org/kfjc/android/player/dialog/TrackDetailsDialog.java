@@ -62,7 +62,7 @@ public class TrackDetailsDialog extends KfjcDialog {
             bundle = getArguments();
         }
 
-        ContextThemeWrapper themeWrapper = new ContextThemeWrapper(getActivity(), R.style.KfjcDialog);
+        ContextThemeWrapper themeWrapper = new ContextThemeWrapper(getActivity(), R.style.AppTheme);
         View view = View.inflate(themeWrapper, R.layout.layout_trackdetails, null);
 
         if (bundle != null) {
@@ -76,7 +76,7 @@ public class TrackDetailsDialog extends KfjcDialog {
             setValueAndShow(view, R.id.trackdetails_label_row, R.id.trackdetails_label_value, labelString);
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.KfjcDialog);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme);
         builder.setView(view)
                 .setNegativeButton(android.R.string.copy, dialogExit)
                 .setPositiveButton(android.R.string.search_go, dialogExit);

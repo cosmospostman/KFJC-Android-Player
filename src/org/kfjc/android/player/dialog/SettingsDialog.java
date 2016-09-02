@@ -61,7 +61,7 @@ public class SettingsDialog extends KfjcDialog {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         previousPreference = PreferenceControl.getStreamPreference();
 
-        themeWrapper = new ContextThemeWrapper(getActivity(), R.style.KfjcDialog);
+        themeWrapper = new ContextThemeWrapper(getActivity(), R.style.AppTheme);
         View view = View.inflate(themeWrapper, R.layout.layout_settings, null);
         initVolumeBar(view);
 
@@ -99,7 +99,7 @@ public class SettingsDialog extends KfjcDialog {
             initStreamOptions();
         }
 
-        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity(), R.style.KfjcDialog);
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity(), R.style.AppTheme);
         dialog.setView(view);
         dialog.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
