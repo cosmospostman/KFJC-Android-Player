@@ -24,7 +24,7 @@ import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.service.StreamService.PlayerState;
 import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
-import org.kfjc.android.player.util.Intents;
+import org.kfjc.android.player.intent.PlayerControlIntent;
 
 public class PodcastPlayerFragment extends PlayerFragment {
 
@@ -185,16 +185,16 @@ public class PodcastPlayerFragment extends PlayerFragment {
             case PAUSE:
                 if (playerSource.type == MediaSource.Type.ARCHIVE
                         && playerSource.show.getPlaylistId().equals(show.getPlaylistId())) {
-                    Intents.sendAction(getActivity(), Intents.INTENT_UNPAUSE);
+                    PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_UNPAUSE);
                 } // else fall through:
             case STOP:
-                Intents.sendAction(getActivity(), Intents.INTENT_PLAY, new MediaSource(show));
+                PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_PLAY, new MediaSource(show));
                 break;
             case BUFFER:
-                Intents.sendAction(getActivity(), Intents.INTENT_STOP);
+                PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_STOP);
                 break;
             case PLAY:
-                Intents.sendAction(getActivity(), Intents.INTENT_PAUSE);
+                PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_PAUSE);
                 break;
         }
     }

@@ -26,9 +26,8 @@ import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
 import org.kfjc.android.player.Constants;
-import org.kfjc.android.player.fragment.PlayerFragment;
 import org.kfjc.android.player.model.MediaSource;
-import org.kfjc.android.player.util.Intents;
+import org.kfjc.android.player.intent.PlayerControlIntent;
 import org.kfjc.android.player.util.NotificationUtil;
 
 import java.io.File;
@@ -128,14 +127,14 @@ public class StreamService extends Service {
         notificationUtil = new NotificationUtil(this);
 
         if (intent != null) {
-            if (Intents.INTENT_STOP.equals(intent.getAction())) {
+            if (PlayerControlIntent.INTENT_STOP.equals(intent.getAction())) {
                 stop();
-            } else if (Intents.INTENT_PAUSE.equals(intent.getAction())) {
+            } else if (PlayerControlIntent.INTENT_PAUSE.equals(intent.getAction())) {
                 pause();
-            } else if (Intents.INTENT_UNPAUSE.equals(intent.getAction())) {
+            } else if (PlayerControlIntent.INTENT_UNPAUSE.equals(intent.getAction())) {
                 unpause();
-            } else if (Intents.INTENT_PLAY.equals(intent.getAction())) {
-                MediaSource source = intent.getParcelableExtra(Intents.INTENT_SOURCE);
+            } else if (PlayerControlIntent.INTENT_PLAY.equals(intent.getAction())) {
+                MediaSource source = intent.getParcelableExtra(PlayerControlIntent.INTENT_SOURCE);
                 if (getSource() == null || !getSource().equals(source) || !isPlaying()) {
                     stop();
                     play(source);
@@ -184,7 +183,7 @@ public class StreamService extends Service {
             Notification n = notificationUtil.kfjcStreamNotification(
                     getApplicationContext(),
                     getSource(),
-                    Intents.INTENT_STOP,
+                    PlayerControlIntent.INTENT_STOP,
                     true);
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             play(mediaSource.url);
@@ -192,7 +191,7 @@ public class StreamService extends Service {
             Notification n = notificationUtil.kfjcStreamNotification(
                     getApplicationContext(),
                     getSource(),
-                    Intents.INTENT_PAUSE,
+                    PlayerControlIntent.INTENT_PAUSE,
                     false);
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             activeSourceNumber = -1;
@@ -253,7 +252,7 @@ public class StreamService extends Service {
         Notification n = NotificationUtil.kfjcStreamNotification(
                 getApplicationContext(),
                 getSource(),
-                Intents.INTENT_UNPAUSE,
+                PlayerControlIntent.INTENT_UNPAUSE,
                 false);
         notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, n);
     }
@@ -271,7 +270,7 @@ public class StreamService extends Service {
             Notification n = NotificationUtil.kfjcStreamNotification(
                     getApplicationContext(),
                     getSource(),
-                    Intents.INTENT_PAUSE,
+                    PlayerControlIntent.INTENT_PAUSE,
                     false);
             notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             return;

@@ -1,10 +1,9 @@
 package org.kfjc.android.player.activity;
 
-import android.app.Activity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
-import org.kfjc.android.player.util.Intents;
+import org.kfjc.android.player.intent.PlayerControlIntent;
 
 /**
  * Listen for telephone events. Stop playback if phone is in use; start it again when phone
@@ -25,13 +24,13 @@ public class KfjcPhoneStateListener extends PhoneStateListener {
             case TelephonyManager.CALL_STATE_RINGING:
             case TelephonyManager.CALL_STATE_OFFHOOK:
                 if (homeScreen.isStreamServicePlaying()) {
-                    Intents.sendAction(homeScreen, Intents.INTENT_PAUSE);
+                    PlayerControlIntent.sendAction(homeScreen, PlayerControlIntent.INTENT_PAUSE);
                     isStoppedDueToPhone = true;
                 }
                 break;
             case TelephonyManager.CALL_STATE_IDLE:
                 if (isStoppedDueToPhone) {
-                    Intents.sendAction(homeScreen, Intents.INTENT_UNPAUSE);
+                    PlayerControlIntent.sendAction(homeScreen, PlayerControlIntent.INTENT_UNPAUSE);
                     isStoppedDueToPhone = false;
                 }
                 break;

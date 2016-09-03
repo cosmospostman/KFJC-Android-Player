@@ -20,7 +20,7 @@ import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.service.StreamService.PlayerState;
 import org.kfjc.android.player.util.GraphicsUtil;
-import org.kfjc.android.player.util.Intents;
+import org.kfjc.android.player.intent.PlayerControlIntent;
 import org.kfjc.android.player.util.NotificationUtil;
 
 public class LiveStreamFragment extends PlayerFragment {
@@ -74,11 +74,11 @@ public class LiveStreamFragment extends PlayerFragment {
             public void onClick(View v) {
                 switch (displayState) {
                     case STOP:
-                        Intents.sendAction(getActivity(), Intents.INTENT_PLAY, PreferenceControl.getStreamPreference());
+                        PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_PLAY, PreferenceControl.getStreamPreference());
                         break;
                     case BUFFER:
                     case PLAY:
-                        Intents.sendAction(getActivity(), Intents.INTENT_STOP);
+                        PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_STOP);
                         break;
                 }
             }
@@ -131,8 +131,8 @@ public class LiveStreamFragment extends PlayerFragment {
                 if (playerSource != null
                         && MediaSource.Type.LIVESTREAM == playerSource.type
                         && homeScreen.isStreamServicePlaying()) {
-                    Intents.sendAction(getActivity(), Intents.INTENT_STOP);
-                    Intents.sendAction(getActivity(), Intents.INTENT_PLAY, PreferenceControl.getStreamPreference());
+                    PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_STOP);
+                    PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_PLAY, PreferenceControl.getStreamPreference());
                 }
             }
         });

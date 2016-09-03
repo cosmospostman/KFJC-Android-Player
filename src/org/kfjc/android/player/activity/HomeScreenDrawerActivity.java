@@ -41,24 +41,23 @@ import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.fragment.KfjcFragment;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
-import org.kfjc.android.player.fragment.PlayerFragment;
 import org.kfjc.android.player.fragment.PodcastFragment;
 import org.kfjc.android.player.fragment.PodcastPlayerFragment;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
+import org.kfjc.android.player.receiver.DownloadReceiver;
 import org.kfjc.android.player.receiver.MediaStateReceiver;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.DownloadUtil;
 import org.kfjc.android.player.util.HttpUtil;
-import org.kfjc.android.player.util.Intents;
+import org.kfjc.android.player.intent.PlayerControlIntent;
 import org.kfjc.android.player.util.NotificationUtil;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.stream.Stream;
 
 public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeScreenInterface {
 
@@ -479,7 +478,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         Intent intent = getIntent();
         setIntent(null);
         if (intent != null) {
-            MediaSource source = intent.getParcelableExtra(Intents.INTENT_SOURCE);
+            MediaSource source = intent.getParcelableExtra(PlayerControlIntent.INTENT_SOURCE);
             if (source != null) {
                 switch (source.type) {
                     case LIVESTREAM:
@@ -490,7 +489,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                         return;
                 }
             }
-            long[] downloadIds = intent.getLongArrayExtra(Intents.INTENT_DOWNLOAD_IDS);
+            long[] downloadIds = intent.getLongArrayExtra(DownloadReceiver.INTENT_DOWNLOAD_IDS);
             if (downloadIds != null && downloadIds.length > 0) {
                 for (long id : downloadIds) {
                     if (DownloadUtil.hasDownloadId(id)) {
@@ -552,7 +551,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     public void stopPlayer() {
         if (streamService != null) {
-            Intents.sendAction(this, Intents.INTENT_STOP);
+            PlayerControlIntent.sendAction(this, PlayerControlIntent.INTENT_STOP);
         }
         notificationUtil.cancelKfjcNotification();
         if (!isForegroundActivity) {
