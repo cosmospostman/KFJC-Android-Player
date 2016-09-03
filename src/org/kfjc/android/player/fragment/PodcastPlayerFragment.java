@@ -42,6 +42,14 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private LinearLayout bottomControls;
     private ProgressBar loadingProgress;
 
+    public static PodcastPlayerFragment newInstance(ShowDetails show) {
+        PodcastPlayerFragment fragment = new PodcastPlayerFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(PodcastPlayerFragment.BROADCAST_SHOW_KEY, show);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     private View.OnClickListener fabClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
