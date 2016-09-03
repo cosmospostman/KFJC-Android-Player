@@ -9,7 +9,7 @@ import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.service.StreamService;
 
-public class PlayerControlIntent {
+public class PlayerControl {
 
     public static final String INTENT_SOURCE = "media_source";
 
@@ -35,16 +35,16 @@ public class PlayerControlIntent {
 
     static Intent controlIntent(Context context, String action, MediaSource source) {
         Intent i = new Intent(action, null, context, StreamService.class);
-        i.putExtra(PlayerControlIntent.INTENT_SOURCE, source);
+        i.putExtra(PlayerControl.INTENT_SOURCE, source);
         return i;
     }
 
     public static void sendAction(Activity activity, String action) {
-        activity.startService(PlayerControlIntent.controlIntent(activity, action));
+        activity.startService(PlayerControl.controlIntent(activity, action));
     }
 
     public static void sendAction(Activity activity, String action, MediaSource source) {
-        activity.startService(PlayerControlIntent.controlIntent(activity, action, source));
+        activity.startService(PlayerControl.controlIntent(activity, action, source));
     }
 
     public static PendingIntent controlPendingIntent(Context context, String action) {

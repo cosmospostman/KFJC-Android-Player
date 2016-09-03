@@ -11,7 +11,6 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.exoplayer.ExoPlaybackException;
@@ -26,8 +25,9 @@ import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 
 import org.kfjc.android.player.Constants;
+import org.kfjc.android.player.intent.PlayerState;
 import org.kfjc.android.player.model.MediaSource;
-import org.kfjc.android.player.intent.PlayerControlIntent;
+import org.kfjc.android.player.intent.PlayerControl;
 import org.kfjc.android.player.util.NotificationUtil;
 
 import java.io.File;
@@ -43,51 +43,6 @@ public class StreamService extends Service {
     private static final int MIN_BUFFER_MS = 5000;
     private static final int MIN_REBUFFER_MS = 5000;
 
-    public enum PlayerState {
-        PLAY,
-        PAUSE,
-        STOP,
-        BUFFER,
-        ERROR
-    }
-
-    public static final String INTENT_PLAYER_STATE = "kfjc_intent_player_state";
-    public static final String INTENT_KEY_PLAYER_STATE = "kfjc_key_player_state";
-    public static final  String INTENT_KEY_PLAYER_SOURCE = "kfjc_key_player_source";
-    public static final String INTENT_KEY_PLAYER_MESSAGE = "kfjc_key_player_message";
-
-    private static Intent lastPlayerState;
-    public static Intent getLastPlayerState() {
-        if (lastPlayerState == null) {
-            Intent intent = new Intent(INTENT_PLAYER_STATE);
-            intent.putExtra(INTENT_KEY_PLAYER_STATE, PlayerState.STOP);
-            intent.putExtra(INTENT_KEY_PLAYER_SOURCE, new MediaSource());
-            return intent;
-        }
-        return lastPlayerState;
-    }
-
-    private void sendStateIntent(PlayerState state, MediaSource source) {
-        sendStateIntent(state, source, null);
-    }
-
-    private void sendStateIntent(PlayerState state, String message) {
-        sendStateIntent(state, null, message);
-    }
-
-    private void sendStateIntent(PlayerState state, MediaSource source, String message) {
-        Intent intent = new Intent(INTENT_PLAYER_STATE);
-        intent.putExtra(INTENT_KEY_PLAYER_STATE, state);
-        if (source != null) {
-            intent.putExtra(INTENT_KEY_PLAYER_SOURCE, source);
-        }
-        if (message != null) {
-            intent.putExtra(INTENT_KEY_PLAYER_MESSAGE, message);
-        }
-        lastPlayerState = intent;
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
 	public class LiveStreamBinder extends Binder {
 		public StreamService getService() {
 			return StreamService.this;
@@ -95,6 +50,7 @@ public class StreamService extends Service {
 	}
 
     private MediaSource mediaSource;
+    private PlayerState playerState = new PlayerState();
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
     private ExoPlayer player;
     private boolean becomingNoisyReceiverRegistered = false;
@@ -127,14 +83,9 @@ public class StreamService extends Service {
         notificationUtil = new NotificationUtil(this);
 
         if (intent != null) {
-            if (PlayerControlIntent.INTENT_STOP.equals(intent.getAction())) {
                 stop();
-            } else if (PlayerControlIntent.INTENT_PAUSE.equals(intent.getAction())) {
                 pause();
-            } else if (PlayerControlIntent.INTENT_UNPAUSE.equals(intent.getAction())) {
                 unpause();
-            } else if (PlayerControlIntent.INTENT_PLAY.equals(intent.getAction())) {
-                MediaSource source = intent.getParcelableExtra(PlayerControlIntent.INTENT_SOURCE);
                 if (getSource() == null || !getSource().equals(source) || !isPlaying()) {
                     stop();
                     play(source);
@@ -183,7 +134,6 @@ public class StreamService extends Service {
             Notification n = notificationUtil.kfjcStreamNotification(
                     getApplicationContext(),
                     getSource(),
-                    PlayerControlIntent.INTENT_STOP,
                     true);
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             play(mediaSource.url);
@@ -191,7 +141,6 @@ public class StreamService extends Service {
             Notification n = notificationUtil.kfjcStreamNotification(
                     getApplicationContext(),
                     getSource(),
-                    PlayerControlIntent.INTENT_PAUSE,
                     false);
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             activeSourceNumber = -1;
@@ -252,7 +201,6 @@ public class StreamService extends Service {
         Notification n = NotificationUtil.kfjcStreamNotification(
                 getApplicationContext(),
                 getSource(),
-                PlayerControlIntent.INTENT_UNPAUSE,
                 false);
         notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, n);
     }
@@ -270,7 +218,6 @@ public class StreamService extends Service {
             Notification n = NotificationUtil.kfjcStreamNotification(
                     getApplicationContext(),
                     getSource(),
-                    PlayerControlIntent.INTENT_PAUSE,
                     false);
             notificationManager.notify(NotificationUtil.KFJC_NOTIFICATION_ID, n);
             return;
@@ -296,20 +243,12 @@ public class StreamService extends Service {
         if (player != null) {
             player.release();
             player = null;
-            sendStateIntent(PlayerState.STOP, mediaSource);
         }
         unregisterReceivers();
         becomingNoisyReceiverRegistered = false;
         stopForeground(true);
         Log.i(TAG, "Service stopped");
     }
-
-//    public void reload(MediaSource mediaSource) {
-//        if (player != null) {
-//            player.stop();
-//        }
-//        play(mediaSource);
-//    }
 
     private void unregisterReceivers() {
         try {
@@ -327,23 +266,18 @@ public class StreamService extends Service {
             switch (state) {
                 case ExoPlayer.STATE_READY:
                     if (playWhenReady) {
-                        sendStateIntent(PlayerState.PLAY, mediaSource);
                         registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
                     } else {
-                        sendStateIntent(PlayerState.PAUSE, mediaSource);
                     }
                     break;
                 case ExoPlayer.STATE_PREPARING:
-                    sendStateIntent(PlayerState.BUFFER, mediaSource);
                     becomingNoisyReceiverRegistered = true;
                     break;
                 case ExoPlayer.STATE_BUFFERING:
                     if (!isPlaying()) {
-                        sendStateIntent(PlayerState.BUFFER, mediaSource);
                     }
                     break;
                 case ExoPlayer.STATE_ENDED:
-                    sendStateIntent(PlayerState.STOP, mediaSource);
                     unregisterReceivers();
                     if (!playNextArchiveHour()) {
                         stop(true);
@@ -360,7 +294,6 @@ public class StreamService extends Service {
         @Override
         public void onPlayerError(ExoPlaybackException e) {
             Log.e(TAG, "ExoPlaybackException: " + e.getMessage());
-            sendStateIntent(PlayerState.ERROR, e.getMessage());
         }
     };
 

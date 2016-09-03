@@ -24,11 +24,11 @@ import org.kfjc.android.player.model.BroadcastHour;
 import org.kfjc.android.player.model.BroadcastHourJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.model.MediaSource;
-import org.kfjc.android.player.service.StreamService.PlayerState;
+import org.kfjc.android.player.intent.PlayerState.State;
 import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
-import org.kfjc.android.player.intent.PlayerControlIntent;
+import org.kfjc.android.player.intent.PlayerControl;
 
 
 import java.io.IOException;
@@ -91,10 +91,10 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         public void onClick(View v) {
             switch (displayState) {
                 case PAUSE:
-                    PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_UNPAUSE);
+                    PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_UNPAUSE);
                     break;
                 case PLAY:
-                    PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_PAUSE);
+                    PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_PAUSE);
                     break;
             }
         }
@@ -139,7 +139,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     }
 
     @Override
-    void onStateChanged(PlayerState state, MediaSource source) {
+    void onStateChanged(State state, MediaSource source) {
         if (source != null && source.type == MediaSource.Type.ARCHIVE) {
             nowPlayingLabel.setText(source.show.getAirName());
             switch (state) {

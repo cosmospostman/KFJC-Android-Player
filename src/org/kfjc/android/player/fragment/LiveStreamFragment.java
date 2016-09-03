@@ -18,9 +18,9 @@ import org.kfjc.android.player.dialog.PlaylistDialog;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
-import org.kfjc.android.player.service.StreamService.PlayerState;
+import org.kfjc.android.player.intent.PlayerState.State;
 import org.kfjc.android.player.util.GraphicsUtil;
-import org.kfjc.android.player.intent.PlayerControlIntent;
+import org.kfjc.android.player.intent.PlayerControl;
 import org.kfjc.android.player.util.NotificationUtil;
 
 public class LiveStreamFragment extends PlayerFragment {
@@ -48,7 +48,6 @@ public class LiveStreamFragment extends PlayerFragment {
         playlistButton.setOnClickListener(showPlaylist);
         radioDevil = (ImageView) view.findViewById(R.id.logo);
         addButtonListeners();
-        updatePlaylist(homeScreen.getLatestPlaylist());
         notificationUtil = new NotificationUtil(getActivity());
 
         return view;
@@ -74,11 +73,11 @@ public class LiveStreamFragment extends PlayerFragment {
             public void onClick(View v) {
                 switch (displayState) {
                     case STOP:
-                        PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_PLAY, PreferenceControl.getStreamPreference());
+                        PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_PLAY, PreferenceControl.getStreamPreference());
                         break;
                     case BUFFER:
                     case PLAY:
-                        PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_STOP);
+                        PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_STOP);
                         break;
                 }
             }
@@ -131,8 +130,8 @@ public class LiveStreamFragment extends PlayerFragment {
                 if (playerSource != null
                         && MediaSource.Type.LIVESTREAM == playerSource.type
                         && homeScreen.isStreamServicePlaying()) {
-                    PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_STOP);
-                    PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_PLAY, PreferenceControl.getStreamPreference());
+                    PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_STOP);
+                    PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_PLAY, PreferenceControl.getStreamPreference());
                 }
             }
         });
@@ -140,7 +139,7 @@ public class LiveStreamFragment extends PlayerFragment {
     }
 
     @Override
-    void onStateChanged(PlayerState state, MediaSource source) {
+    void onStateChanged(State state, MediaSource source) {
         if (source.type == MediaSource.Type.LIVESTREAM) {
             switch(state) {
                 case PLAY:
@@ -159,7 +158,7 @@ public class LiveStreamFragment extends PlayerFragment {
         playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
         graphics.radioDevilOn(radioDevil);
         radioDevil.setEnabled(true);
-        displayState = PlayerState.PLAY;
+        displayState = State.PLAY;
     }
 
     private void setStopState() {
@@ -167,14 +166,14 @@ public class LiveStreamFragment extends PlayerFragment {
         playStopButton.setImageResource(R.drawable.ic_play_arrow_white_48dp);
         graphics.radioDevilOff(radioDevil);
         radioDevil.setEnabled(false);
-        displayState = PlayerState.STOP;
+        displayState = State.STOP;
     }
 
     private void setBufferState() {
         graphics.bufferDevil(radioDevil, true);
         playStopButton.setImageResource(R.drawable.ic_stop_white_48dp);
         radioDevil.setEnabled(false);
-        displayState = PlayerState.BUFFER;
+        displayState = State.BUFFER;
     }
 
     private View.OnClickListener showPlaylist = new View.OnClickListener() {

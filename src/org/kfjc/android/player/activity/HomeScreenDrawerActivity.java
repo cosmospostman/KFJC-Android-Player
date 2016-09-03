@@ -43,6 +43,7 @@ import org.kfjc.android.player.fragment.KfjcFragment;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.fragment.PodcastFragment;
 import org.kfjc.android.player.fragment.PodcastPlayerFragment;
+import org.kfjc.android.player.intent.PlayerState;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
@@ -53,7 +54,7 @@ import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.DownloadUtil;
 import org.kfjc.android.player.util.HttpUtil;
-import org.kfjc.android.player.intent.PlayerControlIntent;
+import org.kfjc.android.player.intent.PlayerControl;
 import org.kfjc.android.player.util.NotificationUtil;
 
 import java.io.IOException;
@@ -122,8 +123,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupListenersAndManagers();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mediaStateReceiver,
-                new IntentFilter(StreamService.INTENT_PLAYER_STATE));
-        mediaStateReceiver.onReceive(this, StreamService.getLastPlayerState());
+                new IntentFilter(PlayerState.INTENT_PLAYER_STATE));
+        mediaStateReceiver.onReceive(this, PlayerState.getLastPlayerState());
     }
 
     private void loadResources() {
@@ -179,8 +180,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     private BroadcastReceiver mediaStateReceiver = new MediaStateReceiver() {
         @Override
-        protected void onStateChange(StreamService.PlayerState state, MediaSource source) {
-            if (!StreamService.PlayerState.STOP.equals(state)
+        protected void onStateChange(PlayerState.State state, MediaSource source) {
+            if (!PlayerState.State.STOP.equals(state)
                     && source != null
                     && source.type == MediaSource.Type.LIVESTREAM) {
                 notificationUtil.updateNowPlayNotification(
@@ -189,7 +190,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
 
         @Override
-        protected void onError(StreamService.PlayerState state, String message) {
+        protected void onError(PlayerState.State state, String message) {
             stopPlayer();
             String errorMessage = getString(R.string.error_generic);
             if (message != null && message.contains("HttpDataSourceException")) {
@@ -352,9 +353,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         switch (fragmentId) {
             case R.id.nav_livestream:
                 replaceFragment(liveStreamFragment);
-                if (playlistService != null) {
-                    liveStreamFragment.updatePlaylist(playlistService.getPlaylist());
-                }
                 break;
             case R.id.nav_podcast:
                 loadPodcastListFragment(false);
@@ -478,7 +476,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         Intent intent = getIntent();
         setIntent(null);
         if (intent != null) {
-            MediaSource source = intent.getParcelableExtra(PlayerControlIntent.INTENT_SOURCE);
+            MediaSource source = intent.getParcelableExtra(PlayerControl.INTENT_SOURCE);
             if (source != null) {
                 switch (source.type) {
                     case LIVESTREAM:
@@ -551,7 +549,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     public void stopPlayer() {
         if (streamService != null) {
-            PlayerControlIntent.sendAction(this, PlayerControlIntent.INTENT_STOP);
+            PlayerControl.sendAction(this, PlayerControl.INTENT_STOP);
         }
         notificationUtil.cancelKfjcNotification();
         if (!isForegroundActivity) {

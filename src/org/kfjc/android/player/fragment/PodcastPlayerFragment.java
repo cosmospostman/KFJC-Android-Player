@@ -21,10 +21,10 @@ import org.kfjc.android.player.dialog.PlaylistDialog;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.ShowDetails;
-import org.kfjc.android.player.service.StreamService.PlayerState;
+import org.kfjc.android.player.intent.PlayerState.State;
 import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
-import org.kfjc.android.player.intent.PlayerControlIntent;
+import org.kfjc.android.player.intent.PlayerControl;
 
 public class PodcastPlayerFragment extends PlayerFragment {
 
@@ -115,7 +115,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         @Override
         public void onProgressChanged(SeekBar arg0, int progress, boolean arg2) {
             long seekToMillis = (long) (progress) * 100;
-            if (isTrackingTouch && playerState != PlayerState.STOP) {
+            if (isTrackingTouch && playerState != State.STOP) {
                 handler.removeCallbacks(playClockUpdater);
                 updateClockHelper(seekToMillis);
                 homeScreen.seekPlayer(seekToMillis);
@@ -185,16 +185,16 @@ public class PodcastPlayerFragment extends PlayerFragment {
             case PAUSE:
                 if (playerSource.type == MediaSource.Type.ARCHIVE
                         && playerSource.show.getPlaylistId().equals(show.getPlaylistId())) {
-                    PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_UNPAUSE);
+                    PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_UNPAUSE);
                 } // else fall through:
             case STOP:
-                PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_PLAY, new MediaSource(show));
+                PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_PLAY, new MediaSource(show));
                 break;
             case BUFFER:
-                PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_STOP);
+                PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_STOP);
                 break;
             case PLAY:
-                PlayerControlIntent.sendAction(getActivity(), PlayerControlIntent.INTENT_PAUSE);
+                PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_PAUSE);
                 break;
         }
     }
@@ -218,7 +218,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     @Override
-    void onStateChanged(PlayerState state, MediaSource source) {
+    void onStateChanged(State state, MediaSource source) {
         if (source.type == MediaSource.Type.ARCHIVE
                 && show != null
                 && source.show.getPlaylistId().equals(show.getPlaylistId())) {
@@ -242,14 +242,14 @@ public class PodcastPlayerFragment extends PlayerFragment {
         fab.setImageResource(R.drawable.ic_pause_white_48dp);
         loadingProgress.setVisibility(View.INVISIBLE);
         startPlayClockUpdater();
-        displayState = PlayerState.PLAY;
+        displayState = State.PLAY;
     }
 
     private void setPauseState() {
         playtimeSeekBar.setEnabled(false);
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
         updateClock();
-        displayState = PlayerState.PAUSE;
+        displayState = State.PAUSE;
     }
 
     private void setStopState() {
@@ -259,14 +259,14 @@ public class PodcastPlayerFragment extends PlayerFragment {
         handler.removeCallbacks(playClockUpdater);
         playtimeSeekBar.setProgress(0);
         podcastDetails.setText("");
-        displayState = PlayerState.STOP;
+        displayState = State.STOP;
     }
 
     private void setBufferState() {
         playtimeSeekBar.setEnabled(false);
         loadingProgress.setVisibility(View.VISIBLE);
         fab.setImageResource(R.drawable.ic_stop_white_48dp);
-        displayState = PlayerState.BUFFER;
+        displayState = State.BUFFER;
     }
 
     @Override

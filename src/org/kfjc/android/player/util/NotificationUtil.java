@@ -11,7 +11,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import org.kfjc.android.player.control.PreferenceControl;
-import org.kfjc.android.player.intent.PlayerControlIntent;
+import org.kfjc.android.player.intent.PlayerControl;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.R;
@@ -36,7 +36,7 @@ public class NotificationUtil {
             return;
         }
         Notification.Builder builder = kfjcBaseNotification(
-                context, PlayerControlIntent.notificationIntent(context, source), PlayerControlIntent.INTENT_STOP);
+                context, PlayerControl.notificationIntent(context, source), PlayerControl.INTENT_STOP);
         if (playlist.hasError()) {
             cancelKfjcNotification();
             builder.setContentTitle(context.getString(R.string.app_name));
@@ -69,7 +69,7 @@ public class NotificationUtil {
     }
 
     private static Notification.Builder kfjcBaseNotification(Context context, Intent i, String action) {
-        PendingIntent kfjcPlayerIntent = PlayerControlIntent.playerIntent(context, i);
+        PendingIntent kfjcPlayerIntent = PlayerControl.playerIntent(context, i);
 
         Notification.Builder builder = new Notification.Builder(context)
                 .setSmallIcon(R.drawable.ic_kfjc_notification)
@@ -83,20 +83,20 @@ public class NotificationUtil {
             // Should instead build action with Icon.fromResource (but only for Api 23+)
             builder.addAction(R.drawable.ic_stop_white_48dp,
                     context.getString(R.string.action_stop),
-                    PlayerControlIntent.controlPendingIntent(context, PlayerControlIntent.INTENT_STOP));
-            if (action.equals(PlayerControlIntent.INTENT_STOP)) {
+                    PlayerControl.controlPendingIntent(context, PlayerControl.INTENT_STOP));
+            if (action.equals(PlayerControl.INTENT_STOP)) {
                 builder.setStyle(new Notification.MediaStyle()
                         .setShowActionsInCompactView(0));
-            } else if (action.equals(PlayerControlIntent.INTENT_PAUSE)) {
+            } else if (action.equals(PlayerControl.INTENT_PAUSE)) {
                 builder.addAction(R.drawable.ic_pause_white_48dp,
                         context.getString(R.string.action_pause),
-                        PlayerControlIntent.controlPendingIntent(context, PlayerControlIntent.INTENT_PAUSE));
+                        PlayerControl.controlPendingIntent(context, PlayerControl.INTENT_PAUSE));
                 builder.setStyle(new Notification.MediaStyle()
                         .setShowActionsInCompactView(0, 1));
-            } else if (action.equals(PlayerControlIntent.INTENT_UNPAUSE)) {
+            } else if (action.equals(PlayerControl.INTENT_UNPAUSE)) {
                 builder.addAction(R.drawable.ic_play_arrow_white_48dp,
                         context.getString(R.string.action_play),
-                        PlayerControlIntent.controlPendingIntent(context, PlayerControlIntent.INTENT_UNPAUSE));
+                        PlayerControl.controlPendingIntent(context, PlayerControl.INTENT_UNPAUSE));
                 builder.setStyle(new Notification.MediaStyle()
                         .setShowActionsInCompactView(0, 1));
             }
@@ -105,7 +105,7 @@ public class NotificationUtil {
     }
 
     public static Notification kfjcStreamNotification(Context context, MediaSource source, String action, boolean isBuffering) {
-        Intent i = PlayerControlIntent.notificationIntent(context, source);
+        Intent i = PlayerControl.notificationIntent(context, source);
         Notification.Builder builder = kfjcBaseNotification(context, i, action);
         if (isBuffering) {
             builder.setContentTitle(context.getString(R.string.app_name));

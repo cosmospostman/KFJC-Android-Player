@@ -6,17 +6,18 @@ import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import org.kfjc.android.player.intent.PlayerState;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.receiver.MediaStateReceiver;
 import org.kfjc.android.player.service.StreamService;
-import org.kfjc.android.player.service.StreamService.PlayerState;
+import org.kfjc.android.player.intent.PlayerState.State;
 
 public abstract class PlayerFragment extends KfjcFragment {
 
     public static final String TAG = PlayerFragment.class.getSimpleName();
 
-    protected PlayerState displayState = PlayerState.STOP;
-    protected PlayerState playerState;
+    protected State displayState = State.STOP;
+    protected State playerState;
     protected MediaSource playerSource;
     protected Handler handler = new Handler();
 
@@ -24,13 +25,13 @@ public abstract class PlayerFragment extends KfjcFragment {
     public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mediaStateReceiver,
-                new IntentFilter(StreamService.INTENT_PLAYER_STATE));
-        mediaStateReceiver.onReceive(getActivity(), StreamService.getLastPlayerState());
+                new IntentFilter(PlayerState.INTENT_PLAYER_STATE));
+        mediaStateReceiver.onReceive(getActivity(), PlayerState.getLastPlayerState());
     }
 
     private BroadcastReceiver mediaStateReceiver = new MediaStateReceiver() {
         @Override
-        protected void onStateChange(StreamService.PlayerState state, MediaSource source) {
+        protected void onStateChange(State state, MediaSource source) {
             playerState = state;
             playerSource = source;
             if (!PlayerFragment.this.isAdded()) {
@@ -40,7 +41,7 @@ public abstract class PlayerFragment extends KfjcFragment {
         }
 
         @Override
-        protected void onError(StreamService.PlayerState state, String message) {}
+        protected void onError(State state, String message) {}
     };
 
     @Override
@@ -68,6 +69,6 @@ public abstract class PlayerFragment extends KfjcFragment {
 
     abstract void updateClock();
 
-    abstract void onStateChanged(PlayerState state, MediaSource source);
+    abstract void onStateChanged(State state, MediaSource source);
 
 }
