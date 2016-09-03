@@ -21,6 +21,7 @@ import org.kfjc.android.player.dialog.PlaylistDialog;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.ShowDetails;
+import org.kfjc.android.player.service.StreamService.PlayerState;
 import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.Intents;
@@ -114,7 +115,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
         @Override
         public void onProgressChanged(SeekBar arg0, int progress, boolean arg2) {
             long seekToMillis = (long) (progress) * 100;
-            if (isTrackingTouch && displayState != PlayerState.STOP) {
+            if (isTrackingTouch && playerState != PlayerState.STOP) {
                 handler.removeCallbacks(playClockUpdater);
                 updateClockHelper(seekToMillis);
                 homeScreen.seekPlayer(seekToMillis);
@@ -159,12 +160,10 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
         updateDownloadState();
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-        homeScreen.syncState();
         bottomControls.setVisibility(View.VISIBLE);
         loadingProgress.setVisibility(View.INVISIBLE);
 
         homeScreen.setActionBarBackArrow(true);
-        homeScreen.syncState();
     }
 
     private void updateDownloadState() {
@@ -182,9 +181,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void onPlayStopButtonClick() {
-        if (displayState == null) {
-            displayState = PlayerState.STOP;
-        }
         switch (displayState) {
             case PAUSE:
                 if (playerSource.type == MediaSource.Type.ARCHIVE
@@ -208,7 +204,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void updateClockHelper(long playerPos) {
-        long totalShowTime = homeScreen.getPlayerSource().show.getTotalShowTimeMillis();
+        long totalShowTime = playerSource.show.getTotalShowTimeMillis();
         podcastDetails.setText(DateUtil.formatTime(playerPos - show.getHourPaddingTimeMillis()));
         playtimeSeekBar.setMax((int)totalShowTime/100);
         playtimeSeekBar.setProgress((int)playerPos/100);
@@ -223,31 +219,22 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     @Override
     void onStateChanged(PlayerState state, MediaSource source) {
-        switch (state) {
-            case PLAY:
-                if (source.type == MediaSource.Type.ARCHIVE
-                        && show != null
-                        && source.show.getPlaylistId().equals(show.getPlaylistId())) {
+        if (source.type == MediaSource.Type.ARCHIVE
+                && show != null
+                && source.show.getPlaylistId().equals(show.getPlaylistId())) {
+            switch (state) {
+                case PLAY:
                     setPlayState();
-                } else {
-                    setStopState();
-                }
-                break;
-            case PAUSE:
-                if (source.type == MediaSource.Type.ARCHIVE
-                        && source.show.getPlaylistId().equals(show.getPlaylistId())) {
+                    return;
+                case PAUSE:
                     setPauseState();
-                } else {
-                    setStopState();
-                }
-                break;
-            case STOP:
-                setStopState();
-                break;
-            case BUFFER:
-                setBufferState();
-                break;
+                    return;
+                case BUFFER:
+                    setBufferState();
+                    return;
+            }
         }
+        setStopState();
     }
 
     private void setPlayState() {

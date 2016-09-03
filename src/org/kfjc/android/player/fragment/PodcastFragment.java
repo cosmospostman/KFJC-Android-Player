@@ -24,10 +24,12 @@ import org.kfjc.android.player.model.BroadcastHour;
 import org.kfjc.android.player.model.BroadcastHourJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.service.StreamService.PlayerState;
 import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 import org.kfjc.android.player.util.HttpUtil;
 import org.kfjc.android.player.util.Intents;
+
 
 import java.io.IOException;
 import java.util.Collections;
@@ -80,7 +82,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     private View.OnClickListener nowPlayingClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            homeScreen.loadPodcastPlayer(homeScreen.getPlayerSource().show, true);
+            homeScreen.loadPodcastPlayer(playerSource.show, true);
         }
     };
 
@@ -115,7 +117,6 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
                 savedShows, PodcastRecyclerAdapter.Type.VERTICAL, PodcastFragment.this);
         savedShowsView.setAdapter(adapter);
         setArchives(shows);
-        homeScreen.syncState();
 
         new GetArchivesTask().execute();
     }
@@ -123,12 +124,12 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     @Override
     void updateClock() {
         final long playerPos = homeScreen.getPlayerPosition();
-        final long padding = homeScreen.getPlayerSource().show.getHourPaddingTimeMillis();
+        final long padding = playerSource.show.getHourPaddingTimeMillis();
 
         String timeStr = DateUtil.formatTime(playerPos - padding);
         clockLabel.setText(timeStr);
 
-        playProgress.setMax((int)homeScreen.getPlayerSource().show.getTotalShowTimeMillis()/100);
+        playProgress.setMax((int) playerSource.show.getTotalShowTimeMillis()/100);
         playProgress.setProgress((int)playerPos/100);
     }
 
@@ -158,7 +159,6 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         playProgress.setVisibility(View.VISIBLE);
         fab.setImageResource(R.drawable.ic_pause_white_48dp);
         startPlayClockUpdater();
-        displayState = PlayerState.PLAY;
     }
 
     private void setPauseState() {
@@ -166,7 +166,6 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         playProgress.setVisibility(View.VISIBLE);
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
         updateClock();
-        displayState = PlayerState.PAUSE;
     }
 
     private void setStopState() {

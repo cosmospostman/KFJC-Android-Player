@@ -6,7 +6,7 @@ import android.os.Parcelable;
 public class MediaSource implements Parcelable {
 
     public enum Format { MP3, AAC, NONE }
-    public enum Type { LIVESTREAM, ARCHIVE }
+    public enum Type { LIVESTREAM, ARCHIVE, NONE }
 
     public final Type type;
     public final String url;
@@ -14,6 +14,15 @@ public class MediaSource implements Parcelable {
     public final String description;
     public final Format format;
     public final ShowDetails show;
+
+    public MediaSource() {
+        this.type = Type.NONE;
+        this.format = Format.NONE;
+        this.name = "";
+        this.url = "";
+        this.description = "";
+        this.show = null;
+    }
 
     public MediaSource(String url, Format format, String name, String description) {
         this.url = url;

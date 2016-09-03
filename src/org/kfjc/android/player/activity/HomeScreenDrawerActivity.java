@@ -1,13 +1,14 @@
 package org.kfjc.android.player.activity;
 
 import android.Manifest;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -19,6 +20,7 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -46,6 +48,7 @@ import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
+import org.kfjc.android.player.receiver.MediaStateReceiver;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.DownloadUtil;
@@ -55,6 +58,7 @@ import org.kfjc.android.player.util.NotificationUtil;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.stream.Stream;
 
 public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeScreenInterface {
 
@@ -117,6 +121,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupDrawer();
         setupStreamService();
         setupListenersAndManagers();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mediaStateReceiver,
+                new IntentFilter(StreamService.INTENT_PLAYER_STATE));
+        mediaStateReceiver.onReceive(this, StreamService.getLastPlayerState());
     }
 
     private void loadResources() {
@@ -161,8 +169,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 public void onServiceConnected(ComponentName name, IBinder service) {
                     StreamService.LiveStreamBinder binder = (StreamService.LiveStreamBinder) service;
                     streamService = binder.getService();
-                    streamService.setMediaEventListener(mediaEventHandler);
-                    syncState();
                 }
 
                 @Override
@@ -172,42 +178,25 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
     }
 
-    public void syncState() {
-        if (streamService != null) {
-            mediaEventHandler.onStateChange(streamService.getPlayerState(), streamService.getSource());
-        }
-    }
-
-    @Override
-    public MediaSource getPlayerSource() {
-        return streamService.getSource();
-    }
-
-    private StreamService.MediaListener mediaEventHandler = new StreamService.MediaListener() {
-
+    private BroadcastReceiver mediaStateReceiver = new MediaStateReceiver() {
         @Override
-        public void onStateChange(PlayerFragment.PlayerState state, MediaSource source) {
-            liveStreamFragment.setState(state, source);
-            if (podcastPlayerFragment != null) {
-                podcastPlayerFragment.setState(state, source);
-            }
-            podcastFragment.setState(state, source);
-            if (source != null && source.type == MediaSource.Type.LIVESTREAM) {
-                if (state != PlayerFragment.PlayerState.STOP) {
-                    notificationUtil.updateNowPlayNotification(
-                            playlistService.getPlaylist(), getPlayerSource());
-                }
+        protected void onStateChange(StreamService.PlayerState state, MediaSource source) {
+            if (!StreamService.PlayerState.STOP.equals(state)
+                    && source != null
+                    && source.type == MediaSource.Type.LIVESTREAM) {
+                notificationUtil.updateNowPlayNotification(
+                        playlistService.getPlaylist(), source);
             }
         }
 
         @Override
-        public void onError(String info) {
+        protected void onError(StreamService.PlayerState state, String message) {
             stopPlayer();
-            String message = getString(R.string.error_generic);
-            if (info.contains("HttpDataSourceException")) {
-                message = getString(R.string.error_unable_to_connect);
+            String errorMessage = getString(R.string.error_generic);
+            if (message != null && message.contains("HttpDataSourceException")) {
+                errorMessage = getString(R.string.error_unable_to_connect);
             }
-            snack(message, Snackbar.LENGTH_LONG);
+            snack(errorMessage, Snackbar.LENGTH_LONG);
         }
     };
 
@@ -575,6 +564,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     protected void onDestroy() {
         super.onDestroy();
         notificationUtil.cancelKfjcNotification();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mediaStateReceiver);
         stopPlayer();
         stopService(streamServiceIntent);
         stopService(playlistServiceIntent);

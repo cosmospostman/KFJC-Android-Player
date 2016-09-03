@@ -18,8 +18,6 @@ public interface HomeScreenInterface {
     void loadPodcastListFragment(boolean animate);
     long getPlayerPosition();
     void seekPlayer(long positionMillis);
-    void syncState();
-    MediaSource getPlayerSource();
     void setActionBarBackArrow(boolean isBackArrorw);
     void requestAndroidWritePermissions();
 }

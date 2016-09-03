@@ -18,6 +18,7 @@ import org.kfjc.android.player.dialog.PlaylistDialog;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
+import org.kfjc.android.player.service.StreamService.PlayerState;
 import org.kfjc.android.player.util.GraphicsUtil;
 import org.kfjc.android.player.util.Intents;
 import org.kfjc.android.player.util.NotificationUtil;
@@ -57,7 +58,6 @@ public class LiveStreamFragment extends PlayerFragment {
     public void onResume() {
         super.onResume();
         homeScreen.setNavigationItemChecked(R.id.nav_livestream);
-        homeScreen.syncState();
     }
 
     @Override
@@ -103,10 +103,9 @@ public class LiveStreamFragment extends PlayerFragment {
     }
 
     public void updatePlaylist(Playlist playlist) {
-        if (homeScreen != null
-                && homeScreen.isStreamServicePlaying()
-                && homeScreen.getPlayerSource().type == MediaSource.Type.LIVESTREAM) {
-            notificationUtil.updateNowPlayNotification(playlist, homeScreen.getPlayerSource());
+        if (homeScreen.isStreamServicePlaying()
+                && playerSource.type == MediaSource.Type.LIVESTREAM) {
+            notificationUtil.updateNowPlayNotification(playlist, playerSource);
         }
         if (!isAdded()) {
             return;
@@ -129,8 +128,8 @@ public class LiveStreamFragment extends PlayerFragment {
         settingsDialog.setUrlPreferenceChangeHandler(
                 new SettingsDialog.StreamUrlPreferenceChangeHandler() {
             @Override public void onStreamUrlPreferenceChange() {
-                if (homeScreen.getPlayerSource() != null
-                        && MediaSource.Type.LIVESTREAM == homeScreen.getPlayerSource().type
+                if (playerSource != null
+                        && MediaSource.Type.LIVESTREAM == playerSource.type
                         && homeScreen.isStreamServicePlaying()) {
                     Intents.sendAction(getActivity(), Intents.INTENT_STOP);
                     Intents.sendAction(getActivity(), Intents.INTENT_PLAY, PreferenceControl.getStreamPreference());
@@ -142,24 +141,17 @@ public class LiveStreamFragment extends PlayerFragment {
 
     @Override
     void onStateChanged(PlayerState state, MediaSource source) {
-        switch (state) {
-            case PLAY:
-                if (source.type == MediaSource.Type.LIVESTREAM) {
+        if (source.type == MediaSource.Type.LIVESTREAM) {
+            switch(state) {
+                case PLAY:
                     setPlayState();
-                } else {
-                    setStopState();
-                }
-                break;
-            case PAUSE:
-            case STOP:
-                setStopState();
-                break;
-            case BUFFER:
-                if (source.type == MediaSource.Type.LIVESTREAM) {
+                    return;
+                case BUFFER:
                     setBufferState();
-                }
-                break;
+                    return;
+            }
         }
+        setStopState();
     }
 
     private void setPlayState() {

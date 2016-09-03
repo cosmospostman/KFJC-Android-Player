@@ -11,6 +11,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.exoplayer.ExoPlaybackException;
@@ -43,9 +44,49 @@ public class StreamService extends Service {
     private static final int MIN_BUFFER_MS = 5000;
     private static final int MIN_REBUFFER_MS = 5000;
 
-    public interface MediaListener {
-        void onStateChange(PlayerFragment.PlayerState state, MediaSource source);
-        void onError(String message);
+    public enum PlayerState {
+        PLAY,
+        PAUSE,
+        STOP,
+        BUFFER,
+        ERROR
+    }
+
+    public static final String INTENT_PLAYER_STATE = "kfjc_intent_player_state";
+    public static final String INTENT_KEY_PLAYER_STATE = "kfjc_key_player_state";
+    public static final  String INTENT_KEY_PLAYER_SOURCE = "kfjc_key_player_source";
+    public static final String INTENT_KEY_PLAYER_MESSAGE = "kfjc_key_player_message";
+
+    private static Intent lastPlayerState;
+    public static Intent getLastPlayerState() {
+        if (lastPlayerState == null) {
+            Intent intent = new Intent(INTENT_PLAYER_STATE);
+            intent.putExtra(INTENT_KEY_PLAYER_STATE, PlayerState.STOP);
+            intent.putExtra(INTENT_KEY_PLAYER_SOURCE, new MediaSource());
+            return intent;
+        }
+        return lastPlayerState;
+    }
+
+    private void sendStateIntent(PlayerState state, MediaSource source) {
+        sendStateIntent(state, source, null);
+    }
+
+    private void sendStateIntent(PlayerState state, String message) {
+        sendStateIntent(state, null, message);
+    }
+
+    private void sendStateIntent(PlayerState state, MediaSource source, String message) {
+        Intent intent = new Intent(INTENT_PLAYER_STATE);
+        intent.putExtra(INTENT_KEY_PLAYER_STATE, state);
+        if (source != null) {
+            intent.putExtra(INTENT_KEY_PLAYER_SOURCE, source);
+        }
+        if (message != null) {
+            intent.putExtra(INTENT_KEY_PLAYER_MESSAGE, message);
+        }
+        lastPlayerState = intent;
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
 	public class LiveStreamBinder extends Binder {
@@ -55,7 +96,6 @@ public class StreamService extends Service {
 	}
 
     private MediaSource mediaSource;
-	private MediaListener mediaListener;
 	private final IBinder liveStreamBinder = new LiveStreamBinder();
     private ExoPlayer player;
     private boolean becomingNoisyReceiverRegistered = false;
@@ -125,21 +165,6 @@ public class StreamService extends Service {
         }
     }
 
-    public PlayerFragment.PlayerState getPlayerState() {
-        if (player == null) {
-            return PlayerFragment.PlayerState.STOP;
-        }
-        if (player.getPlaybackState() == ExoPlayer.STATE_BUFFERING) {
-            return PlayerFragment.PlayerState.BUFFER;
-        }
-        if (player.getPlaybackState() == ExoPlayer.STATE_READY) {
-            return isPaused()
-                    ? PlayerFragment.PlayerState.PAUSE
-                    : PlayerFragment.PlayerState.PLAY;
-        }
-        return PlayerFragment.PlayerState.STOP;
-    }
-
     public boolean isPlaying() {
         return player != null && (
                player.getPlayWhenReady() &&
@@ -151,10 +176,6 @@ public class StreamService extends Service {
         return player.getPlaybackState() == ExoPlayer.STATE_READY
                 && !player.getPlayWhenReady();
     }
-
-	public void setMediaEventListener(MediaListener listener) {
-		this.mediaListener = listener;
-	}
 
     private void play(MediaSource mediaSource) {
         this.mediaSource = mediaSource;
@@ -276,7 +297,7 @@ public class StreamService extends Service {
         if (player != null) {
             player.release();
             player = null;
-            mediaListener.onStateChange(PlayerFragment.PlayerState.STOP, mediaSource);
+            sendStateIntent(PlayerState.STOP, mediaSource);
         }
         unregisterReceivers();
         becomingNoisyReceiverRegistered = false;
@@ -284,12 +305,12 @@ public class StreamService extends Service {
         Log.i(TAG, "Service stopped");
     }
 
-    public void reload(MediaSource mediaSource) {
-        if (player != null) {
-            player.stop();
-        }
-        play(mediaSource);
-    }
+//    public void reload(MediaSource mediaSource) {
+//        if (player != null) {
+//            player.stop();
+//        }
+//        play(mediaSource);
+//    }
 
     private void unregisterReceivers() {
         try {
@@ -307,23 +328,23 @@ public class StreamService extends Service {
             switch (state) {
                 case ExoPlayer.STATE_READY:
                     if (playWhenReady) {
-                        mediaListener.onStateChange(PlayerFragment.PlayerState.PLAY, mediaSource);
+                        sendStateIntent(PlayerState.PLAY, mediaSource);
                         registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
                     } else {
-                         mediaListener.onStateChange(PlayerFragment.PlayerState.PAUSE, mediaSource);
+                        sendStateIntent(PlayerState.PAUSE, mediaSource);
                     }
                     break;
                 case ExoPlayer.STATE_PREPARING:
-                    mediaListener.onStateChange(PlayerFragment.PlayerState.BUFFER, mediaSource);
+                    sendStateIntent(PlayerState.BUFFER, mediaSource);
                     becomingNoisyReceiverRegistered = true;
                     break;
                 case ExoPlayer.STATE_BUFFERING:
                     if (!isPlaying()) {
-                        mediaListener.onStateChange(PlayerFragment.PlayerState.BUFFER, mediaSource);
+                        sendStateIntent(PlayerState.BUFFER, mediaSource);
                     }
                     break;
                 case ExoPlayer.STATE_ENDED:
-                    mediaListener.onStateChange(PlayerFragment.PlayerState.STOP, mediaSource);
+                    sendStateIntent(PlayerState.STOP, mediaSource);
                     unregisterReceivers();
                     if (!playNextArchiveHour()) {
                         stop(true);
@@ -340,7 +361,7 @@ public class StreamService extends Service {
         @Override
         public void onPlayerError(ExoPlaybackException e) {
             Log.e(TAG, "ExoPlaybackException: " + e.getMessage());
-            mediaListener.onError(e.getMessage());
+            sendStateIntent(PlayerState.ERROR, e.getMessage());
         }
     };
 

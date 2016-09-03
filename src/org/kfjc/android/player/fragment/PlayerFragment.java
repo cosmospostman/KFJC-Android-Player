@@ -1,40 +1,53 @@
 package org.kfjc.android.player.fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.receiver.MediaStateReceiver;
+import org.kfjc.android.player.service.StreamService;
+import org.kfjc.android.player.service.StreamService.PlayerState;
 
 public abstract class PlayerFragment extends KfjcFragment {
 
     public static final String TAG = PlayerFragment.class.getSimpleName();
 
+    protected PlayerState displayState = PlayerState.STOP;
     protected PlayerState playerState;
-    protected PlayerState displayState;
     protected MediaSource playerSource;
     protected Handler handler = new Handler();
 
-    public enum PlayerState {
-        PLAY,
-        PAUSE,
-        STOP,
-        BUFFER
+    @Override
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mediaStateReceiver,
+                new IntentFilter(StreamService.INTENT_PLAYER_STATE));
+        mediaStateReceiver.onReceive(getActivity(), StreamService.getLastPlayerState());
     }
+
+    private BroadcastReceiver mediaStateReceiver = new MediaStateReceiver() {
+        @Override
+        protected void onStateChange(StreamService.PlayerState state, MediaSource source) {
+            playerState = state;
+            playerSource = source;
+            if (!PlayerFragment.this.isAdded()) {
+                return;
+            }
+            onStateChanged(state, source);
+        }
+
+        @Override
+        protected void onError(StreamService.PlayerState state, String message) {}
+    };
 
     @Override
     public void onPause() {
         super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mediaStateReceiver);
         handler.removeCallbacks(playClockUpdater);
-    }
-
-
-    public void setState(PlayerState state, MediaSource source) {
-        playerState = state;
-        playerSource = source;
-        if (!this.isAdded()) {
-            return;
-        }
-        onStateChanged(state, source);
     }
 
     protected Runnable playClockUpdater = new Runnable() {
