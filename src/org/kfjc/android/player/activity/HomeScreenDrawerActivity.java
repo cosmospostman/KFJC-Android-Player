@@ -112,7 +112,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
         this.liveStreamFragment = new LiveStreamFragment();
         this.podcastFragment = new PodcastFragment();
-        this.podcastPlayerFragment = new PodcastPlayerFragment();
+//        this.podcastPlayerFragment = new PodcastPlayerFragment();
 
         setupDrawer();
         setupStreamService();
@@ -188,7 +188,9 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         @Override
         public void onStateChange(PlayerFragment.PlayerState state, MediaSource source) {
             liveStreamFragment.setState(state, source);
-            podcastPlayerFragment.setState(state, source);
+            if (podcastPlayerFragment != null) {
+                podcastPlayerFragment.setState(state, source);
+            }
             podcastFragment.setState(state, source);
             if (source != null && source.type == MediaSource.Type.LIVESTREAM) {
                 if (state != PlayerFragment.PlayerState.STOP) {
@@ -387,15 +389,12 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void loadPodcastPlayer(ShowDetails show, boolean animate) {
         if (activeFragmentId == R.id.nav_podcast_player
+                && podcastPlayerFragment != null
                 && show.equals(podcastPlayerFragment.getShow())) {
             return;
         }
         activeFragmentId = R.id.nav_podcast_player;
-        podcastPlayerFragment = new PodcastPlayerFragment();
-
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(PodcastPlayerFragment.BROADCAST_SHOW_KEY, show);
-        podcastPlayerFragment.setArguments(bundle);
+        podcastPlayerFragment = PodcastPlayerFragment.newInstance(show);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         if (animate) {
