@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -150,16 +151,17 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     @Override
     public void onResume() {
-        super.onResume();
         Bundle bundle = getArguments();
-
         // Don't do null check. Prefer to crash if show is null.
         this.show = bundle.getParcelable(BROADCAST_SHOW_KEY);
+        if (show == null) {
+            Log.e("TAG", "null show");
+        }
+        super.onResume();
         homeScreen.setActionbarTitle(show.getAirName());
         dateTime.setText(show.getTimestampString());
 
         updateDownloadState();
-        fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
         bottomControls.setVisibility(View.VISIBLE);
         loadingProgress.setVisibility(View.INVISIBLE);
 

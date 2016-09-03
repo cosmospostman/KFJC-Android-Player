@@ -102,6 +102,7 @@ public class LiveStreamFragment extends PlayerFragment {
     }
 
     public void updatePlaylist(Playlist playlist) {
+        // TODO: move this notification logic elsewhere?
         if (homeScreen.isStreamServicePlaying()
                 && playerSource.type == MediaSource.Type.LIVESTREAM) {
             notificationUtil.updateNowPlayNotification(playlist, playerSource);
@@ -140,6 +141,7 @@ public class LiveStreamFragment extends PlayerFragment {
 
     @Override
     void onStateChanged(State state, MediaSource source) {
+        updatePlaylist(homeScreen.getLatestPlaylist());
         if (source.type == MediaSource.Type.LIVESTREAM) {
             switch(state) {
                 case PLAY:

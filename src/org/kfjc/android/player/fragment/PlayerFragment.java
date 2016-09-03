@@ -9,14 +9,13 @@ import android.util.Log;
 import org.kfjc.android.player.intent.PlayerState;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.receiver.MediaStateReceiver;
-import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.intent.PlayerState.State;
 
 public abstract class PlayerFragment extends KfjcFragment {
 
     public static final String TAG = PlayerFragment.class.getSimpleName();
 
-    protected State displayState = State.STOP;
+    protected State displayState;
     protected State playerState;
     protected MediaSource playerSource;
     protected Handler handler = new Handler();

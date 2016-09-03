@@ -159,6 +159,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         playProgress.setVisibility(View.VISIBLE);
         fab.setImageResource(R.drawable.ic_pause_white_48dp);
         startPlayClockUpdater();
+        displayState = State.PLAY;
     }
 
     private void setPauseState() {
@@ -166,11 +167,13 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         playProgress.setVisibility(View.VISIBLE);
         fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
         updateClock();
+        displayState = State.PAUSE;
     }
 
     private void setStopState() {
         nowPlayingPanel.setVisibility(View.GONE);
         playProgress.setVisibility(View.GONE);
+        displayState = State.STOP;
     }
 
     private class GetArchivesTask extends AsyncTask<Void, Void, List<ShowDetails>> {
