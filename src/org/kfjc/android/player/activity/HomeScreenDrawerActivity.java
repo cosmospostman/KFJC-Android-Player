@@ -431,7 +431,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(KEY_ACTIVE_FRAGMENT, activeFragmentId);
         FragmentManager fm = getFragmentManager();
-        if (fm.findFragmentByTag(podcastPlayerFragment.TAG) != null) {
+        if (fm.findFragmentByTag(PodcastPlayerFragment.TAG) != null) {
             getFragmentManager().putFragment(outState, "PodcastPlayerFragment", podcastPlayerFragment);
         }
         super.onSaveInstanceState(outState);
@@ -502,7 +502,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
         // Neither from notification nor download notification.
         loadFragment(activeFragmentId);
-        return;
     }
 
     @Override
@@ -551,7 +550,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         if (streamService != null) {
             PlayerControl.sendAction(this, PlayerControl.INTENT_STOP);
         }
-        notificationUtil.cancelKfjcNotification();
+        NotificationUtil.cancelKfjcNotification();
         if (!isForegroundActivity) {
             playlistService.stop();
         }
@@ -560,7 +559,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        notificationUtil.cancelKfjcNotification();
+        NotificationUtil.cancelKfjcNotification();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mediaStateReceiver);
         stopPlayer();
         stopService(streamServiceIntent);
