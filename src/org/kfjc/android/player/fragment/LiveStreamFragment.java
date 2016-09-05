@@ -19,7 +19,6 @@ import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.dialog.PlaylistDialog;
 import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.intent.PlayerControl;
-import org.kfjc.android.player.intent.PlayerState;
 import org.kfjc.android.player.intent.PlayerState.State;
 import org.kfjc.android.player.intent.PlaylistUpdate;
 import org.kfjc.android.player.model.MediaSource;

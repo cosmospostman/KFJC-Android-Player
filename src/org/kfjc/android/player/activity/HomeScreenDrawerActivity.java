@@ -46,8 +46,6 @@ import org.kfjc.android.player.fragment.PodcastPlayerFragment;
 import org.kfjc.android.player.intent.PlayerState;
 import org.kfjc.android.player.intent.PlaylistUpdate;
 import org.kfjc.android.player.model.MediaSource;
-import org.kfjc.android.player.model.Playlist;
-import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.receiver.DownloadReceiver;
 import org.kfjc.android.player.receiver.MediaStateReceiver;
@@ -80,8 +78,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private TelephonyManager telephonyManager;
     private PhoneStateListener phoneStateListener;
 
-    private LiveStreamFragment liveStreamFragment;
-    private PodcastFragment podcastFragment;
     private PodcastPlayerFragment podcastPlayerFragment;
 
     private NavigationView navigationView;
@@ -114,10 +110,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupPlaylistService();
         streamServiceIntent = new Intent(this, StreamService.class);
         startService(streamServiceIntent);
-
-        this.liveStreamFragment = new LiveStreamFragment();
-        this.podcastFragment = new PodcastFragment();
-//        this.podcastPlayerFragment = new PodcastPlayerFragment();
 
         setupDrawer();
         setupStreamService();
@@ -347,7 +339,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         activeFragmentId = fragmentId;
         switch (fragmentId) {
             case R.id.nav_livestream:
-                replaceFragment(liveStreamFragment);
+                replaceFragment(new LiveStreamFragment());
                 break;
             case R.id.nav_podcast:
                 loadPodcastListFragment(false);
@@ -394,7 +386,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         if (animate) {
             ft.setCustomAnimations(R.animator.fade_in_to_right, R.animator.fade_out_to_right);
         }
-        ft.replace(R.id.home_screen_main_fragment, podcastFragment)
+        ft.replace(R.id.home_screen_main_fragment, new PodcastFragment())
             .addToBackStack(null)
             .commit();
     }
