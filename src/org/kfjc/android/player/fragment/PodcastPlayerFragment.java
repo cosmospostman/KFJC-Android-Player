@@ -62,8 +62,8 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private View.OnClickListener settingsButtonClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            SettingsDialog settingsFragment = SettingsDialog.newInstance(true);
-            settingsFragment.show(getFragmentManager(), "settings");        }
+            SettingsDialog.newInstance(true).show(getFragmentManager(), "settings");
+        }
     };
 
     private View.OnClickListener showPlaylist = new View.OnClickListener() {

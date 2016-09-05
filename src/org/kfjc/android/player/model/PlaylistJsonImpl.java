@@ -29,6 +29,7 @@ public class PlaylistJsonImpl implements Playlist {
     String jsonString;
 
     public PlaylistJsonImpl(String jsonPlaylistString) {
+
         try {
             if (TextUtils.isEmpty(jsonPlaylistString)) {
                 hasError = true;
