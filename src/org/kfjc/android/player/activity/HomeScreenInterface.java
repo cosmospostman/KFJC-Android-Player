@@ -1,8 +1,6 @@
 package org.kfjc.android.player.activity;
 
 import org.kfjc.android.player.model.ShowDetails;
-import org.kfjc.android.player.model.Playlist;
-import org.kfjc.android.player.model.MediaSource;
 
 public interface HomeScreenInterface {
     void setActionbarTitle(String title);
@@ -10,7 +8,6 @@ public interface HomeScreenInterface {
     String getString(int resId);
     void snack(String message, int duration);
     void snackDone();
-    Playlist getLatestPlaylist();
     void setNavigationItemChecked(int navigationItemId);
     void updateBackground();
     void startDownload(ShowDetails showDetails);

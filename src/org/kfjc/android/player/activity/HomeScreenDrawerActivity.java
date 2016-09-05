@@ -44,6 +44,7 @@ import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.fragment.PodcastFragment;
 import org.kfjc.android.player.fragment.PodcastPlayerFragment;
 import org.kfjc.android.player.intent.PlayerState;
+import org.kfjc.android.player.intent.PlaylistUpdate;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
@@ -144,12 +145,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     PlaylistService.PlaylistBinder binder = (PlaylistService.PlaylistBinder) service;
                     playlistService = binder.getService();
                     playlistService.start();
-                    playlistService.registerPlaylistCallback(new PlaylistService.PlaylistCallback() {
-                        @Override
-                        public void onPlaylistUpdate(Playlist playlist) {
-                            liveStreamFragment.updatePlaylist(playlist);
-                        }
-                    });
                 }
 
                 @Override
@@ -185,7 +180,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     && source != null
                     && source.type == MediaSource.Type.LIVESTREAM) {
                 notificationUtil.updateNowPlayNotification(
-                        playlistService.getPlaylist(), source);
+                        PlaylistUpdate.getLastPlaylist(), source);
             }
         }
 
@@ -586,14 +581,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         if (snackbar != null) {
             snackbar.dismiss();
         }
-    }
-
-    @Override
-    public Playlist getLatestPlaylist() {
-        if (playlistService == null) {
-            return new PlaylistJsonImpl("");
-        }
-        return playlistService.getPlaylist();
     }
 
     @Override

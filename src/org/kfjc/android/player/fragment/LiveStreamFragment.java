@@ -1,8 +1,10 @@
 package org.kfjc.android.player.fragment;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,11 +18,14 @@ import org.kfjc.android.player.activity.LavaLampActivity;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.dialog.PlaylistDialog;
 import org.kfjc.android.player.dialog.SettingsDialog;
+import org.kfjc.android.player.intent.PlayerControl;
+import org.kfjc.android.player.intent.PlayerState;
+import org.kfjc.android.player.intent.PlayerState.State;
+import org.kfjc.android.player.intent.PlaylistUpdate;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
-import org.kfjc.android.player.intent.PlayerState.State;
+import org.kfjc.android.player.receiver.PlaylistUpdateReceiver;
 import org.kfjc.android.player.util.GraphicsUtil;
-import org.kfjc.android.player.intent.PlayerControl;
 import org.kfjc.android.player.util.NotificationUtil;
 
 public class LiveStreamFragment extends PlayerFragment {
@@ -56,6 +61,9 @@ public class LiveStreamFragment extends PlayerFragment {
     @Override
     public void onResume() {
         super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(playlistUpdateReceiver,
+                new IntentFilter(PlaylistUpdate.INTENT_PLAYLIST_UPDATE));
+        playlistUpdateReceiver.onPlaylistUpdate(PlaylistUpdate.getLastPlaylist());
         homeScreen.setNavigationItemChecked(R.id.nav_livestream);
     }
 
@@ -63,10 +71,18 @@ public class LiveStreamFragment extends PlayerFragment {
     public void onPause() {
         super.onPause();
         graphics.bufferDevil(radioDevil, false);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(playlistUpdateReceiver);
     }
 
     @Override
     void updateClock() {}
+
+    private PlaylistUpdateReceiver playlistUpdateReceiver = new PlaylistUpdateReceiver() {
+        @Override
+        public void onPlaylistUpdate(Playlist playlist) {
+            updatePlaylist(playlist);
+        }
+    };
 
     private void addButtonListeners() {
         playStopButton.setOnClickListener(new View.OnClickListener() {
@@ -141,8 +157,8 @@ public class LiveStreamFragment extends PlayerFragment {
 
     @Override
     void onStateChanged(State state, MediaSource source) {
-        updatePlaylist(homeScreen.getLatestPlaylist());
         if (source.type == MediaSource.Type.LIVESTREAM) {
+            updatePlaylist(PlaylistUpdate.getLastPlaylist());
             switch(state) {
                 case PLAY:
                     setPlayState();
@@ -181,7 +197,7 @@ public class LiveStreamFragment extends PlayerFragment {
     private View.OnClickListener showPlaylist = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Playlist playlist = homeScreen.getLatestPlaylist();
+            Playlist playlist = PlaylistUpdate.getLastPlaylist();
             PlaylistDialog d = PlaylistDialog.newInstance(
                     playlist == null ? "" : playlist.toJsonString());
             d.show(getFragmentManager(), "playlist");

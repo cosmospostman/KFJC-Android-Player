@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 
 import org.kfjc.android.player.model.MediaSource;
-import org.kfjc.android.player.service.StreamService;
 
 public class PlayerState {
 
@@ -17,8 +16,9 @@ public class PlayerState {
         ERROR
     }
 
-    public static final String INTENT_KEY_PLAYER_MESSAGE = "kfjc_key_player_message";
     public static final String INTENT_PLAYER_STATE = "kfjc_intent_player_state";
+
+    public static final String INTENT_KEY_PLAYER_MESSAGE = "kfjc_key_player_message";
     public static final String INTENT_KEY_PLAYER_SOURCE = "kfjc_key_player_source";
     public static final String INTENT_KEY_PLAYER_STATE = "kfjc_key_player_state";
 

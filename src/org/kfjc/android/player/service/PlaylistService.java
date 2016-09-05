@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import org.kfjc.android.player.Constants;
+import org.kfjc.android.player.intent.PlaylistUpdate;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.model.PlaylistJsonImpl;
 import org.kfjc.android.player.util.HttpUtil;
@@ -17,10 +18,6 @@ public class PlaylistService extends Service {
 
     private static final String TAG = PlaylistService.class.getSimpleName();
 
-    public interface PlaylistCallback {
-        void onPlaylistUpdate(Playlist playlist);
-    }
-
     public class PlaylistBinder extends Binder {
         public PlaylistService getService() {
             return PlaylistService.this;
@@ -28,9 +25,7 @@ public class PlaylistService extends Service {
     }
 
     private Handler handler = new Handler();
-    private Playlist lastFetchedPlaylist;
     private PlaylistBinder binder = new PlaylistBinder();
-    private PlaylistCallback playlistCallback;
     private boolean isStarted = false;
     private Runnable fetchRunner = new Runnable() {
         @Override public void run() {
@@ -91,24 +86,9 @@ public class PlaylistService extends Service {
         };
     }
 
-    public Playlist getPlaylist() {
-        return lastFetchedPlaylist;
-    }
-
-    public void registerPlaylistCallback(PlaylistCallback callback) {
-        this.playlistCallback = callback;
-        if (lastFetchedPlaylist != null) {
-            callback.onPlaylistUpdate(lastFetchedPlaylist);
-        }
-    }
-
     private void onTrackInfoFetched(Playlist playlist) {
-        if (lastFetchedPlaylist != null && playlist.hasError()) {
-            return;
-        }
-        if (playlistCallback != null) {
-            lastFetchedPlaylist = playlist;
-            playlistCallback.onPlaylistUpdate(playlist);
+        if (!playlist.hasError()) {
+            PlaylistUpdate.send(getApplicationContext(), playlist.toJsonString());
         }
     }
 }

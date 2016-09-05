@@ -15,9 +15,7 @@ import java.util.concurrent.ExecutionException;
 
 public class PreferenceControl {
 
-	private static final String TAG = PreferenceControl.class.getSimpleName();
 	private static final String PREFERENCE_KEY = "kfjc.preferences";
-	private static final String STREAM_PREFERENCE_KEY = "kfjc.preferences.streamname";
 	private static final String STREAM_URL_PREFERENCE_KEY = "kfjc.preferences.streamUrl";
 	private static final String ENABLE_BACKGROUNDS_KEY = "kfjc.preferences.enableBackgrounds";
 	private static final String CACHED_RESOURCES_KEY = "kfjc.preferences.cachedResources";
@@ -82,7 +80,6 @@ public class PreferenceControl {
 	
 	public static MediaSource getStreamPreference() {
 		String urlPref = preferences.getString(STREAM_URL_PREFERENCE_KEY, "");
-		// TODO: block on streams being non-null or maybe set streams to fallback initailly?
 		if (mediaSources == null) {
 			return Constants.FALLBACK_MEDIA_SOURCE;
 		}
