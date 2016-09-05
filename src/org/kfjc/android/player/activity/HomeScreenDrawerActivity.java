@@ -12,6 +12,8 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -159,8 +161,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 }
 
                 @Override
-                public void onServiceDisconnected(ComponentName arg0) {
-                }
+                public void onServiceDisconnected(ComponentName arg0) {}
             };
         }
     }
@@ -349,8 +350,14 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     if (podcastPlayerFragment != null) {
                         replaceFragment(podcastPlayerFragment);
                     } else {
-                        // Don't load empty podcast player
-                        loadPodcastListFragment(false);
+                        Intent i = PlayerState.getLastPlayerState();
+                        MediaSource source = i.getParcelableExtra(PlayerState.INTENT_KEY_PLAYER_SOURCE);
+                        if (source.show != null) {
+                            loadPodcastPlayer(source.show, false);
+                        } else {
+                            // Don't load empty podcast player
+                            loadPodcastListFragment(false);
+                        }
                     }
                 } else {
                     loadPodcastPlayer(streamService.getSource().show, false);
@@ -548,11 +555,27 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         super.onDestroy();
         NotificationUtil.cancelKfjcNotification();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mediaStateReceiver);
-        stopPlayer();
-        stopService(streamServiceIntent);
-        stopService(playlistServiceIntent);
+        if (isFinishing()) {
+            stopPlayer();
+            stopService(streamServiceIntent);
+            stopService(playlistServiceIntent);
+        }
         if (telephonyManager != null) {
             telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+        }
+        recycleBackground();
+    }
+
+    /**
+     * Need to call this from onDestroy to free up background image bitmap
+     */
+    private void recycleBackground() {
+        ImageView backgroundImageView = (ImageView) findViewById(R.id.backgroundImageView);
+        Drawable drawable = backgroundImageView.getDrawable();
+        if (drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+            Bitmap bitmap = bitmapDrawable.getBitmap();
+            bitmap.recycle();
         }
     }
 
@@ -577,6 +600,9 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public long getPlayerPosition() {
+        if (streamService == null) {
+            return 0;
+        }
         return streamService.getPlayerPosition();
     }
 

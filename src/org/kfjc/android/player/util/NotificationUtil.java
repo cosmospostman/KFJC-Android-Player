@@ -10,11 +10,11 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.text.TextUtils;
 
+import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.intent.PlayerControl;
 import org.kfjc.android.player.model.MediaSource;
 import org.kfjc.android.player.model.Playlist;
-import org.kfjc.android.player.R;
 
 public class NotificationUtil {
 
