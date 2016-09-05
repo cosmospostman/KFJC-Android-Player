@@ -6,19 +6,16 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.util.Log;
 
-import com.google.common.io.Files;
-
-import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.model.Playlist;
+import org.kfjc.android.player.model.ShowDetails;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 
 public class ExternalStorageUtil {
 
@@ -154,7 +151,7 @@ public class ExternalStorageUtil {
 
     public static String readFile(File f) {
         try {
-            return Files.toString(f, Charset.defaultCharset());
+            return new Scanner(f).useDelimiter("\\Z").next();
         } catch (IOException e) {
             return "";
         }
