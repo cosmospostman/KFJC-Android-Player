@@ -94,7 +94,8 @@
             android:layout_height="wrap_content"
             android:paddingTop="4dp"
             android:paddingBottom="12dp"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:theme="@style/AppTheme"/>
 
         <ProgressBar
             android:id="@+id/loadingProgress"
