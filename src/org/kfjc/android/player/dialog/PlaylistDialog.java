@@ -76,6 +76,9 @@ public class PlaylistDialog extends DialogFragment {
             timestamp = playlist.getTimestampMillis();
         } else {
             playlistId = getArguments().getString(PLAYLIST_ID_KEY);
+            if (playlistId == null) {
+                playlistId = Constants.CURRENT_PLAYLIST_ID;
+            }
             djName = getArguments().getString(DJ_NAME_KEY);
             timestamp = getArguments().getLong(TIME_KEY);
         }
