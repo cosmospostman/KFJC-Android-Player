@@ -1,0 +1,52 @@
+[[[action_pause]]] Pause
+[[[action_play]]] Play
+[[[action_stop]]] Stop
+[[[action_app_name]]] KFJC
+
+[[[button_close]]] Close
+[[[button_download]]] Download
+[[[button_delete]]] Delete
+
+[[[default_dj_name: Name to show when the on-air host is unknown. Foothill is the name of the college we broadcast from.]]] George Foothill
+[[[dialog_podcast_can_download]]] This show can be saved to your device.
+[[[dialog_podcast_is_downloaded]]]This show is saved on your device.
+
+[[[error_generic]]] Something went wrong
+[[[error_unable_to_connect]]] Can't connect to KFJC
+[[[error_activity_not_found]]] Couldn't find a relevant app
+
+[[[fragment_title_stream]]] KFJC Live Stream
+[[[fragment_title_playlist, nav_playlists]]] Playlist
+[[[fragment_title_podcast, nav_podcast]]] On Demand
+
+[[[nav_livestream]]] Live stream
+[[[navigation_drawer_open]]] Open navigation
+[[[navigation_drawer_close]]] Close navigation
+[[[navigation_drawer_title]]] KFJC Radio
+
+[[[permissions_phone_title]]] Phone permissions
+[[[permission_phone_rationale]]] KFJC only uses phone permissions to automatically stop playback when your phone is in use. We don't snoop!
+[[[podcast_label_recent_archives: This label for new podcasts is a pun of "Hot off the press" and "Hot air"]]] Hot (off the) air
+[[[podcast_label_saved_archives]]] Available offline
+[[[podcast_no_saved_shows]]] You haven't saved any shows to this device.
+
+[[[setting_audio_quality]]] Live stream audio quality
+[[[setting_backgrounds]]] Enable hourly backgrounds
+[[[status_connecting]]] Connecting to KFJC&#8230;
+[[[status_default_stream]]] Using default stream
+[[[status_playlist_unavailable]]] Playlist unavailable :\'(
+[[[status_lava_download: Downloading a video of a lava lamp]]] Downloading Lava&#8230;
+[[[status_lava_download_format]]] Downloading Lava ([[[NUMBER]]]MB)&#8230;
+
+[[[trackdetails_album]]] Album
+[[[trackdetails_artist]]] Artist
+[[[trackdetails_label: Record label]]] Label
+[[[trackdetails_track]]] Track
+
+[[[format_buffering]]] Buffering stream: [[[STREAM NAME]]]
+[[[format_artist_track: Concatenation of artist and track info]]] [[[ARTIST]]] - [[[TRACK]]]
+[[[format_file_size_download]]] [[[NUMBER]]]Mb download
+[[format_file_size_download_no_space]]] [[[NUMBER]]]Mb download (Not enough space on device)
+[[[format_file_size_saved]]] [[[NUMBER]]]Mb of device storage used
+[[[format_share_track_details]]] From KFJC: [[[ARTIST]]] - [[[TRACK]]] ([[[ALBUM]]])
+[[[format_archive_file: Partial download of a DJ show]]] [[[DJ_NAME]]], part [[[NUMBER]]] of [[[NUMBER]]]

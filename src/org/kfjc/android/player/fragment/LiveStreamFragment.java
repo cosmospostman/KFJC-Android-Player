@@ -202,4 +202,9 @@ public class LiveStreamFragment extends PlayerFragment {
             d.show(getFragmentManager(), "playlist");
         }
     };
+
+    @Override
+    public boolean setActionBarBackArrow() {
+        return false;
+    }
 }

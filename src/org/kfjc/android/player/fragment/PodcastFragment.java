@@ -232,4 +232,9 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
             recentShowsView.startAnimation(fadeIn);
         }
     }
+
+    @Override
+    public boolean setActionBarBackArrow() {
+        return false;
+    }
 }

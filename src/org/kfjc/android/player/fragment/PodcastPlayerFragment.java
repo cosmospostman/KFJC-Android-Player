@@ -279,4 +279,9 @@ public class PodcastPlayerFragment extends PlayerFragment {
     public ShowDetails getShow() {
         return show;
     }
+
+    @Override
+    public boolean setActionBarBackArrow() {
+        return true;
+    }
 }

@@ -383,12 +383,12 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         ft.replace(R.id.home_screen_main_fragment, podcastPlayerFragment)
             .addToBackStack(null)
             .commit();
+        setActionBarBackArrow(true);
     }
 
     @Override
     public void loadPodcastListFragment(boolean animate) {
         activeFragmentId = R.id.nav_podcast;
-        setActionBarBackArrow(false);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         if (animate) {
             ft.setCustomAnimations(R.animator.fade_in_to_right, R.animator.fade_out_to_right);
@@ -396,14 +396,15 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         ft.replace(R.id.home_screen_main_fragment, new PodcastFragment())
             .addToBackStack(null)
             .commit();
+        setActionBarBackArrow(false);
     }
 
     private void replaceFragment(KfjcFragment fragment) {
-        setActionBarBackArrow(false);
         getFragmentManager().beginTransaction()
                 .replace(R.id.home_screen_main_fragment, fragment, fragment.getFragmentTag())
                 .addToBackStack(null)
                 .commit();
+        setActionBarBackArrow(fragment.setActionBarBackArrow());
     }
 
     @Override

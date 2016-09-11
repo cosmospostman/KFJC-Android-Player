@@ -6,7 +6,7 @@ import android.content.Context;
 
 import org.kfjc.android.player.activity.HomeScreenDrawerActivity;
 
-public class KfjcFragment extends Fragment {
+public abstract class KfjcFragment extends Fragment {
 
     public static final String TAG = KfjcFragment.class.getSimpleName();
 
@@ -40,4 +40,6 @@ public class KfjcFragment extends Fragment {
     public String getFragmentTag() {
         return TAG;
     }
+
+    public abstract boolean setActionBarBackArrow();
 }
