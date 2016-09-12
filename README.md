@@ -30,6 +30,15 @@ Build
 
 Changelog
 ---------
+v10 (12 September 2016)
+ - Bug fixes
+ - Targets sdk24
+ - Translations for es, de, fi, ru, se.
+ - More intents for internal communication
+
+v9 (28 May 2016)
+ - Bugfixes
+
 v6 (23 May 2016)
  - Can play from broadcast archive
  - Can save from broadcast archive to play later
