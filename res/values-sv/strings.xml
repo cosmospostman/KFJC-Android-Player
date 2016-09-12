@@ -50,7 +50,6 @@
         stoppa uppspelningen när telefonen är i bruk. Vi tjuvlyssnar inte!</string>
     <string name="podcast_label_recent_archives">Hot (utanför) air</string>
     <string name="podcast_label_saved_archives">Offline tillgängligt</string>
-    <string name="podcast_delete_warning">Du kan inte ladda ner show:en igen ifall det har varit mera än två veckor sedan show:en was inspelad.</string>
     <string name="podcast_no_saved_shows">Du har inte sparat program till denna enhet.</string>
 
     <string name="setting_audio_quality">Live stream audio kvalitet</string>
