@@ -12,7 +12,6 @@ import org.kfjc.android.player.intent.PlayerControl;
 public class KfjcPhoneStateListener extends PhoneStateListener {
 
     private HomeScreenDrawerActivity homeScreen;
-    private static boolean isStoppedDueToPhone = false;
 
     public KfjcPhoneStateListener(HomeScreenDrawerActivity homeScreen) {
         this.homeScreen = homeScreen;
@@ -25,13 +24,6 @@ public class KfjcPhoneStateListener extends PhoneStateListener {
             case TelephonyManager.CALL_STATE_OFFHOOK:
                 if (homeScreen.isStreamServicePlaying()) {
                     PlayerControl.sendAction(homeScreen, PlayerControl.INTENT_PAUSE);
-                    isStoppedDueToPhone = true;
-                }
-                break;
-            case TelephonyManager.CALL_STATE_IDLE:
-                if (isStoppedDueToPhone) {
-                    PlayerControl.sendAction(homeScreen, PlayerControl.INTENT_UNPAUSE);
-                    isStoppedDueToPhone = false;
                 }
                 break;
         }
