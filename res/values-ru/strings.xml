@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="action_pause">Пауза</string>
+    <string name="action_play">Воспроизвести</string>
+    <string name="action_stop">Стоп</string>
+    <string name="app_name">KFJC</string>
+
+    <string name="button_close">Закрыть</string>
+    <string name="button_download">Загрузить</string>
+    <string name="button_delete">Удалить</string>
+
+    <string name="default_dj_name"
+            translation_description="DJ name to show if nobody is signed into spidey">
+            Джордж Футхилл</string>
+    <string name="dialog_podcast_can_download">Это шоу можно сохранить на Ваше устройство.</string>
+    <string name="dialog_podcast_is_downloaded">Это шоу сохранено на Ваше устройство.</string>
+
+    <string name="empty_string"
+            translation_description="No need to translate nothingness">
+            </string>
+
+    <string name="error_generic">
+            Что-то пошло не так</string>
+    <string name="error_unable_to_connect">
+            Не могу подключиться к KFJC</string>
+    <string name="error_activity_not_found">
+            Не получилось найти подходящее приложение</string>
+
+    <string name="fragment_title_stream"
+            translation_description="UI title for the live stream screen">
+            KFJC Прямая трансляция</string>
+    <string name="fragment_title_playlist"
+            translation_description="UI title for the playlist screen">
+            Плейлист</string>
+
+    <string name="fragment_title_podcast"
+        translation_description="UI title for the podcast screen">
+            По запросу</string>
+
+    <string name="nav_livestream">Прямая трансляция</string>
+    <string name="nav_playlists">Плейлист</string>
+    <string name="nav_podcast">По запросу</string>
+    <string name="navigation_drawer_open">Открыть навигацию</string>
+    <string name="navigation_drawer_close">Закрыть навигацию</string>
+    <string name="navigation_drawer_title">KFJC Радио</string>
+
+    <string name="permission_phone_title">Доступ к телефону</string>
+    <string name="permission_phone_rationale">KFJC использует доступ к телефону только для того, чтобы автоматически останавливать проигрывание, когда телефон используется. Мы не шпионим!</string>
+    <string name="podcast_label_recent_archives">недавно добавленный</string>
+    <string name="podcast_label_saved_archives">Доступно офлайн</string>
+    <string name="podcast_no_saved_shows">Вы не сохранили никакие шоу на это устройство</string>
+
+    <string name="setting_audio_quality">Прямая трансляция аудио качества</string>
+    <string name="setting_backgrounds">Активировать ежечасную заставку</string>
+    <string name="status_connecting">Подключение к KFJC&#8230;</string>
+    <string name="status_default_stream">Использование трансляции по умолчанию</string>
+    <string name="status_playlist_unavailable">Плейлист недоступен :\'(</string>
+    <string name="status_lava_download">Загрузка Лава&#8230;</string>
+    <string name="status_lava_download_format">Загрузка Лава (%1$sМб)&#8230;</string>
+
+    <string name="trackdetails_album">Альбом</string>
+    <string name="trackdetails_artist">Артист</string>
+    <string name="trackdetails_label">Лейбл</string>
+    <string name="trackdetails_track">Трек</string>
+
+    <string name="format_buffering"
+            translation_description="String to show when buffering stream called (%1s)">
+         	Буферизация трансляции: %1$s</string>
+    <string name="format_artist_track"
+            translation_description="String combining artist (%1s) and track (%2$s)">
+         	%1$s - %2$s</string>
+
+    <string name="format_file_size_download"
+        translation_description="File size used">
+         	Мб загружено</string>
+    <string name="format_file_size_download_no_space"
+        translation_description="File size used">
+         	%1$sМб загружено (Недостаточно места на устройстве)</string>
+    <string name="format_file_size_saved"
+        translation_description="File size used">
+         	%1$sМб памяти устройства занято</string>
+    <string name="format_share_track_details"
+        translation_description="String for sharing, combining artist (%1s), track (%2$s) and album (%3$s)">
+        Из KFJC: %1$s - %2$s (%3$s)</string>
+    <string name="format_archive_file"
+        translation_description="DJ name, plus which archive file (of total hours for that show)">
+        %1$s, часть %2$d из %3$d</string>
+</resources>
