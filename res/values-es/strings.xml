@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="action_pause">Pausar</string>
+    <string name="action_play">Reproducir</string>
+    <string name="action_stop">Detener</string>
+    <string name="app_name">KFJC</string>
+
+    <string name="button_close">Cerrar</string>
+    <string name="button_download">Descargar</string>
+    <string name="button_delete">Borrar</string>
+
+    <string name="default_dj_name"
+            translation_description="DJ name to show if nobody is signed into spidey">
+            George Foothill</string>
+    <string name="dialog_podcast_can_download">Este programa se puede guardar en tu dispositivo.</string>
+    <string name="dialog_podcast_is_downloaded">Este programa está guardado en tu dispositivo.</string>
+
+    <string name="empty_string"
+            translation_description="No need to translate nothingness">
+            </string>
+
+    <string name="error_generic">
+            Algo salió mal</string>
+    <string name="error_unable_to_connect">
+            No es posible conectarse a KFJC</string>
+    <string name="error_activity_not_found">
+            No se encontró una aplicación correspondiente</string>
+
+    <string name="fragment_title_stream"
+            translation_description="UI title for the live stream screen">
+            Transmisión en vivo de KFJC</string>
+    <string name="fragment_title_playlist"
+            translation_description="UI title for the playlist screen">
+            Lista de reproducción</string>
+
+    <string name="fragment_title_podcast"
+        translation_description="UI title for the podcast screen">
+            Bajo demanda</string>
+
+    <string name="nav_livestream">Transmisión en vivo</string>
+    <string name="nav_playlists">Lista de reproducción</string>
+    <string name="nav_podcast">Bajo demanda</string>
+    <string name="navigation_drawer_open">Abrir navegación</string>
+    <string name="navigation_drawer_close">Cerrar navegación</string>
+    <string name="navigation_drawer_title">Radio KFJC</string>
+
+    <string name="permission_phone_title">Permisos del teléfono</string>
+    <string name="permission_phone_rationale">KFJC utiliza los permisos del teléfono solamente para detener automáticamente la reproducción cuando el teléfono está en uso. ¡Nosotros no espiamos!</string>
+    <string name="podcast_label_recent_archives">Recién (salidos) al aire</string>
+    <string name="podcast_label_saved_archives">Disponible sin conexión</string>
+    <string name="podcast_no_saved_shows">No has guardado ningún programa en este dispositivo.</string>
+
+    <string name="setting_audio_quality">Calidad del audio en vivo</string>
+    <string name="setting_backgrounds">Habilitar fondos por hora</string>
+    <string name="status_connecting">Conexión a KFJC&#8230;</string>
+    <string name="status_default_stream">Uso de transmisión por defecto</string>
+    <string name="status_playlist_unavailable">Lista de reproducción no disponible :\'(</string>
+    <string name="status_lava_download">Descarga de Lava&#8230;</string>
+    <string name="status_lava_download_format">Descarga de Lava (%1$sMB)&#8230;</string>
+
+    <string name="trackdetails_album">Álbum</string>
+    <string name="trackdetails_artist">Artista</string>
+    <string name="trackdetails_label">Sello</string>
+    <string name="trackdetails_track">Pista</string>
+
+    <string name="format_buffering"
+            translation_description="String to show when buffering stream called (%1s)">
+         	Transmisión almacenada en búfer: %1$s</string>
+    <string name="format_artist_track"
+            translation_description="String combining artist (%1s) and track (%2$s)">
+         	%1$s - %2$s</string>
+
+    <string name="format_file_size_download"
+        translation_description="File size used">
+         	Descarga de %1$sMb</string>
+    <string name="format_file_size_download_no_space"
+        translation_description="File size used">
+         	Descarga de %1$sMb (no hay suficiente espacio en el dispositivo)</string>
+    <string name="format_file_size_saved"
+        translation_description="File size used">
+         	%1$sMb de almacenamiento del dispositivo utilizados</string>
+    <string name="format_share_track_details"
+        translation_description="String for sharing, combining artist (%1s), track (%2$s) and album (%3$s)">
+        De KFJC: %1$s - %2$s (%3$s)</string>
+    <string name="format_archive_file"
+        translation_description="DJ name, plus which archive file (of total hours for that show)">
+        %1$s, parte %2$d de %3$d</string>
+</resources>
