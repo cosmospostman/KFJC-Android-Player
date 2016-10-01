@@ -6,7 +6,6 @@ import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -25,11 +24,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,8 +60,7 @@ import java.util.Calendar;
 public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeScreenInterface {
 
     private static final String KEY_ACTIVE_FRAGMENT = "active-fragment";
-    private static final int KFJC_PERM_READ_PHONE_STATE = 0;
-    private static final int KFJC_PERM_WRITE_EXTERNAL = 1;
+    private static final int KFJC_PERM_WRITE_EXTERNAL = 0;
 
     private KfjcApplication application;
 
@@ -77,8 +72,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private Intent playlistServiceIntent;
 
     private NotificationUtil notificationUtil;
-    private TelephonyManager telephonyManager;
-    private PhoneStateListener phoneStateListener;
 
     private PodcastPlayerFragment podcastPlayerFragment;
 
@@ -88,7 +81,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private View view;
     private Snackbar snackbar;
 
-    private boolean askPermissionsAgain = true;
     private boolean isForegroundActivity = false;
     private int activeFragmentId = R.id.nav_livestream;
 
@@ -190,22 +182,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     private void setupListenersAndManagers() {
         this.notificationUtil = new NotificationUtil(this);
-        maybeAddPhoneStateListener();
-    }
-
-    private void maybeAddPhoneStateListener() {
-        if (hasPhonePermission()) {
-            this.telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            this.phoneStateListener = new KfjcPhoneStateListener(this);
-            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-        } else {
-            requestPhonePermission();
-        }
-    }
-
-    private boolean hasPhonePermission() {
-        return ContextCompat.checkSelfPermission(
-                this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -220,32 +196,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }.execute();
     }
 
-    private void requestPhonePermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.READ_PHONE_STATE)) {
-            AlertDialog alertDialog = new AlertDialog.Builder(this, R.style.AppTheme).create();
-            alertDialog.setTitle(R.string.permission_phone_title);
-            alertDialog.setMessage(getString(R.string.permission_phone_rationale));
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(android.R.string.ok),
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            requestAndroidPhonePermissions();
-                        }
-                    });
-            alertDialog.show();
-        } else {
-            requestAndroidPhonePermissions();
-        }
-    }
-
-    private void requestAndroidPhonePermissions() {
-        ActivityCompat.requestPermissions(
-                HomeScreenDrawerActivity.this,
-                new String[]{Manifest.permission.READ_PHONE_STATE},
-                KFJC_PERM_READ_PHONE_STATE);
-    }
-
     public void requestAndroidWritePermissions() {
         ActivityCompat.requestPermissions(
                 HomeScreenDrawerActivity.this,
@@ -256,27 +206,13 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void onRequestPermissionsResult(
             int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case KFJC_PERM_READ_PHONE_STATE:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Got permissions
-                    maybeAddPhoneStateListener();
-                } else {
-                    // Permission not granted
-                    if (askPermissionsAgain) {
-                        askPermissionsAgain = false;
-                        requestPhonePermission();
-                    }
-                }
-                return;
-            case KFJC_PERM_WRITE_EXTERNAL:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    onWritePermissionGranted(true);
-                } else {
-                    onWritePermissionGranted(false);
-                }
+        if (requestCode == KFJC_PERM_WRITE_EXTERNAL) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                onWritePermissionGranted(true);
+            } else {
+                onWritePermissionGranted(false);
+            }
         }
     }
 
@@ -560,9 +496,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             stopPlayer();
             stopService(streamServiceIntent);
             stopService(playlistServiceIntent);
-        }
-        if (telephonyManager != null) {
-            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
         }
         recycleBackground();
     }

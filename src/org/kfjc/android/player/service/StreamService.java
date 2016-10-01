@@ -57,10 +57,6 @@ public class StreamService extends Service {
     private NotificationUtil notificationUtil;
     private int activeSourceNumber = -1;
 
-    public Intent getLastPlayerState() {
-        return playerState.getLastPlayerState();
-    }
-
     /**
      * The Becoming Noisy broadcast intent is sent when audio output hardware changes, perhaps
      * from headphones to internal speaker. In such cases, we stop the stream to avoid
@@ -395,6 +391,7 @@ public class StreamService extends Service {
             AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             switch (focusChange) {
                 case AudioManager.AUDIOFOCUS_LOSS:
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                     Log.i(TAG, "Lost audio focus");
                     volumeBeforeLoss = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (mediaSource != null && mediaSource.type == MediaSource.Type.ARCHIVE) {

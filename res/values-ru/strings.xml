@@ -46,7 +46,6 @@
     <string name="navigation_drawer_title">KFJC Радио</string>
 
     <string name="permission_phone_title">Доступ к телефону</string>
-    <string name="permission_phone_rationale">KFJC использует доступ к телефону только для того, чтобы автоматически останавливать проигрывание, когда телефон используется. Мы не шпионим!</string>
     <string name="podcast_label_recent_archives">недавно добавленный</string>
     <string name="podcast_label_saved_archives">Доступно офлайн</string>
     <string name="podcast_no_saved_shows">Вы не сохранили никакие шоу на это устройство</string>

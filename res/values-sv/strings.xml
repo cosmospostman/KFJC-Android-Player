@@ -46,8 +46,6 @@
     <string name="navigation_drawer_title">KFJC Radio</string>
 
     <string name="permission_phone_title">Telefon behörigheter</string>
-    <string name="permission_phone_rationale">KFJC använder endast telefonbehörighet för att automatiskt
-        stoppa uppspelningen när telefonen är i bruk. Vi tjuvlyssnar inte!</string>
     <string name="podcast_label_recent_archives">Hot (utanför) air</string>
     <string name="podcast_label_saved_archives">Offline tillgängligt</string>
     <string name="podcast_no_saved_shows">Du har inte sparat program till denna enhet.</string>

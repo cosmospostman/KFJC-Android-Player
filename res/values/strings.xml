@@ -46,8 +46,6 @@
     <string name="navigation_drawer_title">KFJC Radio</string>
 
     <string name="permission_phone_title">Phone permissions</string>
-    <string name="permission_phone_rationale">KFJC only uses phone permissions to automatically
-        stop playback when your phone is in use. We don\'t snoop!</string>
     <string name="podcast_label_recent_archives">Hot (off the) air</string>
     <string name="podcast_label_saved_archives">Available offline</string>
     <string name="podcast_no_saved_shows">You haven\'t saved any shows to this device.</string>

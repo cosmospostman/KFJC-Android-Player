@@ -46,7 +46,6 @@
     <string name="navigation_drawer_title">KFJC Radio</string>
 
     <string name="permission_phone_title">Handy-Berechtigungen</string>
-    <string name="permission_phone_rationale">KFJC nutzt die Handy-Berechtigungen nur, um das Playback im Falle eines Anrufs automatisch zu unterbrechen. Wir lauschen nicht!</string>
     <string name="podcast_label_recent_archives">Direkt aus der Presse</string>
     <string name="podcast_label_saved_archives">Offline verfügbar</string>
     <string name="podcast_no_saved_shows">Du hast keine Sendungen auf diesem Gerät gespeichert.</string>
