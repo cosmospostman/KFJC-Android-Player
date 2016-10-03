@@ -36,3 +36,5 @@ proguard/
 *.alloc
 
 *.trace
+
+*.DS_Store
