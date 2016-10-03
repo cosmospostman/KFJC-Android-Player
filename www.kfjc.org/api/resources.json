@@ -3,7 +3,6 @@
 		{ "name":"Best", "format":"aac", "desc": "Superior 192k AAC, 110 Mb/hour", "url":"http://aac.kfjc.org:80/" },
 		{ "name":"Modest", "format":"mp3", "desc": "Old school 128k MP3, 68 Mb/hour", "url":"http://netcast.kfjc.org:80/" },
 		{ "name":"Okay", "format":"aac", "desc": "Economical 48k HE-AAC, 32 Mb/hour", "url":"http://aac1.kfjc.org:80/" },
-		{ "name":"Worst",  "format":"mp3", "desc": "Tightass 40k MP3, 32 Mb/hour", "url":"http://netcast.kfjc.org:8974/" }
 	],
 	"drawables": {
 		"backgrounds": [
@@ -12,11 +11,11 @@
 			"http://www.kfjc.org/api/drawable/bg_2.jpg",
 			"http://www.kfjc.org/api/drawable/bg_3.jpg",
 			"http://www.kfjc.org/api/drawable/bg_4.jpg",
-			"http://www.kfjc.org/api/drawable/bg_4.jpg",
+			"http://www.kfjc.org/api/drawable/bg_5.jpg",
 			"http://www.kfjc.org/api/drawable/bg_6.jpg",
 			"http://www.kfjc.org/api/drawable/bg_7.jpg",
 			"http://www.kfjc.org/api/drawable/bg_8.jpg",
-			"http://www.kfjc.org/api/drawable/bg_8.jpg",
+			"http://www.kfjc.org/api/drawable/bg_9.jpg",
 			"http://www.kfjc.org/api/drawable/bg_10.jpg",
 			"http://www.kfjc.org/api/drawable/bg_11.jpg",
 			"http://www.kfjc.org/api/drawable/bg_12.jpg",
@@ -26,11 +25,11 @@
 			"http://www.kfjc.org/api/drawable/bg_16.jpg",
 			"http://www.kfjc.org/api/drawable/bg_17.jpg",
 			"http://www.kfjc.org/api/drawable/bg_18.jpg",
-			"http://www.kfjc.org/api/drawable/bg_18.jpg",
+			"http://www.kfjc.org/api/drawable/bg_19.jpg",
 			"http://www.kfjc.org/api/drawable/bg_20.jpg",
-			"http://www.kfjc.org/api/drawable/bg_20.jpg",
+			"http://www.kfjc.org/api/drawable/bg_21.jpg",
 			"http://www.kfjc.org/api/drawable/bg_22.jpg",
-			"http://www.kfjc.org/api/drawable/bg_23.jpg",
+			"http://www.kfjc.org/api/drawable/bg_23.jpg"
 		],
 		"lava": "http://www.kfjc.org/api/drawable/lavalamp.mp4"
 	}
