@@ -27,7 +27,7 @@ import android.widget.TextView;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.HomeScreenInterface;
 import org.kfjc.android.player.control.PreferenceControl;
-import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.model.KfjcMediaSource;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class SettingsDialog extends KfjcDialog {
     private AudioManager audioManager;
     private Spinner spinner;
     private SwitchCompat backgroundSwitch;
-    private MediaSource previousPreference;
+    private KfjcMediaSource previousPreference;
     private StreamUrlPreferenceChangeHandler urlPreferenceChangeHandler;
     private ContextThemeWrapper themeWrapper;
     private HomeScreenInterface home;
@@ -78,8 +78,8 @@ public class SettingsDialog extends KfjcDialog {
             spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    MediaSource mediaSource = (MediaSource) parent.getItemAtPosition(position);
-                    PreferenceControl.setStreamPreference(mediaSource);
+                    KfjcMediaSource kfjcMediaSource = (KfjcMediaSource) parent.getItemAtPosition(position);
+                    PreferenceControl.setStreamPreference(kfjcMediaSource);
                 }
 
                 @Override
@@ -128,11 +128,11 @@ public class SettingsDialog extends KfjcDialog {
     }
 
     private void initStreamOptions() {
-        List<MediaSource> mediaSources = PreferenceControl.getMediaSources();
+        List<KfjcMediaSource> kfjcMediaSources = PreferenceControl.getKfjcMediaSources();
         StreamAdapter streamAdapter = new StreamAdapter(
-                themeWrapper, android.R.layout.simple_spinner_item, mediaSources);
+                themeWrapper, android.R.layout.simple_spinner_item, kfjcMediaSources);
         spinner.setAdapter(streamAdapter);
-        int selectedIndex = mediaSources.indexOf(PreferenceControl.getStreamPreference());
+        int selectedIndex = kfjcMediaSources.indexOf(PreferenceControl.getStreamPreference());
         spinner.setSelection(Math.max(0, selectedIndex));
     }
 
@@ -171,13 +171,13 @@ public class SettingsDialog extends KfjcDialog {
                 android.provider.Settings.System.CONTENT_URI, true, mSettingsContentObserver);
     }
 
-    private class StreamAdapter extends ArrayAdapter<MediaSource> {
-        private List<MediaSource> mediaSources;
+    private class StreamAdapter extends ArrayAdapter<KfjcMediaSource> {
+        private List<KfjcMediaSource> kfjcMediaSources;
         private Context context;
-        public StreamAdapter(Context context, int resource, List<MediaSource> mediaSources) {
-            super(context, resource, mediaSources);
+        public StreamAdapter(Context context, int resource, List<KfjcMediaSource> kfjcMediaSources) {
+            super(context, resource, kfjcMediaSources);
             this.context = context;
-            this.mediaSources = mediaSources;
+            this.kfjcMediaSources = kfjcMediaSources;
         }
 
         @Override
@@ -185,7 +185,7 @@ public class SettingsDialog extends KfjcDialog {
             View view = LayoutInflater.from(context).inflate(
                     android.R.layout.simple_spinner_item, parent, false);
             TextView streamName = (TextView) view.findViewById(android.R.id.text1);
-            streamName.setText(mediaSources.get(position).name);
+            streamName.setText(kfjcMediaSources.get(position).name);
             return view;
         }
 
@@ -195,8 +195,8 @@ public class SettingsDialog extends KfjcDialog {
                     android.R.layout.simple_list_item_2, parent, false);
             TextView streamName = (TextView) view.findViewById(android.R.id.text1);
             TextView streamDesc = (TextView) view.findViewById(android.R.id.text2);
-            streamName.setText(mediaSources.get(position).name);
-            streamDesc.setText(mediaSources.get(position).description);
+            streamName.setText(kfjcMediaSources.get(position).name);
+            streamDesc.setText(kfjcMediaSources.get(position).description);
             streamDesc.setTextColor(ContextCompat.getColor(context, R.color.kfjc_secondary_text));
             return view;
         }

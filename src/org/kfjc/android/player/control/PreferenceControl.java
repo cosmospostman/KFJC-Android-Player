@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableList;
 
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.KfjcApplication;
-import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.model.KfjcMediaSource;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -23,7 +23,7 @@ public class PreferenceControl {
     private static final int PREFERENCE_MODE = Context.MODE_PRIVATE;
 	
 	private static SharedPreferences preferences;
-	private static List<MediaSource> mediaSources;
+	private static List<KfjcMediaSource> kfjcMediaSources;
 	private static KfjcApplication app;
 
 	public static void init(final KfjcApplication kfjcApp) {
@@ -35,7 +35,7 @@ public class PreferenceControl {
 		new AsyncTask<Void, Void, Void>() {
 			@Override protected Void doInBackground(Void... unsedParams) {
 				try {
-					mediaSources = app.getKfjcResources().getStreamsList().get();
+					kfjcMediaSources = app.getKfjcResources().getStreamsList().get();
 				} catch (InterruptedException | ExecutionException e) {
 					// TODO
 				}
@@ -44,8 +44,8 @@ public class PreferenceControl {
 		}.execute();
 	}
 
-	public static List<MediaSource> getMediaSources() {
-		return mediaSources == null ? ImmutableList.of(Constants.FALLBACK_MEDIA_SOURCE) : mediaSources;
+	public static List<KfjcMediaSource> getKfjcMediaSources() {
+		return kfjcMediaSources == null ? ImmutableList.of(Constants.FALLBACK_MEDIA_SOURCE) : kfjcMediaSources;
 	}
 
 	public static boolean areBackgroundsEnabled() {
@@ -78,28 +78,28 @@ public class PreferenceControl {
 		editor.commit();
 	}
 	
-	public static MediaSource getStreamPreference() {
+	public static KfjcMediaSource getStreamPreference() {
 		String urlPref = preferences.getString(STREAM_URL_PREFERENCE_KEY, "");
-		if (mediaSources == null) {
+		if (kfjcMediaSources == null) {
 			return Constants.FALLBACK_MEDIA_SOURCE;
 		}
 		// Stored URL preference matches a loaded stream
-		for (MediaSource s : mediaSources) {
+		for (KfjcMediaSource s : kfjcMediaSources) {
 			if (s.url.equals(urlPref)) {
 				return s;
 			}
 		}
 		// Try first loaded stream
-		if (mediaSources.size() > 0) {
-			return mediaSources.get(0);
+		if (kfjcMediaSources.size() > 0) {
+			return kfjcMediaSources.get(0);
 		}
 		// Otherwise fallback.
 		return Constants.FALLBACK_MEDIA_SOURCE;
     }
 	
-	public static void setStreamPreference(MediaSource mediaSource) {
+	public static void setStreamPreference(KfjcMediaSource kfjcMediaSource) {
 		SharedPreferences.Editor editor = preferences.edit();
-		editor.putString(STREAM_URL_PREFERENCE_KEY, mediaSource.url);
+		editor.putString(STREAM_URL_PREFERENCE_KEY, kfjcMediaSource.url);
 		editor.commit();
 	}
 }

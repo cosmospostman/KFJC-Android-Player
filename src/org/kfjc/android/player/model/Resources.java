@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface Resources {
     void loadResources();
-    ListenableFuture<List<MediaSource>> getStreamsList();
+    ListenableFuture<List<KfjcMediaSource>> getStreamsList();
     ListenableFuture<Drawable> getBackgroundImage(int hourOfDay);
     ListenableFuture<String> getLavaUrl();
 }

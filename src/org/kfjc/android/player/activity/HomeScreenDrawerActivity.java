@@ -43,7 +43,7 @@ import org.kfjc.android.player.fragment.PodcastFragment;
 import org.kfjc.android.player.fragment.PodcastPlayerFragment;
 import org.kfjc.android.player.intent.PlayerState;
 import org.kfjc.android.player.intent.PlaylistUpdate;
-import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.model.KfjcMediaSource;
 import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.receiver.DownloadReceiver;
 import org.kfjc.android.player.receiver.MediaStateReceiver;
@@ -160,10 +160,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     private BroadcastReceiver mediaStateReceiver = new MediaStateReceiver() {
         @Override
-        protected void onStateChange(PlayerState.State state, MediaSource source) {
+        protected void onStateChange(PlayerState.State state, KfjcMediaSource source) {
             if (!PlayerState.State.STOP.equals(state)
                     && source != null
-                    && source.type == MediaSource.Type.LIVESTREAM) {
+                    && source.type == KfjcMediaSource.Type.LIVESTREAM) {
                 notificationUtil.updateNowPlayNotification(
                         PlaylistUpdate.getLastPlaylist(), source);
             }
@@ -287,7 +287,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                         replaceFragment(podcastPlayerFragment);
                     } else {
                         Intent i = PlayerState.getLastPlayerState();
-                        MediaSource source = i.getParcelableExtra(PlayerState.INTENT_KEY_PLAYER_SOURCE);
+                        KfjcMediaSource source = i.getParcelableExtra(PlayerState.INTENT_KEY_PLAYER_SOURCE);
                         if (source.show != null) {
                             loadPodcastPlayer(source.show, false);
                         } else {
@@ -407,7 +407,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         Intent intent = getIntent();
         setIntent(null);
         if (intent != null) {
-            MediaSource source = intent.getParcelableExtra(PlayerControl.INTENT_SOURCE);
+            KfjcMediaSource source = intent.getParcelableExtra(PlayerControl.INTENT_SOURCE);
             if (source != null) {
                 switch (source.type) {
                     case LIVESTREAM:

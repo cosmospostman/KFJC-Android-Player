@@ -7,7 +7,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.kfjc.android.player.intent.PlayerState;
-import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.model.KfjcMediaSource;
 import org.kfjc.android.player.receiver.MediaStateReceiver;
 import org.kfjc.android.player.intent.PlayerState.State;
 
@@ -17,7 +17,7 @@ public abstract class PlayerFragment extends KfjcFragment {
 
     protected State displayState;
     protected State playerState;
-    protected MediaSource playerSource;
+    protected KfjcMediaSource playerSource;
     protected Handler handler = new Handler();
 
     @Override
@@ -30,7 +30,7 @@ public abstract class PlayerFragment extends KfjcFragment {
 
     private BroadcastReceiver mediaStateReceiver = new MediaStateReceiver() {
         @Override
-        protected void onStateChange(State state, MediaSource source) {
+        protected void onStateChange(State state, KfjcMediaSource source) {
             playerState = state;
             playerSource = source;
             if (!PlayerFragment.this.isAdded()) {
@@ -68,6 +68,6 @@ public abstract class PlayerFragment extends KfjcFragment {
 
     abstract void updateClock();
 
-    abstract void onStateChanged(State state, MediaSource source);
+    abstract void onStateChanged(State state, KfjcMediaSource source);
 
 }

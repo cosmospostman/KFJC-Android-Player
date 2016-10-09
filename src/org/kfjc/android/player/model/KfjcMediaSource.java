@@ -3,7 +3,7 @@ package org.kfjc.android.player.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class MediaSource implements Parcelable {
+public class KfjcMediaSource implements Parcelable {
 
     public enum Format { MP3, AAC, NONE }
     public enum Type { LIVESTREAM, ARCHIVE, NONE }
@@ -15,7 +15,7 @@ public class MediaSource implements Parcelable {
     public final Format format;
     public final ShowDetails show;
 
-    public MediaSource() {
+    public KfjcMediaSource() {
         this.type = Type.NONE;
         this.format = Format.NONE;
         this.name = "";
@@ -24,7 +24,7 @@ public class MediaSource implements Parcelable {
         this.show = null;
     }
 
-    public MediaSource(String url, Format format, String name, String description) {
+    public KfjcMediaSource(String url, Format format, String name, String description) {
         this.url = url;
         this.name = name;
         this.description = description;
@@ -33,7 +33,7 @@ public class MediaSource implements Parcelable {
         this.show = null;
     }
 
-    public MediaSource(ShowDetails show) {
+    public KfjcMediaSource(ShowDetails show) {
         this.url = null;
         this.format = Format.MP3;
         this.type = Type.ARCHIVE;
@@ -42,7 +42,7 @@ public class MediaSource implements Parcelable {
         this.show = show;
     }
 
-    public MediaSource(Parcel in) {
+    public KfjcMediaSource(Parcel in) {
         this.type = Type.values()[in.readInt()];
         this.format = Format.values()[in.readInt()];
         this.name = in.readString();
@@ -57,12 +57,12 @@ public class MediaSource implements Parcelable {
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-        public MediaSource createFromParcel(Parcel in) {
-            return new MediaSource(in);
+        public KfjcMediaSource createFromParcel(Parcel in) {
+            return new KfjcMediaSource(in);
         }
 
-        public MediaSource[] newArray(int size) {
-            return new MediaSource[size];
+        public KfjcMediaSource[] newArray(int size) {
+            return new KfjcMediaSource[size];
         }
     };
 
@@ -83,10 +83,10 @@ public class MediaSource implements Parcelable {
         if (that == this) {
             return true;
         }
-        if (!(that instanceof MediaSource)) {
+        if (!(that instanceof KfjcMediaSource)) {
             return false;
         }
-        MediaSource thatSource = (MediaSource) that;
+        KfjcMediaSource thatSource = (KfjcMediaSource) that;
         if (thatSource.url != null) {
             return thatSource.url.equals(this.url);
         }

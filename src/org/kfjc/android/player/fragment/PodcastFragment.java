@@ -23,7 +23,7 @@ import org.kfjc.android.player.model.ShowListBuilder;
 import org.kfjc.android.player.model.BroadcastHour;
 import org.kfjc.android.player.model.BroadcastHourJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
-import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.model.KfjcMediaSource;
 import org.kfjc.android.player.intent.PlayerState.State;
 import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
@@ -139,8 +139,8 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     }
 
     @Override
-    void onStateChanged(State state, MediaSource source) {
-        if (source != null && source.type == MediaSource.Type.ARCHIVE) {
+    void onStateChanged(State state, KfjcMediaSource source) {
+        if (source != null && source.type == KfjcMediaSource.Type.ARCHIVE) {
             nowPlayingLabel.setText(source.show.getAirName());
             switch (state) {
                 case PLAY:

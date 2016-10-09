@@ -32,7 +32,7 @@ public class ResourcesImpl implements Resources {
     private static final String TAG = ResourcesImpl.class.getSimpleName();
     ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
     private Context context;
-    private SettableFuture<List<MediaSource>> streamsList;
+    private SettableFuture<List<KfjcMediaSource>> streamsList;
     private List<String> backgroundsUrls;
     private SettableFuture<String> lavaUrl;
 
@@ -60,23 +60,23 @@ public class ResourcesImpl implements Resources {
             // Streams
             JSONArray jStreams = jResources.getJSONArray("streams");
             Map<String, String> streamMap = new HashMap<>();
-            List<MediaSource> mediaSourceList = new ArrayList<>();
+            List<KfjcMediaSource> kfjcMediaSourceList = new ArrayList<>();
             for (int i = 0; i < jStreams.length(); i++) {
                 JSONObject stream = jStreams.getJSONObject(i);
                 String url = stream.getString("url");
                 String name = stream.getString("name");
                 String description = stream.getString("desc");
                 String formatString = stream.getString("format");
-                MediaSource.Format format = MediaSource.Format.NONE;
+                KfjcMediaSource.Format format = KfjcMediaSource.Format.NONE;
                 if (formatString.toLowerCase().equals("aac")) {
-                    format = MediaSource.Format.AAC;
+                    format = KfjcMediaSource.Format.AAC;
                 } else if (formatString.toLowerCase().equals("mp3")) {
-                    format = MediaSource.Format.MP3;
+                    format = KfjcMediaSource.Format.MP3;
                 }
-                mediaSourceList.add(new MediaSource(url, format, name, description));
+                kfjcMediaSourceList.add(new KfjcMediaSource(url, format, name, description));
                 streamMap.put(name, url);
             }
-            streamsList.set(mediaSourceList);
+            streamsList.set(kfjcMediaSourceList);
 
             // Backgrounds
             JSONObject jDrawables = jResources.getJSONObject("drawables");
@@ -97,7 +97,7 @@ public class ResourcesImpl implements Resources {
     }
 
     @Override
-    public SettableFuture<List<MediaSource>> getStreamsList() {
+    public SettableFuture<List<KfjcMediaSource>> getStreamsList() {
         return streamsList;
     }
 

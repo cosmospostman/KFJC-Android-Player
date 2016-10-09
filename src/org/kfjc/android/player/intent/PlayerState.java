@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 
-import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.model.KfjcMediaSource;
 
 public class PlayerState {
 
@@ -28,12 +28,12 @@ public class PlayerState {
         if (lastPlayerState == null) {
             lastPlayerState = new Intent(PlayerState.INTENT_PLAYER_STATE);
             lastPlayerState.putExtra(PlayerState.INTENT_KEY_PLAYER_STATE, PlayerState.State.STOP);
-            lastPlayerState.putExtra(PlayerState.INTENT_KEY_PLAYER_SOURCE, new MediaSource());
+            lastPlayerState.putExtra(PlayerState.INTENT_KEY_PLAYER_SOURCE, new KfjcMediaSource());
         }
         return lastPlayerState;
     }
 
-    public void send(Context context, State state, MediaSource source) {
+    public void send(Context context, State state, KfjcMediaSource source) {
         sendStateIntent(context, state, source , null);
     }
 
@@ -41,7 +41,7 @@ public class PlayerState {
         sendStateIntent(context, state, null, message);
     }
 
-    private void sendStateIntent(Context context, State state, MediaSource source, String message) {
+    private void sendStateIntent(Context context, State state, KfjcMediaSource source, String message) {
         Intent intent = new Intent(INTENT_PLAYER_STATE);
         intent.putExtra(INTENT_KEY_PLAYER_STATE, state);
         if (source != null) {

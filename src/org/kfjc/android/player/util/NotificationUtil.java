@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.intent.PlayerControl;
-import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.model.KfjcMediaSource;
 import org.kfjc.android.player.model.Playlist;
 
 public class NotificationUtil {
@@ -31,7 +31,7 @@ public class NotificationUtil {
         icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.radiodevil);
     }
 
-    public void updateNowPlayNotification(Playlist playlist, MediaSource source) {
+    public void updateNowPlayNotification(Playlist playlist, KfjcMediaSource source) {
         if (playlist == null) {
             return;
         }
@@ -104,7 +104,7 @@ public class NotificationUtil {
         return builder;
     }
 
-    public static Notification kfjcStreamNotification(Context context, MediaSource source, String action, boolean isBuffering) {
+    public static Notification kfjcStreamNotification(Context context, KfjcMediaSource source, String action, boolean isBuffering) {
         Intent i = PlayerControl.notificationIntent(context, source);
         Notification.Builder builder = kfjcBaseNotification(context, i, action);
         if (isBuffering) {
@@ -112,10 +112,10 @@ public class NotificationUtil {
             builder.setContentText(context.getString(R.string.format_buffering,
                     PreferenceControl.getStreamPreference().description));
         }
-        else if (source.type == MediaSource.Type.LIVESTREAM) {
+        else if (source.type == KfjcMediaSource.Type.LIVESTREAM) {
             builder.setContentTitle(context.getString(R.string.fragment_title_stream));
             builder.setContentText("");
-        } else if (source.type == MediaSource.Type.ARCHIVE) {
+        } else if (source.type == KfjcMediaSource.Type.ARCHIVE) {
             builder.setContentTitle(source.show.getAirName());
             builder.setContentText(source.show.getTimestampString());
         }

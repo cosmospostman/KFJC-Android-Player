@@ -21,7 +21,7 @@ import org.kfjc.android.player.dialog.SettingsDialog;
 import org.kfjc.android.player.intent.PlayerControl;
 import org.kfjc.android.player.intent.PlayerState.State;
 import org.kfjc.android.player.intent.PlaylistUpdate;
-import org.kfjc.android.player.model.MediaSource;
+import org.kfjc.android.player.model.KfjcMediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.receiver.PlaylistUpdateReceiver;
 import org.kfjc.android.player.util.GraphicsUtil;
@@ -119,7 +119,7 @@ public class LiveStreamFragment extends PlayerFragment {
     public void updatePlaylist(Playlist playlist) {
         // TODO: move this notification logic elsewhere?
         if (homeScreen.isStreamServicePlaying()
-                && playerSource.type == MediaSource.Type.LIVESTREAM) {
+                && playerSource.type == KfjcMediaSource.Type.LIVESTREAM) {
             notificationUtil.updateNowPlayNotification(playlist, playerSource);
         }
         if (!isAdded()) {
@@ -144,7 +144,7 @@ public class LiveStreamFragment extends PlayerFragment {
                 new SettingsDialog.StreamUrlPreferenceChangeHandler() {
             @Override public void onStreamUrlPreferenceChange() {
                 if (playerSource != null
-                        && MediaSource.Type.LIVESTREAM == playerSource.type
+                        && KfjcMediaSource.Type.LIVESTREAM == playerSource.type
                         && homeScreen.isStreamServicePlaying()) {
                     PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_STOP);
                     PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_PLAY, PreferenceControl.getStreamPreference());
@@ -155,8 +155,8 @@ public class LiveStreamFragment extends PlayerFragment {
     }
 
     @Override
-    void onStateChanged(State state, MediaSource source) {
-        if (source.type == MediaSource.Type.LIVESTREAM) {
+    void onStateChanged(State state, KfjcMediaSource source) {
+        if (source.type == KfjcMediaSource.Type.LIVESTREAM) {
             updatePlaylist(PlaylistUpdate.getLastPlaylist());
             switch(state) {
                 case PLAY:
