@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    buildToolsVersion "24.0.3"
 
     defaultConfig {
         applicationId "org.kfjc.android.player"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 10
-        versionName "10"
+        versionCode 11
+        versionName "11"
     }
 
     buildTypes {
@@ -45,7 +45,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.3'
+        classpath 'com.android.tools.build:gradle:2.2.0'
         classpath 'com.novoda:bintray-release:0.2.7'
     }
 }
@@ -56,11 +56,11 @@ repositories {
 
 dependencies {
     apply plugin: 'idea'
-    compile 'com.android.support:design:24.2.0'
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.android.support:cardview-v7:24.2.0'
-    compile 'com.android.support:recyclerview-v7:24.2.0'
-    compile 'com.google.android.exoplayer:exoplayer:r1.5.10'
-    compile 'com.android.support:support-v4:24.2.0'
+    compile 'com.android.support:design:24.2.1'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:cardview-v7:24.2.1'
+    compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile 'com.google.android.exoplayer:exoplayer:r1.5.11'
+    compile 'com.android.support:support-v4:24.2.1'
     compile 'com.google.guava:guava:19.0'
 }

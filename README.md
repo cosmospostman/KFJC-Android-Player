@@ -30,6 +30,10 @@ Build
 
 Changelog
 ---------
+v11 (3 October 2016)
+ - Don't ask for phone permissions to stop playback for incoming call. Instead, just handle loss of
+   audio focus.
+
 v10 (12 September 2016)
  - Bug fixes
  - Targets sdk24
