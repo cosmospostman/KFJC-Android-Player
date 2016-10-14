@@ -53,7 +53,7 @@ public class PlaylistService extends Service {
 
     public void start() {
         if (!isStarted) {
-            Log.i(TAG, "Service (re)started");
+            Log.i(TAG, "PlaylistService (re)started");
             handler.postDelayed(fetchRunner, 0);
             isStarted = true;
         } else {
@@ -63,7 +63,7 @@ public class PlaylistService extends Service {
     }
 
     public void stop() {
-        Log.i(TAG, "Service stopped");
+        Log.i(TAG, "PlaylistService stopped");
         handler.removeCallbacksAndMessages(null);
         isStarted = false;
     }

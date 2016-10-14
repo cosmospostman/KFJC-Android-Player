@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -28,6 +29,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.FixedTrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
@@ -179,6 +181,7 @@ public class StreamService extends Service {
                     new DefaultTrackSelector(mainHandler, new FixedTrackSelection.Factory());
 
             // 2. Create a default LoadControl
+//            new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
             LoadControl loadControl = new DefaultLoadControl();
 
             // 3. Create the player

@@ -208,6 +208,9 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void updateClockHelper(long playerPos) {
+        if (playerSource == null) {
+            return;
+        }
         long totalShowTime = playerSource.show.getTotalShowTimeMillis();
         podcastDetails.setText(DateUtil.formatTime(playerPos - show.getHourPaddingTimeMillis()));
         playtimeSeekBar.setMax((int)totalShowTime/100);
