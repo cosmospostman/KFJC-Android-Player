@@ -7,3 +7,5 @@
 }
 
 -dontwarn com.google.common.***
+
+-keepattributes EnclosingMethod
