@@ -25,8 +25,10 @@ import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.FixedTrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
@@ -176,9 +178,8 @@ public class StreamService extends Service {
         Log.i(TAG, "Playing stream " + streamUrl);
         if (player == null) {
             // 1. Create a default TrackSelector
-            Handler mainHandler = new Handler();
             TrackSelector trackSelector =
-                    new DefaultTrackSelector(mainHandler, new FixedTrackSelection.Factory());
+                    new DefaultTrackSelector();
 
             // 2. Create a default LoadControl
 //            new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
@@ -307,6 +308,11 @@ public class StreamService extends Service {
 
         @Override
         public void onTimelineChanged(Timeline timeline, Object manifest) {}
+
+        @Override
+        public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+            Log.i("KFJC StreamService", "exoplayer onTracksChanged");
+        }
 
         @Override
         public void onPlayerError(ExoPlaybackException error) {
