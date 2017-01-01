@@ -8,13 +8,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -27,13 +26,17 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.FixedTrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.SessionManagerListener;
+import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.intent.PlayerControl;
@@ -49,7 +52,12 @@ public class StreamService extends Service {
     private static final IntentFilter becomingNoisyIntentFilter =
             new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 
-	public class LiveStreamBinder extends Binder {
+    public enum PlaybackLocation {
+        LOCAL,
+        REMOTE
+    }
+
+    public class LiveStreamBinder extends Binder {
 		public StreamService getService() {
 			return StreamService.this;
 		}
@@ -62,6 +70,12 @@ public class StreamService extends Service {
     private boolean becomingNoisyReceiverRegistered = false;
     private NotificationUtil notificationUtil;
     private int activeSourceNumber = -1;
+
+    private CastContext mCastContext;
+    private CastSession mCastSession;
+    private SessionManagerListener<CastSession> mSessionManagerListener;
+
+    private PlaybackLocation playbackLocation;
 
     /**
      * The Becoming Noisy broadcast intent is sent when audio output hardware changes, perhaps
@@ -83,6 +97,22 @@ public class StreamService extends Service {
             }
         }
     };
+
+    @Override
+    public void onCreate() {
+        Log.i("StreamService", "onCreate");
+        super.onCreate();
+        setupCastListener();
+        mCastContext = CastContext.getSharedInstance(this);
+        mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
+        mCastContext.getSessionManager().addSessionManagerListener(
+                mSessionManagerListener, CastSession.class);
+        if (mCastSession != null && mCastSession.isConnected()) {
+            updatePlaybackLocation(PlaybackLocation.REMOTE);
+        } else {
+            updatePlaybackLocation(PlaybackLocation.LOCAL);
+        }
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -127,6 +157,7 @@ public class StreamService extends Service {
     }
 
     public boolean isPlaying() {
+        //TODO: update for cast
         return player != null && (
                player.getPlayWhenReady() &&
                player.getPlaybackState() == ExoPlayer.STATE_READY ||
@@ -175,14 +206,23 @@ public class StreamService extends Service {
     }
 
     private void play(String streamUrl) {
-        Log.i(TAG, "Playing stream " + streamUrl);
+        switch (playbackLocation) {
+            case LOCAL:
+                playLocal(streamUrl);
+                break;
+            case REMOTE:
+                loadRemoteMedia(streamUrl, true);
+        }
+    }
+
+    private void playLocal(String streamUrl) {
+        Log.i(TAG, "Playing stream locally: " + streamUrl);
         if (player == null) {
             // 1. Create a default TrackSelector
             TrackSelector trackSelector =
                     new DefaultTrackSelector();
 
             // 2. Create a default LoadControl
-//            new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
             LoadControl loadControl = new DefaultLoadControl();
 
             // 3. Create the player
@@ -432,4 +472,113 @@ public class StreamService extends Service {
         }
     };
 
+    public void updatePlaybackLocation(PlaybackLocation location) {
+        playbackLocation = location;
+        switch (location) {
+            case LOCAL:
+                if (isPlaying()) {
+                    // Stop chromecast staff
+                    // setCoverArtStatus(null);
+                    // startControllersTimer();
+                } else {
+                    // Start chromecast stuff
+                    // stopControllersTimer();
+                    // setCoverArtStatus(mSelectedMedia.getImage(0));
+                }
+                break;
+            case REMOTE:
+                // Stop local stream and start chromecast stuff
+                // stopControllersTimer();
+                // setCoverArtStatus(mSelectedMedia.getImage(0));
+                // updateControllersVisibility(false);
+                break;
+        }
+    }
+
+    private void loadRemoteMedia(String streamUrl, boolean autoPlay) {
+        Log.i(TAG, "Playing stream over chromecast: " + streamUrl);
+        if (mCastSession == null) {
+            return;
+        }
+        RemoteMediaClient remoteMediaClient = mCastSession.getRemoteMediaClient();
+        if (remoteMediaClient == null) {
+            return;
+        }
+        remoteMediaClient.load(buildMediaInfo(streamUrl), autoPlay);
+    }
+
+    private MediaInfo buildMediaInfo(String streamUrl) {
+//        MediaMetadata movieMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
+//
+//        movieMetadata.putString(MediaMetadata.KEY_SUBTITLE, mSelectedMedia.getStudio());
+//        movieMetadata.putString(MediaMetadata.KEY_TITLE, mSelectedMedia.getTitle());
+//        movieMetadata.addImage(new WebImage(Uri.parse(mSelectedMedia.getImage(0))));
+//        movieMetadata.addImage(new WebImage(Uri.parse(mSelectedMedia.getImage(1))));
+        return new MediaInfo.Builder(streamUrl + ";")
+                .setStreamType(MediaInfo.STREAM_TYPE_LIVE)
+                .setContentType(getSource().getMimeType())
+//                .setMetadata(movieMetadata)
+                .setStreamDuration(10 * 1000)
+                .build();
+    }
+
+
+    private void setupCastListener() {
+        mSessionManagerListener = new SessionManagerListener<CastSession>() {
+
+            @Override
+            public void onSessionEnded(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionResumed(CastSession session, boolean wasSuspended) {
+                onApplicationConnected(session);
+            }
+
+            @Override
+            public void onSessionResumeFailed(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionStarted(CastSession session, String sessionId) {
+                onApplicationConnected(session);
+            }
+
+            @Override
+            public void onSessionStartFailed(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionStarting(CastSession session) {}
+
+            @Override
+            public void onSessionEnding(CastSession session) {}
+
+            @Override
+            public void onSessionResuming(CastSession session, String sessionId) {}
+
+            @Override
+            public void onSessionSuspended(CastSession session, int reason) {}
+
+            private void onApplicationConnected(CastSession castSession) {
+                Log.i("kfjc-cast", "application connected");
+                mCastSession = castSession;
+                if (isPlaying()) {
+                    // TODO
+                    // mVideoView.pause();
+                    // loadRemoteMedia(mSeekbar.getProgress(), true);
+                    return;
+                } else {
+                    updatePlaybackLocation(PlaybackLocation.REMOTE);
+                }
+            }
+
+            private void onApplicationDisconnected() {
+                updatePlaybackLocation(PlaybackLocation.LOCAL);
+            }
+        };
+    }
 }

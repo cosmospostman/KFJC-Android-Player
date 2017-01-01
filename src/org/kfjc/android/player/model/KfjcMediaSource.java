@@ -95,4 +95,16 @@ public class KfjcMediaSource implements Parcelable {
         }
         return false;
     }
+
+    public String getMimeType() {
+        switch (format) {
+            case AAC:
+                return "audio/mp4; codecs=\"mp4a.40.5\"";
+            case MP3:
+                return "audio/mpeg";
+            case NONE:
+            default:
+                return "";
+        }
+    }
 }
