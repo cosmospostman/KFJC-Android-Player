@@ -35,6 +35,9 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.google.android.gms.cast.framework.CastButtonFactory;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 
@@ -57,6 +60,13 @@ import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.DownloadUtil;
 import org.kfjc.android.player.util.HttpUtil;
 import org.kfjc.android.player.util.NotificationUtil;
+
+import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.SessionManagerListener;
+import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -85,6 +95,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private View view;
     private Snackbar snackbar;
 
+    private CastContext mCastContext;
+    private CastSession mCastSession;
+    private SessionManagerListener<CastSession> mSessionManagerListener;
+
     private boolean isForegroundActivity = false;
     private int activeFragmentId = R.id.nav_livestream;
 
@@ -112,6 +126,12 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupDrawer();
         setupStreamService();
         setupListenersAndManagers();
+
+        setupCastListener();
+        mCastContext = CastContext.getSharedInstance(this);
+        mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
+        mCastContext.getSessionManager().addSessionManagerListener(
+                mSessionManagerListener, CastSession.class);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mediaStateReceiver,
                 new IntentFilter(PlayerState.INTENT_PLAYER_STATE));
@@ -155,6 +175,11 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 public void onServiceConnected(ComponentName name, IBinder service) {
                     StreamService.LiveStreamBinder binder = (StreamService.LiveStreamBinder) service;
                     streamService = binder.getService();
+                    if (mCastSession != null && mCastSession.isConnected()) {
+                        streamService.updatePlaybackLocation(StreamService.PlaybackLocation.REMOTE);
+                    } else {
+                        streamService.updatePlaybackLocation(StreamService.PlaybackLocation.LOCAL);
+                    }
                 }
 
                 @Override
@@ -275,9 +300,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.i("MENU", "onCreate");
-        super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.toolbar, menu);
-        MenuItem mediaRouteMenuItem = CastButtonFactory.setUpMediaRouteButton(
+        CastButtonFactory.setUpMediaRouteButton(
                 getApplicationContext(), menu, R.id.media_route_menu_item);
         return true;
     }
@@ -566,6 +590,59 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     @Override
     public void seekPlayer(long positionMillis) {
         streamService.seekOverEntireShow(positionMillis);
+    }
+
+    private void setupCastListener() {
+        mSessionManagerListener = new SessionManagerListener<CastSession>() {
+
+            @Override
+            public void onSessionEnded(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionResumed(CastSession session, boolean wasSuspended) {
+                onApplicationConnected(session);
+            }
+
+            @Override
+            public void onSessionResumeFailed(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionStarted(CastSession session, String sessionId) {
+                onApplicationConnected(session);
+            }
+
+            @Override
+            public void onSessionStartFailed(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionStarting(CastSession session) {}
+
+            @Override
+            public void onSessionEnding(CastSession session) {}
+
+            @Override
+            public void onSessionResuming(CastSession session, String sessionId) {}
+
+            @Override
+            public void onSessionSuspended(CastSession session, int reason) {}
+
+            private void onApplicationConnected(CastSession castSession) {
+                Log.i("kfjc-cast", "application connected");
+                streamService.setCastSession(castSession);
+                streamService.updatePlaybackLocation(StreamService.PlaybackLocation.REMOTE);
+                invalidateOptionsMenu();
+            }
+
+            private void onApplicationDisconnected() {
+                streamService.updatePlaybackLocation(StreamService.PlaybackLocation.LOCAL);
+            }
+        };
     }
 
 }
