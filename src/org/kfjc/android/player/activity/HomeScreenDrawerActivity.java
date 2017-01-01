@@ -26,6 +26,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,7 +35,6 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.google.android.gms.cast.framework.CastButtonFactory;
-import com.google.android.gms.cast.framework.CastContext;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 
@@ -44,6 +45,7 @@ import org.kfjc.android.player.fragment.KfjcFragment;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
 import org.kfjc.android.player.fragment.PodcastFragment;
 import org.kfjc.android.player.fragment.PodcastPlayerFragment;
+import org.kfjc.android.player.intent.PlayerControl;
 import org.kfjc.android.player.intent.PlayerState;
 import org.kfjc.android.player.intent.PlaylistUpdate;
 import org.kfjc.android.player.model.KfjcMediaSource;
@@ -54,7 +56,6 @@ import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.DownloadUtil;
 import org.kfjc.android.player.util.HttpUtil;
-import org.kfjc.android.player.intent.PlayerControl;
 import org.kfjc.android.player.util.NotificationUtil;
 
 import java.io.IOException;
@@ -73,7 +74,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private Intent streamServiceIntent;
     private PlaylistService playlistService;
     private Intent playlistServiceIntent;
-    private CastContext mCastContext;
 
     private NotificationUtil notificationUtil;
 
@@ -112,11 +112,11 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupDrawer();
         setupStreamService();
         setupListenersAndManagers();
-        mCastContext = CastContext.getSharedInstance(this);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mediaStateReceiver,
                 new IntentFilter(PlayerState.INTENT_PLAYER_STATE));
         mediaStateReceiver.onReceive(this, PlayerState.getLastPlayerState());
+
     }
 
     private void loadResources() {
@@ -274,6 +274,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.i("MENU", "onCreate");
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.toolbar, menu);
         MenuItem mediaRouteMenuItem = CastButtonFactory.setUpMediaRouteButton(
