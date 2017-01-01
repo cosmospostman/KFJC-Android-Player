@@ -67,7 +67,7 @@ public class ResourcesImpl implements Resources {
                 String name = stream.getString("name");
                 String description = stream.getString("desc");
                 String formatString = stream.getString("format");
-                KfjcMediaSource.Format format = KfjcMediaSource.Format.NONE;
+                KfjcMediaSource.Format format = null;
                 if (formatString.toLowerCase().equals("aac")) {
                     format = KfjcMediaSource.Format.AAC;
                 } else if (formatString.toLowerCase().equals("mp3")) {
