@@ -5,8 +5,8 @@ import android.os.Parcelable;
 
 public class KfjcMediaSource implements Parcelable {
 
-    public enum Format { MP3, AAC, NONE }
-    public enum Type { LIVESTREAM, ARCHIVE, NONE }
+    public enum Format { MP3, AAC }
+    public enum Type { LIVESTREAM, ARCHIVE }
 
     public final Type type;
     public final String url;
@@ -16,8 +16,8 @@ public class KfjcMediaSource implements Parcelable {
     public final ShowDetails show;
 
     public KfjcMediaSource() {
-        this.type = Type.NONE;
-        this.format = Format.NONE;
+        this.type = null;
+        this.format = null;
         this.name = "";
         this.url = "";
         this.description = "";
@@ -102,7 +102,6 @@ public class KfjcMediaSource implements Parcelable {
                 return "audio/mp4; codecs=\"mp4a.40.5\"";
             case MP3:
                 return "audio/mpeg";
-            case NONE:
             default:
                 return "";
         }
