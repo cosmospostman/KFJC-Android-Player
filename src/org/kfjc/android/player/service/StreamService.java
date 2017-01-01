@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
@@ -32,7 +31,6 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.gms.cast.MediaInfo;
-import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
 import com.google.android.gms.cast.framework.SessionManagerListener;
@@ -73,7 +71,6 @@ public class StreamService extends Service {
 
     private CastContext mCastContext;
     private CastSession mCastSession;
-    private SessionManagerListener<CastSession> mSessionManagerListener;
 
     private PlaybackLocation playbackLocation;
 
@@ -100,18 +97,9 @@ public class StreamService extends Service {
 
     @Override
     public void onCreate() {
-        Log.i("StreamService", "onCreate");
         super.onCreate();
-        setupCastListener();
         mCastContext = CastContext.getSharedInstance(this);
         mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
-        mCastContext.getSessionManager().addSessionManagerListener(
-                mSessionManagerListener, CastSession.class);
-        if (mCastSession != null && mCastSession.isConnected()) {
-            updatePlaybackLocation(PlaybackLocation.REMOTE);
-        } else {
-            updatePlaybackLocation(PlaybackLocation.LOCAL);
-        }
     }
 
     @Override
@@ -523,62 +511,7 @@ public class StreamService extends Service {
     }
 
 
-    private void setupCastListener() {
-        mSessionManagerListener = new SessionManagerListener<CastSession>() {
-
-            @Override
-            public void onSessionEnded(CastSession session, int error) {
-                onApplicationDisconnected();
-            }
-
-            @Override
-            public void onSessionResumed(CastSession session, boolean wasSuspended) {
-                onApplicationConnected(session);
-            }
-
-            @Override
-            public void onSessionResumeFailed(CastSession session, int error) {
-                onApplicationDisconnected();
-            }
-
-            @Override
-            public void onSessionStarted(CastSession session, String sessionId) {
-                onApplicationConnected(session);
-            }
-
-            @Override
-            public void onSessionStartFailed(CastSession session, int error) {
-                onApplicationDisconnected();
-            }
-
-            @Override
-            public void onSessionStarting(CastSession session) {}
-
-            @Override
-            public void onSessionEnding(CastSession session) {}
-
-            @Override
-            public void onSessionResuming(CastSession session, String sessionId) {}
-
-            @Override
-            public void onSessionSuspended(CastSession session, int reason) {}
-
-            private void onApplicationConnected(CastSession castSession) {
-                Log.i("kfjc-cast", "application connected");
-                mCastSession = castSession;
-                if (isPlaying()) {
-                    // TODO
-                    // mVideoView.pause();
-                    // loadRemoteMedia(mSeekbar.getProgress(), true);
-                    return;
-                } else {
-                    updatePlaybackLocation(PlaybackLocation.REMOTE);
-                }
-            }
-
-            private void onApplicationDisconnected() {
-                updatePlaybackLocation(PlaybackLocation.LOCAL);
-            }
-        };
+    public void setCastSession(CastSession session) {
+        mCastSession = session;
     }
 }
