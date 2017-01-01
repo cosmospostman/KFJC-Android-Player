@@ -85,4 +85,6 @@
     <string name="format_archive_file"
         translation_description="DJ name, plus which archive file (of total hours for that show)">
         %1$s, part %2$d of %3$d</string>
+    <string name="media_route_menu_title">Chromecast</string>
+    <string name="application_cast_id">8B3496AD</string>
 </resources>

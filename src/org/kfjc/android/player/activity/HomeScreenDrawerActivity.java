@@ -27,10 +27,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.android.gms.cast.framework.CastButtonFactory;
+import com.google.android.gms.cast.framework.CastContext;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 
@@ -70,6 +73,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private Intent streamServiceIntent;
     private PlaylistService playlistService;
     private Intent playlistServiceIntent;
+    private CastContext mCastContext;
 
     private NotificationUtil notificationUtil;
 
@@ -108,6 +112,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupDrawer();
         setupStreamService();
         setupListenersAndManagers();
+        mCastContext = CastContext.getSharedInstance(this);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mediaStateReceiver,
                 new IntentFilter(PlayerState.INTENT_PLAYER_STATE));
@@ -253,7 +258,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 }
             }
         });
-
         drawerLayout.addDrawerListener(drawerToggle);
     }
 
@@ -266,6 +270,15 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             drawerToggle.setDrawerIndicatorEnabled(true);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.toolbar, menu);
+        MenuItem mediaRouteMenuItem = CastButtonFactory.setUpMediaRouteButton(
+                getApplicationContext(), menu, R.id.media_route_menu_item);
+        return true;
     }
 
     public void setNavigationItemChecked(int navigationItemId) {
