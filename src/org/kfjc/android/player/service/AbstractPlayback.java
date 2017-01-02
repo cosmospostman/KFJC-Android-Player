@@ -20,6 +20,21 @@ public abstract class AbstractPlayback {
         this.context = context;
     }
 
+    public KfjcMediaSource getSource() {
+        return mediaSource;
+    }
+
+    public void play(KfjcMediaSource mediaSource) {
+        this.mediaSource = mediaSource;
+        stop(false);
+        if (mediaSource.type == KfjcMediaSource.Type.LIVESTREAM) {
+            play(mediaSource.url);
+        } else if (mediaSource.type == KfjcMediaSource.Type.ARCHIVE) {
+            activeSourceNumber = -1;
+            playArchiveHour(0);
+        }
+    }
+
     /**
      * @return true if a next hour was started.
      */
@@ -47,18 +62,19 @@ public abstract class AbstractPlayback {
         seek(mediaSource.show.getHourPaddingTimeMillis());
     }
 
-    public KfjcMediaSource getSource() {
-        return mediaSource;
-    }
-
-    public void play(KfjcMediaSource mediaSource) {
-        this.mediaSource = mediaSource;
-        stop(false);
-        if (mediaSource.type == KfjcMediaSource.Type.LIVESTREAM) {
-            play(mediaSource.url);
-        } else if (mediaSource.type == KfjcMediaSource.Type.ARCHIVE) {
-            activeSourceNumber = -1;
-            playArchiveHour(0);
+    public void seekOverEntireShow(long seekToMillis) {
+        long[] segmentBounds = mediaSource.show.getSegmentBounds();
+        for (int i = 0; i < segmentBounds.length; i++) {
+            if (seekToMillis <= segmentBounds[i]) {
+                // load segment i
+                playArchiveHour(i);
+                //seek to adjusted position
+                long thisSegmentStart = (i == 0) ? 0 : segmentBounds[i-1];
+                long extraSeek = (i == 0) ? 0 : mediaSource.show.getHourPaddingTimeMillis();
+                long localSeekTo = seekToMillis - thisSegmentStart + extraSeek;
+                seek(localSeekTo);
+                return;
+            }
         }
     }
 
@@ -78,22 +94,6 @@ public abstract class AbstractPlayback {
         }
         // TODO: brittle, fixme
         return null;
-    }
-
-    public void seekOverEntireShow(long seekToMillis) {
-        long[] segmentBounds = mediaSource.show.getSegmentBounds();
-        for (int i = 0; i < segmentBounds.length; i++) {
-            if (seekToMillis <= segmentBounds[i]) {
-                // load segment i
-                playArchiveHour(i);
-                //seek to adjusted position
-                long thisSegmentStart = (i == 0) ? 0 : segmentBounds[i-1];
-                long extraSeek = (i == 0) ? 0 : mediaSource.show.getHourPaddingTimeMillis();
-                long localSeekTo = seekToMillis - thisSegmentStart + extraSeek;
-                seek(localSeekTo);
-                return;
-            }
-        }
     }
 
     public abstract void play(String streamUrl);
