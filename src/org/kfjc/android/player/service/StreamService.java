@@ -30,12 +30,8 @@ public class StreamService extends Service {
         playback = new ExoPlayback(getApplicationContext());
     }
 
-    public void setCastPlayback(CastSession castSession) {
-        playback = new ChromecastPlayback(getApplicationContext(), castSession);
-    }
-
     public void setCastPlayback() {
-        playback = new ChromecastPlayback(getApplicationContext());
+        playback = ChromecastPlayback.getInstance();
     }
 
     @Override

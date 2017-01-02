@@ -47,7 +47,7 @@ public class ExoPlayback extends AbstractPlayback {
         super(context);
     }
 
-    public void play(String streamUrl) {
+    public void play(String streamUrl, boolean isLive) {
         Log.i(TAG, "Playing stream locally: " + streamUrl);
 
         if (player == null) {

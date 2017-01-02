@@ -28,7 +28,7 @@ public abstract class AbstractPlayback {
         this.mediaSource = mediaSource;
         stop(false);
         if (mediaSource.type == KfjcMediaSource.Type.LIVESTREAM) {
-            play(mediaSource.url);
+            play(mediaSource.url, true);
         } else if (mediaSource.type == KfjcMediaSource.Type.ARCHIVE) {
             activeSourceNumber = -1;
             playArchiveHour(0);
@@ -55,9 +55,9 @@ public abstract class AbstractPlayback {
         File expectedSavedHour = mediaSource.show.getSavedHourUrl(hour);
         stop(false);
         if (expectedSavedHour.exists()) {
-            play(expectedSavedHour.getPath());
+            play(expectedSavedHour.getPath(), false);
         } else {
-            play(mediaSource.show.getUrls().get(hour));
+            play(mediaSource.show.getUrls().get(hour), false);
         }
         seek(mediaSource.show.getHourPaddingTimeMillis());
     }
@@ -96,7 +96,7 @@ public abstract class AbstractPlayback {
         return null;
     }
 
-    public abstract void play(String streamUrl);
+    public abstract void play(String streamUrl, boolean isLive);
     public abstract void stop(boolean alsoReset);
     public abstract void pause();
     public abstract void unpause();

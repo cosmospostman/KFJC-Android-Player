@@ -26,7 +26,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -55,18 +54,13 @@ import org.kfjc.android.player.model.KfjcMediaSource;
 import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.receiver.DownloadReceiver;
 import org.kfjc.android.player.receiver.MediaStateReceiver;
+import org.kfjc.android.player.service.ChromecastPlayback;
+import org.kfjc.android.player.service.ChromecastPlayback.CastConnectionChangedCallback;
 import org.kfjc.android.player.service.PlaylistService;
 import org.kfjc.android.player.service.StreamService;
 import org.kfjc.android.player.util.DownloadUtil;
 import org.kfjc.android.player.util.HttpUtil;
 import org.kfjc.android.player.util.NotificationUtil;
-
-import com.google.android.gms.cast.MediaInfo;
-import com.google.android.gms.cast.MediaMetadata;
-import com.google.android.gms.cast.framework.CastContext;
-import com.google.android.gms.cast.framework.CastSession;
-import com.google.android.gms.cast.framework.SessionManagerListener;
-import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -94,10 +88,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
     private ActionBarDrawerToggle drawerToggle;
     private View view;
     private Snackbar snackbar;
-
-    private CastContext mCastContext;
-    private CastSession mCastSession;
-    private SessionManagerListener<CastSession> mSessionManagerListener;
 
     private boolean isForegroundActivity = false;
     private int activeFragmentId = R.id.nav_livestream;
@@ -127,16 +117,16 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setupStreamService();
         setupListenersAndManagers();
 
-        setupCastListener();
-        mCastContext = CastContext.getSharedInstance(this);
-        mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
-        mCastContext.getSessionManager().addSessionManagerListener(
-                mSessionManagerListener, CastSession.class);
+        CastContext mCastContext = CastContext.getSharedInstance(this);
+        CastSession mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
+        ChromecastPlayback
+                .initialize(this, mCastSession)
+                .setupCastListener(castConnectionChangedCallback);
+
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mediaStateReceiver,
                 new IntentFilter(PlayerState.INTENT_PLAYER_STATE));
         mediaStateReceiver.onReceive(this, PlayerState.getLastPlayerState());
-
     }
 
     private void loadResources() {
@@ -175,8 +165,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 public void onServiceConnected(ComponentName name, IBinder service) {
                     StreamService.LiveStreamBinder binder = (StreamService.LiveStreamBinder) service;
                     streamService = binder.getService();
-                    if (mCastSession != null && mCastSession.isConnected()) {
-
+                    if (ChromecastPlayback.getInstance().isConnected()) {
                         streamService.setCastPlayback();
                     } else {
                         streamService.setLocalPlayback();
@@ -593,62 +582,18 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         streamService.seekOverEntireShow(positionMillis);
     }
 
-    private void setupCastListener() {
-        mSessionManagerListener = new SessionManagerListener<CastSession>() {
+    CastConnectionChangedCallback castConnectionChangedCallback = new CastConnectionChangedCallback() {
+        @Override
+        public void onApplicationConnected() {
+            invalidateOptionsMenu();
+            streamService.setCastPlayback();
+        }
 
-            @Override
-            public void onSessionEnded(CastSession session, int error) {
-                onApplicationDisconnected();
-            }
-
-            @Override
-            public void onSessionResumed(CastSession session, boolean wasSuspended) {
-                onApplicationConnected(session);
-            }
-
-            @Override
-            public void onSessionResumeFailed(CastSession session, int error) {
-                onApplicationDisconnected();
-            }
-
-            @Override
-            public void onSessionStarted(CastSession session, String sessionId) {
-                onApplicationConnected(session);
-            }
-
-            @Override
-            public void onSessionStartFailed(CastSession session, int error) {
-                onApplicationDisconnected();
-            }
-
-            @Override
-            public void onSessionStarting(CastSession session) {
-//                streamService.setCastPlaybackState(StreamService.CastPlaybackState.PLAYING);
-            }
-
-            @Override
-            public void onSessionEnding(CastSession session) {
-//                streamService.setCastPlaybackState(StreamService.CastPlaybackState.IDLE);
-            }
-
-            @Override
-            public void onSessionResuming(CastSession session, String sessionId) {}
-
-            @Override
-            public void onSessionSuspended(CastSession session, int reason) {}
-
-            private void onApplicationConnected(CastSession castSession) {
-                Log.i("kfjc-cast", "application connected");
-                streamService.setCastPlayback(castSession);
-                invalidateOptionsMenu();
-            }
-
-            private void onApplicationDisconnected() {
-                streamService.setLocalPlayback();
-                PlayerState.send(getApplicationContext(), PlayerState.State.PLAY, "Stopped");
-                invalidateOptionsMenu();
-            }
-        };
-    }
+        @Override
+        public void onApplicationDisconnected() {
+            invalidateOptionsMenu();
+            streamService.setLocalPlayback();
+        }
+    };
 
 }
