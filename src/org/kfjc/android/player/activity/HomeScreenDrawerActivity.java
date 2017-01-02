@@ -176,9 +176,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     StreamService.LiveStreamBinder binder = (StreamService.LiveStreamBinder) service;
                     streamService = binder.getService();
                     if (mCastSession != null && mCastSession.isConnected()) {
-                        streamService.updatePlaybackLocation(StreamService.PlaybackLocation.REMOTE);
+
+                        streamService.setCastPlayback();
                     } else {
-                        streamService.updatePlaybackLocation(StreamService.PlaybackLocation.LOCAL);
+                        streamService.setLocalPlayback();
                     }
                 }
 
@@ -612,10 +613,14 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             }
 
             @Override
-            public void onSessionStarting(CastSession session) {}
+            public void onSessionStarting(CastSession session) {
+//                streamService.setCastPlaybackState(StreamService.CastPlaybackState.PLAYING);
+            }
 
             @Override
-            public void onSessionEnding(CastSession session) {}
+            public void onSessionEnding(CastSession session) {
+//                streamService.setCastPlaybackState(StreamService.CastPlaybackState.IDLE);
+            }
 
             @Override
             public void onSessionResuming(CastSession session, String sessionId) {}
@@ -625,13 +630,14 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
             private void onApplicationConnected(CastSession castSession) {
                 Log.i("kfjc-cast", "application connected");
-                streamService.setCastSession(castSession);
-                streamService.updatePlaybackLocation(StreamService.PlaybackLocation.REMOTE);
+                streamService.setCastPlayback(castSession);
                 invalidateOptionsMenu();
             }
 
             private void onApplicationDisconnected() {
-                streamService.updatePlaybackLocation(StreamService.PlaybackLocation.LOCAL);
+                streamService.setLocalPlayback();
+                PlayerState.send(getApplicationContext(), PlayerState.State.PLAY, "Stopped");
+                invalidateOptionsMenu();
             }
         };
     }
