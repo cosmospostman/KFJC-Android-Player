@@ -33,15 +33,15 @@ public class PlayerState {
         return lastPlayerState;
     }
 
-    public void send(Context context, State state, KfjcMediaSource source) {
+    public static void send(Context context, State state, KfjcMediaSource source) {
         sendStateIntent(context, state, source , null);
     }
 
-    public void send(Context context, State state, String message) {
+    public static void send(Context context, State state, String message) {
         sendStateIntent(context, state, null, message);
     }
 
-    private void sendStateIntent(Context context, State state, KfjcMediaSource source, String message) {
+    private static void sendStateIntent(Context context, State state, KfjcMediaSource source, String message) {
         Intent intent = new Intent(INTENT_PLAYER_STATE);
         intent.putExtra(INTENT_KEY_PLAYER_STATE, state);
         if (source != null) {

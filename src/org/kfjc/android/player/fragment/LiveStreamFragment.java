@@ -156,7 +156,7 @@ public class LiveStreamFragment extends PlayerFragment {
 
     @Override
     void onStateChanged(State state, KfjcMediaSource source) {
-        if (source.type == KfjcMediaSource.Type.LIVESTREAM) {
+        if (source != null && source.type == KfjcMediaSource.Type.LIVESTREAM) {
             updatePlaylist(PlaylistUpdate.getLastPlaylist());
             switch(state) {
                 case PLAY:
