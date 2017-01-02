@@ -118,7 +118,7 @@ public class LiveStreamFragment extends PlayerFragment {
 
     public void updatePlaylist(Playlist playlist) {
         // TODO: move this notification logic elsewhere?
-        if (homeScreen.isStreamServicePlaying()
+        if (homeScreen.isStreamServicePlaying() && playerSource != null
                 && playerSource.type == KfjcMediaSource.Type.LIVESTREAM) {
             notificationUtil.updateNowPlayNotification(playlist, playerSource);
         }

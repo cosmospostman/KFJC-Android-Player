@@ -226,7 +226,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
 
     @Override
     void onStateChanged(State state, KfjcMediaSource source) {
-        if (source.type == KfjcMediaSource.Type.ARCHIVE
+        if (source != null && source.type == KfjcMediaSource.Type.ARCHIVE
                 && show != null
                 && source.show.getPlaylistId().equals(show.getPlaylistId())) {
             switch (state) {

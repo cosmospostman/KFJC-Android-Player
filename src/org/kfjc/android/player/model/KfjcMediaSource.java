@@ -101,7 +101,7 @@ public class KfjcMediaSource implements Parcelable {
             case AAC:
                 return "audio/mp4; codecs=\"mp4a.40.5\"";
             case MP3:
-                return "audio/mpeg";
+                return "audio/mp3";
             default:
                 return "";
         }
