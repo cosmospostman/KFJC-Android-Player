@@ -4,9 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
-
-import com.google.android.gms.cast.framework.CastSession;
 
 import org.kfjc.android.player.intent.PlayerControl;
 import org.kfjc.android.player.model.KfjcMediaSource;
@@ -26,12 +23,10 @@ public class StreamService extends Service {
 
     private AbstractPlayback playback;
 
-    public void setLocalPlayback() {
+    @Override
+    public void onCreate() {
+        super.onCreate();
         playback = new ExoPlayback(getApplicationContext());
-    }
-
-    public void setCastPlayback() {
-        playback = ChromecastPlayback.getInstance();
     }
 
     @Override

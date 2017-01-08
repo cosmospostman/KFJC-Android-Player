@@ -2,30 +2,25 @@ package org.kfjc.android.player.service;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.MediaStatus;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.Session;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.images.WebImage;
 
 import org.kfjc.android.player.intent.PlayerState;
+import org.kfjc.android.player.model.KfjcMediaSource;
 
 public class ChromecastPlayback extends AbstractPlayback {
-
-    private static ChromecastPlayback instance;
-
-    public static ChromecastPlayback initialize(Context context, CastSession castSession) {
-        instance = new ChromecastPlayback(context, castSession);
-        return instance;
-    }
-
-    public static ChromecastPlayback getInstance() {
-        return instance;
-    }
 
     private static final String TAG = ChromecastPlayback.class.getSimpleName();
 
@@ -38,17 +33,20 @@ public class ChromecastPlayback extends AbstractPlayback {
         void onApplicationDisconnected();
     }
 
-    private CastPlaybackState castPlaybackState;
+    CastContext mCastContext;
     private CastSession mCastSession;
     private SessionManagerListener<CastSession> mSessionManagerListener;
 
-    private ChromecastPlayback(Context context, CastSession castSession) {
+    public ChromecastPlayback(Context context, CastContext castContext) {
         super(context);
-        mCastSession = castSession;
+        mCastContext = castContext;
+        mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
     }
 
     @Override
-    public void seek(long positionMillis) {}
+    public void seek(long positionMillis) {
+        mCastSession.getRemoteMediaClient().seek(positionMillis);
+    }
 
     @Override
     public void play(String streamUrl, boolean isLive) {
@@ -59,13 +57,16 @@ public class ChromecastPlayback extends AbstractPlayback {
         if (remoteMediaClient == null) {
             return;
         }
+        Log.i("RMC", remoteMediaClient.toString());
         remoteMediaClient.load(buildMediaInfo(streamUrl, isLive), true);
         PlayerState.send(context, PlayerState.State.PLAY, mediaSource);
     }
 
     @Override
     public void stop(boolean alsoReset) {
-        mCastSession.getRemoteMediaClient().stop();
+        RemoteMediaClient remoteMediaClient = mCastSession.getRemoteMediaClient();
+        Log.i("RMC", remoteMediaClient.toString());
+        remoteMediaClient.stop();
         PlayerState.send(context, PlayerState.State.STOP, mediaSource);
     }
 
