@@ -1,5 +1,6 @@
 package org.kfjc.android.player.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -13,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.cast.framework.CastContext;
+
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.activity.LavaLampActivity;
 import org.kfjc.android.player.control.PreferenceControl;
@@ -24,6 +27,7 @@ import org.kfjc.android.player.intent.PlaylistUpdate;
 import org.kfjc.android.player.model.KfjcMediaSource;
 import org.kfjc.android.player.model.Playlist;
 import org.kfjc.android.player.receiver.PlaylistUpdateReceiver;
+import org.kfjc.android.player.service.ChromecastPlayback;
 import org.kfjc.android.player.util.GraphicsUtil;
 import org.kfjc.android.player.util.NotificationUtil;
 
@@ -88,11 +92,11 @@ public class LiveStreamFragment extends PlayerFragment {
             public void onClick(View v) {
                 switch (displayState) {
                     case STOP:
-                        PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_PLAY, PreferenceControl.getStreamPreference());
+                        homeScreen.startPlayback(PreferenceControl.getStreamPreference());
                         break;
                     case BUFFER:
                     case PLAY:
-                        PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_STOP);
+                        homeScreen.stopPlayback();
                         break;
                 }
             }
