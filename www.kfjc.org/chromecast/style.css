@@ -1,0 +1,25 @@
+.gcpe > .gcpg, .gcpe > .gcph {
+	color: #0E0E0E;
+}
+
+.background {
+  background: center no-repeat url(bg.jpg);
+}
+
+.logo {
+  background-image: url(logo.png);
+  float: right;
+}
+
+.progressBar {
+  background-color: #d73032;
+}
+
+/*.splash {
+  background-image: url(logo.png);
+}*/
+
+.watermark {
+  background-image: url(watermark.png);
+  background-size: 100px 81px;
+}
