@@ -91,10 +91,10 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         public void onClick(View v) {
             switch (displayState) {
                 case PAUSE:
-                    PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_UNPAUSE);
+                    homeScreen.pausePlayback(true);
                     break;
                 case PLAY:
-                    PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_PAUSE);
+                    homeScreen.pausePlayback(false);
                     break;
             }
         }

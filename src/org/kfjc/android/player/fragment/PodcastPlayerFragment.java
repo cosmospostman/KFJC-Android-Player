@@ -16,6 +16,8 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.google.android.gms.cast.framework.media.RemoteMediaClient;
+
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.dialog.OfflineDialog;
 import org.kfjc.android.player.dialog.PlaylistDialog;
@@ -189,16 +191,16 @@ public class PodcastPlayerFragment extends PlayerFragment {
             case PAUSE:
                 if (playerSource.type == KfjcMediaSource.Type.ARCHIVE
                         && playerSource.show.getPlaylistId().equals(show.getPlaylistId())) {
-                    PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_UNPAUSE);
+                    homeScreen.pausePlayback(true);
                 } // else fall through:
             case STOP:
-                PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_PLAY, new KfjcMediaSource(show));
+                homeScreen.startPlayback(new KfjcMediaSource(show));
                 break;
             case BUFFER:
-                PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_STOP);
+                homeScreen.stopPlayback();
                 break;
             case PLAY:
-                PlayerControl.sendAction(getActivity(), PlayerControl.INTENT_PAUSE);
+                homeScreen.pausePlayback(false);
                 break;
         }
     }

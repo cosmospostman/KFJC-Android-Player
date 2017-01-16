@@ -174,7 +174,7 @@ public class ShowDetails implements Parcelable {
         return DateUtil.roundUpHourFormat(timestamp, DateUtil.FORMAT_DELUXE_DATE);
     }
 
-    public String toJsonString() {
+    public JSONObject toJSONObject() {
         JSONObject out = new JSONObject();
         try {
             out.put(KEY_PLAYLIST_ID, playlistId);
@@ -189,7 +189,7 @@ public class ShowDetails implements Parcelable {
             out.put(KEY_TOTAL_TIME, totalShowTimeMillis);
             out.put(KEY_FILE_SIZE, totalFileSizeBytes);
         } catch (JSONException e) {}
-        return out.toString();
+        return out;
     }
 
     @Override

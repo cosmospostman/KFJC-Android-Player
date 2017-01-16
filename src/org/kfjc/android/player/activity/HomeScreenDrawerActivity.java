@@ -36,6 +36,7 @@ import android.widget.ImageView;
 
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.MediaStatus;
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
@@ -666,10 +667,33 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public long getPlayerPosition() {
-        if (streamService == null) {
-            return 0;
+        switch (mPlaybackLocation) {
+            case LOCAL:
+                if (streamService == null) {
+                    return 0;
+                }
+                return streamService.getPlayerPosition();
+            case CAST:
+                RemoteMediaClient client = mCastSession.getRemoteMediaClient();
+                long position = client.getApproximateStreamPosition();
+                int activeSourceNumber = client.getCurrentItem().getMedia().getMetadata()
+                        .getInt(MediaMetadata.KEY_TRACK_NUMBER) - 1;
+                KfjcMediaSource source = KfjcMediaSource.fromJSON(
+                        client.getCurrentItem().getCustomData());
+
+                long segmentOffset = (activeSourceNumber == 0)
+                        ? 0 : source.show.getSegmentBounds()[activeSourceNumber - 1];
+                long extra = (activeSourceNumber == 0)
+                        ? 0 : source.show.getHourPaddingTimeMillis();
+                return position + segmentOffset - extra;
+
+            default:
+                return 0;
         }
-        return streamService.getPlayerPosition();
+    }
+
+    public PlaybackLocation getPlaybackLocation() {
+        return mPlaybackLocation;
     }
 
     @Override
@@ -718,30 +742,15 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
                     }
                 });
-                remoteMediaClient.load(buildMediaInfo(source), true);
+                remoteMediaClient.queueLoad(
+                        source.asQueue(getApplicationContext()),
+                        0, // start index
+                        MediaStatus.REPEAT_MODE_REPEAT_OFF,
+                        5 * 60 * 1000L, // play position 5mins in
+                        null);
                 PlayerState.send(this, PlayerState.State.PLAY, source);
                 break;
         }
-    }
-
-    private MediaInfo buildMediaInfo(KfjcMediaSource source) {
-        boolean isLive = (source.type == KfjcMediaSource.Type.LIVESTREAM);
-        MediaMetadata metadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_GENERIC);
-        metadata.addImage(new WebImage(Uri.parse("https://dl.dropboxusercontent.com/u/7449543/chromecast-dev/kfjc-cover.jpg")));
-
-        if (isLive) {
-            metadata.putString(MediaMetadata.KEY_TITLE, getString(R.string.fragment_title_stream));
-            metadata.putString(MediaMetadata.KEY_SUBTITLE, source.description);
-        } else {
-            metadata.putString(MediaMetadata.KEY_TITLE, source.name);
-            metadata.putString(MediaMetadata.KEY_SUBTITLE, source.description);
-        }
-
-        return new MediaInfo.Builder(source.url + (isLive ? ";" : ""))
-                .setStreamType(isLive ? MediaInfo.STREAM_TYPE_LIVE : MediaInfo.STREAM_TYPE_NONE)
-                .setContentType(source.getMimeType())
-                .setMetadata(metadata)
-                .build();
     }
 
     public void stopPlayback() {
@@ -752,6 +761,25 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
             case CAST:
                 mCastContext.getSessionManager().getCurrentCastSession().getRemoteMediaClient().stop();
                 PlayerState.send(this, PlayerState.State.STOP, PreferenceControl.getStreamPreference());
+                break;
+        }
+    }
+
+    public void pausePlayback(boolean unPause) {
+        switch (mPlaybackLocation) {
+            case LOCAL:
+                PlayerControl.sendAction(
+                        this, unPause ? PlayerControl.INTENT_UNPAUSE : PlayerControl.INTENT_PAUSE);
+                break;
+            case CAST:
+                RemoteMediaClient client = mCastContext.getSessionManager().getCurrentCastSession().getRemoteMediaClient();
+                if (unPause) {
+                    client.play();
+                } else {
+                    client.pause();
+                }
+                PlayerState.State state = unPause ? PlayerState.State.PLAY : PlayerState.State.PAUSE;
+                PlayerState.send(this, state, PreferenceControl.getStreamPreference());
                 break;
         }
     }

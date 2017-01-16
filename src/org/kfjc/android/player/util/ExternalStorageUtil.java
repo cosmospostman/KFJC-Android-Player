@@ -50,7 +50,7 @@ public class ExternalStorageUtil {
 
             // Write the show metadata
             PrintWriter showWriter = new PrintWriter(new File(podcastDir, KFJC_INDEX_FILENAME));
-            showWriter.println(show.toJsonString());
+            showWriter.println(show.toJSONObject().toString());
             showWriter.close();
 
             // Write the playlist
