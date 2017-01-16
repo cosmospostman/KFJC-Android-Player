@@ -282,7 +282,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 loadPodcastListFragment(false);
                 break;
             case R.id.nav_podcast_player:
-                if (streamService == null || streamService.getSource() == null) {
+                if (streamService == null
+                        || streamService.getSource() == null) {
                     if (podcastPlayerFragment != null) {
                         replaceFragment(podcastPlayerFragment);
                     } else {
@@ -304,6 +305,11 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void loadPodcastPlayer(ShowDetails show, boolean animate) {
+        // Failsafe in case show is null. Might be causing crash onResume.
+        if (show == null) {
+            loadPodcastListFragment(false);
+            return;
+        }
         if (activeFragmentId == R.id.nav_podcast_player
                 && podcastPlayerFragment != null
                 && show.equals(podcastPlayerFragment.getShow())) {
@@ -509,7 +515,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         if (drawable instanceof BitmapDrawable) {
             BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
             Bitmap bitmap = bitmapDrawable.getBitmap();
-            bitmap.recycle();
+            // Check if bitmap is recycled, possibly causing crashes.
+            if (! bitmap.isRecycled()) {
+                bitmap.recycle();
+            }
         }
     }
 

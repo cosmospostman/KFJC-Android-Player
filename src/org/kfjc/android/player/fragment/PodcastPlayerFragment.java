@@ -208,7 +208,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void updateClockHelper(long playerPos) {
-        if (playerSource == null) {
+        if (playerSource == null || playerSource.show == null) {
             return;
         }
         long totalShowTime = playerSource.show.getTotalShowTimeMillis();

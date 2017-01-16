@@ -30,7 +30,11 @@ Build
 
 Changelog
 ---------
-v11 (3 October 2016)
+
+v13 (16 January 2017)
+ - Hopefully fix some bugs. Exoplayer 2.1.1
+
+v11/v12 (3 October 2016)
  - Don't ask for phone permissions to stop playback for incoming call. Instead, just handle loss of
    audio focus.
 
