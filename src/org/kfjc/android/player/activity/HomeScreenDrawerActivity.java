@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -33,9 +34,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.MediaQueueItem;
 import com.google.android.gms.cast.MediaStatus;
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
@@ -47,11 +52,13 @@ import com.google.android.gms.common.images.WebImage;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 
+import org.json.JSONObject;
 import org.kfjc.android.player.KfjcApplication;
 import org.kfjc.android.player.R;
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.fragment.KfjcFragment;
 import org.kfjc.android.player.fragment.LiveStreamFragment;
+import org.kfjc.android.player.fragment.MinicontrollerFragment;
 import org.kfjc.android.player.fragment.PodcastFragment;
 import org.kfjc.android.player.fragment.PodcastPlayerFragment;
 import org.kfjc.android.player.intent.PlayerControl;
@@ -137,63 +144,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         LocalBroadcastManager.getInstance(this).registerReceiver(mediaStateReceiver,
                 new IntentFilter(PlayerState.INTENT_PLAYER_STATE));
         mediaStateReceiver.onReceive(this, PlayerState.getLastPlayerState());
-    }
-
-    private void setupCastListener() {
-        mSessionManagerListener = new SessionManagerListener<CastSession>() {
-
-            @Override
-            public void onSessionEnded(CastSession session, int error) {
-                onApplicationDisconnected();
-            }
-
-            @Override
-            public void onSessionResumed(CastSession session, boolean wasSuspended) {
-                onApplicationConnected(session);
-            }
-
-            @Override
-            public void onSessionResumeFailed(CastSession session, int error) {
-                onApplicationDisconnected();
-            }
-
-            @Override
-            public void onSessionStarted(CastSession session, String sessionId) {
-                onApplicationConnected(session);
-            }
-
-            @Override
-            public void onSessionStartFailed(CastSession session, int error) {
-                onApplicationDisconnected();
-            }
-
-            @Override
-            public void onSessionStarting(CastSession session) {
-            }
-
-            @Override
-            public void onSessionEnding(CastSession session) {
-            }
-
-            @Override
-            public void onSessionResuming(CastSession session, String sessionId) {
-            }
-
-            @Override
-            public void onSessionSuspended(CastSession session, int reason) {
-            }
-
-            private void onApplicationConnected(CastSession castSession) {
-                mCastSession = castSession;
-                updatePlaybackLocation(PlaybackLocation.CAST);
-                invalidateOptionsMenu();
-            }
-
-            private void onApplicationDisconnected() {
-                updatePlaybackLocation(PlaybackLocation.LOCAL);
-                invalidateOptionsMenu();
-            }
-        };
     }
 
     private void loadResources() {
@@ -396,6 +346,14 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
     }
 
+    void loadMinicontrollerFragment() {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        MinicontrollerFragment minicontrollerFragment = new MinicontrollerFragment();
+        ft.replace(R.id.minicontroller_fragment, minicontrollerFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
     @Override
     public void loadPodcastPlayer(ShowDetails show, boolean animate) {
         // Failsafe in case show is null. Might be causing crash onResume.
@@ -509,21 +467,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         setIntent(null);
         mCastContext.getSessionManager().addSessionManagerListener(
                 mSessionManagerListener, CastSession.class);
-        if (mCastSession != null && mCastSession.isConnected()) {
-            updatePlaybackLocation(PlaybackLocation.CAST);
-//            if (mCastSession.getRemoteMediaClient().isBuffering()) {
-//                // TODO: store/retrieve source
-//                PlayerState.send(getApplicationContext(),
-//                        PlayerState.State.BUFFER, PreferenceControl.getStreamPreference());
-//            } else
-            if (mCastSession.getRemoteMediaClient().isPlaying()) {
-                // TODO: store/retrieve source
-                PlayerState.send(getApplicationContext(),
-                        PlayerState.State.PLAY, PreferenceControl.getStreamPreference());
-            }
-        } else {
-            updatePlaybackLocation(PlaybackLocation.LOCAL);
-        }
+        loadCastState();
+        loadMinicontrollerFragment();
         if (intent != null) {
             KfjcMediaSource source = intent.getParcelableExtra(PlayerControl.INTENT_SOURCE);
             if (source != null) {
@@ -551,6 +496,34 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
         // Neither from notification nor download notification.
         loadFragment(activeFragmentId);
+    }
+
+    private void loadCastState() {
+        Log.i("HSDA", "loadCastState");
+        if (mCastSession != null && mCastSession.isConnected()) {
+            updatePlaybackLocation(PlaybackLocation.CAST);
+//            if (mCastSession.getRemoteMediaClient().isBuffering()) {
+//                // TODO: store/retrieve source
+//                PlayerState.send(getApplicationContext(),
+//                        PlayerState.State.BUFFER, PreferenceControl.getStreamPreference());
+//            } else
+            if (getRemoteMediaClient().isPlaying()) {
+                KfjcMediaSource source = getCastMediaSource();
+                if (source != null) {
+                    switch (source.type) {
+                        case LIVESTREAM:
+                            loadFragment(R.id.nav_livestream);
+                            return;
+                        case ARCHIVE:
+                            loadPodcastPlayer(source.show, false);
+                            PlayerState.send(getApplicationContext(), PlayerState.State.PLAY, source);
+                            return;
+                    }
+                }
+            }
+        } else {
+            updatePlaybackLocation(PlaybackLocation.LOCAL);
+        }
     }
 
     private void updatePlaybackLocation(PlaybackLocation location) {
@@ -674,13 +647,17 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 }
                 return streamService.getPlayerPosition();
             case CAST:
-                RemoteMediaClient client = mCastSession.getRemoteMediaClient();
-                long position = client.getApproximateStreamPosition();
-                int activeSourceNumber = client.getCurrentItem().getMedia().getMetadata()
-                        .getInt(MediaMetadata.KEY_TRACK_NUMBER) - 1;
-                KfjcMediaSource source = KfjcMediaSource.fromJSON(
-                        client.getCurrentItem().getCustomData());
-
+                long position = getRemoteMediaClient().getApproximateStreamPosition();
+                if (getRemoteMediaClient().getCurrentItem() == null) {
+                    return 0;
+                }
+                int activeSourceNumber = getRemoteMediaClient()
+                        .getCurrentItem().getMedia().getMetadata()
+                        .getInt(MediaMetadata.KEY_TRACK_NUMBER);
+                KfjcMediaSource source = getCastMediaSource();
+                if (source.show == null) {
+                    return 0;
+                }
                 long segmentOffset = (activeSourceNumber == 0)
                         ? 0 : source.show.getSegmentBounds()[activeSourceNumber - 1];
                 long extra = (activeSourceNumber == 0)
@@ -698,7 +675,91 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void seekPlayer(long positionMillis) {
-        streamService.seekOverEntireShow(positionMillis);
+        switch (mPlaybackLocation) {
+            case LOCAL:
+                streamService.seekOverEntireShow(positionMillis);
+                break;
+            case CAST:
+                KfjcMediaSource source = getCastMediaSource();
+                long[] segmentBounds = source.show.getSegmentBounds();
+                for (int i = 0; i < segmentBounds.length; i++) {
+                    if (positionMillis <= segmentBounds[i]) {
+                        //seek to adjusted position
+                        long thisSegmentStart = (i == 0) ? 0 : segmentBounds[i-1];
+                        long extraSeek = (i == 0) ? 0 : source.show.getHourPaddingTimeMillis();
+                        long localSeekTo = positionMillis - thisSegmentStart + extraSeek;
+                        int currentId = mCastSession.getRemoteMediaClient().getMediaStatus().getCurrentItemId();
+                        int itemId = mCastSession.getRemoteMediaClient().getMediaStatus().getItemByIndex(i).getItemId();
+                        if (currentId == itemId) {
+                            mCastSession.getRemoteMediaClient().seek(localSeekTo);
+                        } else {
+                            mCastSession.getRemoteMediaClient().queueJumpToItem(itemId, localSeekTo, null);
+                        }
+                        return;
+                    }
+                }
+                break;
+        }
+    }
+
+    private void setupCastListener() {
+        mSessionManagerListener = new SessionManagerListener<CastSession>() {
+
+            @Override
+            public void onSessionEnded(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionResumed(CastSession session, boolean wasSuspended) {
+                onApplicationConnected(session);
+            }
+
+            @Override
+            public void onSessionResumeFailed(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionStarted(CastSession session, String sessionId) {
+                onApplicationConnected(session);
+            }
+
+            @Override
+            public void onSessionStartFailed(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionStarting(CastSession session) {
+            }
+
+            @Override
+            public void onSessionEnding(CastSession session) {
+            }
+
+            @Override
+            public void onSessionResuming(CastSession session, String sessionId) {
+            }
+
+            @Override
+            public void onSessionSuspended(CastSession session, int reason) {
+            }
+
+            private void onApplicationConnected(CastSession castSession) {
+                Log.i("CAST", "onApplicationConnected");
+                mCastSession = castSession;
+                updatePlaybackLocation(PlaybackLocation.CAST);
+                invalidateOptionsMenu();
+                loadCastState();
+            }
+
+            private void onApplicationDisconnected() {
+                Log.i("CAST", "onApplicationDisconnected");
+                updatePlaybackLocation(PlaybackLocation.LOCAL);
+                invalidateOptionsMenu();
+            }
+        };
     }
 
     public void startPlayback(KfjcMediaSource source) {
@@ -713,11 +774,14 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                     @Override
                     public void onStatusUpdated() {
                         //TODO: use real source, not pref control
-                        Log.i("Chromecast", "onStatusUpdated: buffering? " + remoteMediaClient.isBuffering());
                         if (remoteMediaClient.isPlaying()) {
+                            Log.i("Chromecast", "onStatusUpdated: PLAYING ");
                             PlayerState.send(getApplicationContext(),
                                     PlayerState.State.PLAY, PreferenceControl.getStreamPreference());
                             // remoteMediaClient.removeListener(this);
+                        }
+                        if (remoteMediaClient.isBuffering()) {
+                            Log.i("Chromecast", "onStatusUpdated: BUFFERING ");
                         }
                     }
 
@@ -742,8 +806,8 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
                     }
                 });
-                remoteMediaClient.queueLoad(
-                        source.asQueue(getApplicationContext()),
+                mediaQueue = source.asQueue(getApplicationContext());
+                remoteMediaClient.queueLoad(mediaQueue,
                         0, // start index
                         MediaStatus.REPEAT_MODE_REPEAT_OFF,
                         5 * 60 * 1000L, // play position 5mins in
@@ -752,6 +816,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 break;
         }
     }
+    MediaQueueItem[] mediaQueue;
 
     public void stopPlayback() {
         switch (mPlaybackLocation) {
@@ -772,15 +837,25 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                         this, unPause ? PlayerControl.INTENT_UNPAUSE : PlayerControl.INTENT_PAUSE);
                 break;
             case CAST:
-                RemoteMediaClient client = mCastContext.getSessionManager().getCurrentCastSession().getRemoteMediaClient();
                 if (unPause) {
-                    client.play();
+                    getRemoteMediaClient().play();
                 } else {
-                    client.pause();
+                    getRemoteMediaClient().pause();
                 }
                 PlayerState.State state = unPause ? PlayerState.State.PLAY : PlayerState.State.PAUSE;
                 PlayerState.send(this, state, PreferenceControl.getStreamPreference());
                 break;
         }
     }
+
+    private RemoteMediaClient getRemoteMediaClient() {
+        return mCastContext.getSessionManager().getCurrentCastSession().getRemoteMediaClient();
+    }
+
+    private KfjcMediaSource getCastMediaSource() {
+        JSONObject currentItemData = getRemoteMediaClient().getCurrentItem().getMedia().getCustomData();
+        return KfjcMediaSource.fromJSON(currentItemData);
+    }
+
+
 }

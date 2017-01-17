@@ -49,11 +49,12 @@ public class KfjcMediaSource implements Parcelable {
     public JSONObject toJSONObject() {
         JSONObject out = new JSONObject();
         try {
-            out.put(KEY_TYPE, this.type);
+            // TODO: don't use ordinal.
+            out.put(KEY_TYPE, this.type.ordinal());
             out.put(KEY_URL, this.url);
             out.put(KEY_NAME, this.name);
             out.put(KEY_DESC, this.description);
-            out.put(KEY_FORMAT, this.format);
+            out.put(KEY_FORMAT, this.format.ordinal());
             out.put(KEY_SHOW, this.show.toJSONObject());
         } catch (JSONException e) {}
         return out;
@@ -62,20 +63,20 @@ public class KfjcMediaSource implements Parcelable {
     public static KfjcMediaSource fromJSON(JSONObject in) {
         try {
             Type type = Type.fromOrdinal(in.getInt(KEY_TYPE));
-            String url = in.getString(KEY_URL);
             String name = in.getString(KEY_NAME);
             String description = in.getString(KEY_DESC);
-            Format format = Format.fromOrdinal(in.getInt(KEY_TYPE));
+            Format format = Format.fromOrdinal(in.getInt(KEY_FORMAT));
             ShowDetails show = new ShowDetails(in.getString(KEY_SHOW));
             switch (type) {
                 case LIVESTREAM:
+                    String url = in.getString(KEY_URL);
                     return new KfjcMediaSource(url, format, name, description);
                 case ARCHIVE:
                     return new KfjcMediaSource(show);
             }
 
-        } catch (JSONException e) { }
-        return new KfjcMediaSource();
+        } catch (NullPointerException | JSONException e) { }
+        return null;
     }
 
     public KfjcMediaSource() {
@@ -195,11 +196,12 @@ public class KfjcMediaSource implements Parcelable {
         MediaInfo info = new MediaInfo.Builder(url)
                 .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
                 .setContentType(getMimeType())
+                .setCustomData(this.toJSONObject())
                 .setMetadata(metadata)
                 .build();
         return new MediaQueueItem.Builder(info)
                 .setStartTime(10 * 60) // start 10 mins in
-                .setCustomData(this.toJSONObject())
+//                .setCustomData(this.toJSONObject())
                 .setAutoplay(true)
                 .build();
     }

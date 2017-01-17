@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class PodcastFragment extends PlayerFragment implements PodcastViewHolder.PodcastClickDelegate {
+public class PodcastFragment extends KfjcFragment implements PodcastViewHolder.PodcastClickDelegate {
 
     private static final String TAG = PodcastFragment.class.getSimpleName();
 
@@ -46,11 +46,6 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     private List<ShowDetails> shows = Collections.emptyList();
     private View noSavedShows;
     private View getListError;
-    private TextView nowPlayingLabel;
-    private TextView clockLabel;
-    private FloatingActionButton fab;
-    private ProgressBar playProgress;
-    private RelativeLayout nowPlayingPanel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,37 +63,9 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
         savedShowsView = (RecyclerView) view.findViewById(R.id.savedRecyclerView);
         savedShowsView.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-        nowPlayingLabel = (TextView) view.findViewById(R.id.nowPlayingLabel);
-        clockLabel = (TextView) view.findViewById(R.id.clockLabel);
-        fab = (FloatingActionButton) view.findViewById(R.id.fab);
-        fab.setOnClickListener(fabClickListener);
-        playProgress = (ProgressBar) view.findViewById(R.id.playProgress);
-        nowPlayingPanel = (RelativeLayout) view.findViewById(R.id.nowPlayingPanel);
-        nowPlayingPanel.setOnClickListener(nowPlayingClickListener);
 
         return view;
     }
-
-    private View.OnClickListener nowPlayingClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            homeScreen.loadPodcastPlayer(playerSource.show, true);
-        }
-    };
-
-    private View.OnClickListener fabClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (displayState) {
-                case PAUSE:
-                    homeScreen.pausePlayback(true);
-                    break;
-                case PLAY:
-                    homeScreen.pausePlayback(false);
-                    break;
-            }
-        }
-    };
 
     @Override
     public void onResume() {
@@ -122,58 +89,8 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
     }
 
     @Override
-    void updateClock() {
-        final long playerPos = homeScreen.getPlayerPosition();
-        final long padding = playerSource.show.getHourPaddingTimeMillis();
-
-        String timeStr = DateUtil.formatTime(playerPos - padding);
-        clockLabel.setText(timeStr);
-
-        playProgress.setMax((int) playerSource.show.getTotalShowTimeMillis()/100);
-        playProgress.setProgress((int)playerPos/100);
-    }
-
-    @Override
     public void onClick(ShowDetails show) {
         homeScreen.loadPodcastPlayer(show, true);
-    }
-
-    @Override
-    void onStateChanged(State state, KfjcMediaSource source) {
-        if (source != null && source.type == KfjcMediaSource.Type.ARCHIVE) {
-            nowPlayingLabel.setText(source.show.getAirName());
-            switch (state) {
-                case PLAY:
-                    setPlayState();
-                    return;
-                case PAUSE:
-                    setPauseState();
-                    return;
-            }
-        }
-        setStopState();
-    }
-
-    private void setPlayState() {
-        nowPlayingPanel.setVisibility(View.VISIBLE);
-        playProgress.setVisibility(View.VISIBLE);
-        fab.setImageResource(R.drawable.ic_pause_white_48dp);
-        startPlayClockUpdater();
-        displayState = State.PLAY;
-    }
-
-    private void setPauseState() {
-        nowPlayingPanel.setVisibility(View.VISIBLE);
-        playProgress.setVisibility(View.VISIBLE);
-        fab.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-        updateClock();
-        displayState = State.PAUSE;
-    }
-
-    private void setStopState() {
-        nowPlayingPanel.setVisibility(View.GONE);
-        playProgress.setVisibility(View.GONE);
-        displayState = State.STOP;
     }
 
     private class GetArchivesTask extends AsyncTask<Void, Void, List<ShowDetails>> {

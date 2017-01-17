@@ -179,7 +179,7 @@ public class ExoPlayback extends AbstractPlayback {
 
     @Override
     public long getPlayerPosition() {
-        if (mediaSource.show == null || player == null) {
+        if (mediaSource == null || mediaSource.show == null || player == null) {
             return 0;
         }
         long segmentOffset = (activeSourceNumber == 0)
