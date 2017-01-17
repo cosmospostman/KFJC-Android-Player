@@ -170,7 +170,7 @@ public class KfjcMediaSource implements Parcelable {
                 return "";
         }
     }
-
+    
     public MediaQueueItem[] asQueue(Context context) {
         List<MediaQueueItem> queue = Lists.newArrayList();
         switch (this.type) {
@@ -218,5 +218,4 @@ public class KfjcMediaSource implements Parcelable {
                 .build();
         return new MediaQueueItem.Builder(info).build();
     }
-
 }
