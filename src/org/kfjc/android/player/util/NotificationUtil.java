@@ -1,7 +1,6 @@
 package org.kfjc.android.player.util;
 
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -9,6 +8,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.app.NotificationCompat.MediaStyle;
 import android.text.TextUtils;
 
 import org.kfjc.android.player.R;
@@ -36,7 +37,7 @@ public class NotificationUtil {
         if (playlist == null) {
             return;
         }
-        Notification.Builder builder = kfjcBaseNotification(
+        NotificationCompat.Builder builder = kfjcBaseNotification(
                 context, PlayerControl.notificationIntent(context, source), PlayerControl.INTENT_STOP);
         if (playlist.hasError()) {
             cancelKfjcNotification();
@@ -69,10 +70,10 @@ public class NotificationUtil {
         return artistTrackString;
     }
 
-    private static Notification.Builder kfjcBaseNotification(Context context, Intent i, String action) {
+    private static NotificationCompat.Builder kfjcBaseNotification(Context context, Intent i, String action) {
         PendingIntent kfjcPlayerIntent = PlayerControl.playerIntent(context, i);
 
-        Notification.Builder builder = new Notification.Builder(context)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "org.kfjc.android.player")
                 .setSmallIcon(R.drawable.ic_kfjc_notification)
                 .setLargeIcon(icon)
                 .setOngoing(true)
@@ -86,19 +87,19 @@ public class NotificationUtil {
                     context.getString(R.string.action_stop),
                     PlayerControl.controlPendingIntent(context, PlayerControl.INTENT_STOP));
             if (action.equals(PlayerControl.INTENT_STOP)) {
-                builder.setStyle(new Notification.MediaStyle()
+                builder.setStyle(new MediaStyle()
                         .setShowActionsInCompactView(0));
             } else if (action.equals(PlayerControl.INTENT_PAUSE)) {
                 builder.addAction(R.drawable.ic_pause_white_48dp,
                         context.getString(R.string.action_pause),
                         PlayerControl.controlPendingIntent(context, PlayerControl.INTENT_PAUSE));
-                builder.setStyle(new Notification.MediaStyle()
+                builder.setStyle(new MediaStyle()
                         .setShowActionsInCompactView(0, 1));
             } else if (action.equals(PlayerControl.INTENT_UNPAUSE)) {
                 builder.addAction(R.drawable.ic_play_arrow_white_48dp,
                         context.getString(R.string.action_play),
                         PlayerControl.controlPendingIntent(context, PlayerControl.INTENT_UNPAUSE));
-                builder.setStyle(new Notification.MediaStyle()
+                builder.setStyle(new MediaStyle()
                         .setShowActionsInCompactView(0, 1));
             }
         }
@@ -107,7 +108,7 @@ public class NotificationUtil {
 
     public static Notification kfjcStreamNotification(Context context, KfjcMediaSource source, String action, boolean isBuffering) {
         Intent i = PlayerControl.notificationIntent(context, source);
-        Notification.Builder builder = kfjcBaseNotification(context, i, action);
+        NotificationCompat.Builder builder = kfjcBaseNotification(context, i, action);
         if (isBuffering) {
             builder.setContentTitle(context.getString(R.string.app_name));
             builder.setContentText(context.getString(R.string.format_buffering,
@@ -120,7 +121,6 @@ public class NotificationUtil {
             builder.setContentTitle(source.show.getAirName());
             builder.setContentText(source.show.getTimestampString());
         }
-
         return builder.build();
     }
 
