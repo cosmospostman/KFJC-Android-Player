@@ -1,6 +1,8 @@
 package org.kfjc.android.player.util;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -21,6 +23,7 @@ import org.kfjc.android.player.model.Playlist;
 public class NotificationUtil {
 
     public static final int KFJC_NOTIFICATION_ID = 1;
+    private static final String KFJC_NOTIFICATION_CHANNEL_ID = "org.kfjc.android.player";
 
     private Context context;
     private static NotificationManager notificationManager;
@@ -31,6 +34,16 @@ public class NotificationUtil {
         notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.radiodevil);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel();
+        }
+    }
+
+    @TargetApi(26)
+    private void createNotificationChannel() {
+        NotificationChannel notificationChannel =
+                new NotificationChannel(KFJC_NOTIFICATION_CHANNEL_ID, "default", NotificationManager.IMPORTANCE_LOW);
+        notificationManager.createNotificationChannel(notificationChannel);
     }
 
     public void updateNowPlayNotification(Playlist playlist, KfjcMediaSource source) {
@@ -73,7 +86,7 @@ public class NotificationUtil {
     private static NotificationCompat.Builder kfjcBaseNotification(Context context, Intent i, String action) {
         PendingIntent kfjcPlayerIntent = PlayerControl.playerIntent(context, i);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "org.kfjc.android.player")
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, KFJC_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_kfjc_notification)
                 .setLargeIcon(icon)
                 .setOngoing(true)

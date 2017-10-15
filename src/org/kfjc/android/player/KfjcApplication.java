@@ -2,10 +2,12 @@ package org.kfjc.android.player;
 
 import android.app.Application;
 import android.os.AsyncTask;
+import android.os.Build;
 
 import org.kfjc.android.player.control.PreferenceControl;
 import org.kfjc.android.player.model.Resources;
 import org.kfjc.android.player.model.ResourcesImpl;
+import org.kfjc.android.player.util.NotificationUtil;
 
 public class KfjcApplication extends Application {
 
