@@ -20,6 +20,8 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
@@ -276,14 +278,14 @@ public class StreamService extends Service {
         }
     }
 
-    private ExoPlayer.EventListener exoEventListener = new ExoPlayer.EventListener() {
+    private Player.EventListener exoEventListener = new Player.EventListener() {
         @Override
         public void onLoadingChanged(boolean isLoading) {}
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int state) {
             switch (state) {
-                case ExoPlayer.STATE_READY:
+                case Player.STATE_READY:
                     if (playWhenReady) {
                         playerState.send(getApplicationContext(), PlayerState.State.PLAY, mediaSource);
                         registerReceiver(onAudioBecomingNoisyReceiver, becomingNoisyIntentFilter);
@@ -291,19 +293,24 @@ public class StreamService extends Service {
                         playerState.send(getApplicationContext(), PlayerState.State.PAUSE, mediaSource);
                     }
                     break;
-                case ExoPlayer.STATE_BUFFERING:
+                case Player.STATE_BUFFERING:
                     playerState.send(getApplicationContext(), PlayerState.State.BUFFER, mediaSource);
                     break;
-                case ExoPlayer.STATE_ENDED:
+                case Player.STATE_ENDED:
                     playerState.send(getApplicationContext(), PlayerState.State.STOP, mediaSource);
                     unregisterReceivers();
                     if (!playNextArchiveHour()) {
                         stop(true);
                     }
                     break;
-                case ExoPlayer.STATE_IDLE:
+                case Player.STATE_IDLE:
                     break;
             }
+        }
+
+        @Override
+        public void onRepeatModeChanged(int repeatMode) {
+
         }
 
         @Override
@@ -322,6 +329,9 @@ public class StreamService extends Service {
 
         @Override
         public void onPositionDiscontinuity() {}
+
+        @Override
+        public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {}
     };
 
     /**
