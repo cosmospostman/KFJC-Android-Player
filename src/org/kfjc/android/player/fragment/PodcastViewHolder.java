@@ -62,7 +62,7 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
             iconBackground.setBackgroundColor(color);
         }
         airName.setText(show.getAirName());
-        timestamp.setText(DateUtil.roundUpHourFormat(show.getTimestamp(), getSimpleDateFormat()));
+        timestamp.setText(DateUtil.format(show.getTimestamp(), getSimpleDateFormat()));
     }
 
     private String getIconLetter() {
@@ -85,7 +85,7 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
     }
 
     private int getClockHour(long timestamp) {
-        Date date = new Date(DateUtil.roundUpHour(timestamp) * 1000);
+        Date date = new Date(timestamp * 1000);
         SimpleDateFormat df = new SimpleDateFormat("H");
         df.setTimeZone(Constants.BROADCAST_TIMEZONE);
         return Integer.parseInt(df.format(date));

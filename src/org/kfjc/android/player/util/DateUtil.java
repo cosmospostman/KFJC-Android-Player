@@ -10,14 +10,15 @@ import java.util.TimeZone;
 public class DateUtil {
 
     private static final int SECONDS_IN_HOUR = 3600;
+    private static final int SECONDS_IN_HALF_HOUR = 1800;
 
     public static final SimpleDateFormat FORMAT_H_MM = new SimpleDateFormat("h:mm a");
     public static final SimpleDateFormat FORMAT_DELUXE_DATE = new SimpleDateFormat("ha, EEEE d MMMM yyyy");
     public static final SimpleDateFormat FORMAT_FULL_DATE = new SimpleDateFormat("ha EEE d MMM yyyy");
     public static final SimpleDateFormat FORMAT_SHORT_DATE = new SimpleDateFormat("ha EEE d MMM");
 
-    public static long roundUpHour(long timestampSec) {
-        return timestampSec + remainderToHour(timestampSec);
+    public static long roundToNearestHour(long timestampSec) {
+        return roundDownHour(timestampSec + SECONDS_IN_HALF_HOUR);
     }
 
     public static long roundDownHour(long timestampSec) {
@@ -32,11 +33,6 @@ public class DateUtil {
     public static String format(long timestamp, SimpleDateFormat df) {
         df.setTimeZone(Constants.BROADCAST_TIMEZONE);
         return df.format(new Date(timestamp * 1000));
-    }
-
-    public static String roundUpHourFormat(long timestamp, SimpleDateFormat df) {
-        df.setTimeZone(Constants.BROADCAST_TIMEZONE);
-        return df.format(new Date(DateUtil.roundUpHour(timestamp) * 1000));
     }
 
     public static String roundDownHourFormat(long timestamp, SimpleDateFormat df) {

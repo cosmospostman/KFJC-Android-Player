@@ -171,7 +171,7 @@ public class ShowDetails implements Parcelable {
     }
 
     public String getTimestampString() {
-        return DateUtil.roundUpHourFormat(timestamp, DateUtil.FORMAT_DELUXE_DATE);
+        return DateUtil.format(timestamp, DateUtil.FORMAT_DELUXE_DATE);
     }
 
     public String toJsonString() {
