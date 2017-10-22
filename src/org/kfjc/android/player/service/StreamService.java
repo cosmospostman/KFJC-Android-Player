@@ -8,43 +8,28 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.ExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.FixedTrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultAllocator;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.intent.PlayerControl;
 import org.kfjc.android.player.intent.PlayerState;
 import org.kfjc.android.player.model.KfjcMediaSource;
 import org.kfjc.android.player.util.NotificationUtil;
-
-import java.io.File;
 
 public class StreamService extends Service {
 
@@ -150,7 +135,7 @@ public class StreamService extends Service {
                     PlayerControl.INTENT_STOP,
                     true);
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
-            play(mediaSource.url);
+            play(mediaSource.getMediaSource(this));
         } else if (mediaSource.type == KfjcMediaSource.Type.ARCHIVE) {
             Notification n = notificationUtil.kfjcStreamNotification(
                     getApplicationContext(),
@@ -158,7 +143,7 @@ public class StreamService extends Service {
                     PlayerControl.INTENT_PAUSE,
                     false);
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
-            play(mediaSource.show.getMediaSource(this));
+            play(mediaSource.getMediaSource(this));
         }
     }
 
@@ -173,32 +158,6 @@ public class StreamService extends Service {
     private void abandonAudioFocus() {
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.abandonAudioFocus(audioFocusListener);
-    }
-
-    @Deprecated
-    private void play(String streamUrl) {
-        Log.i(TAG, "Playing stream " + streamUrl);
-        if (player == null) {
-            player = ExoPlayerFactory.newSimpleInstance(
-                    new DefaultRenderersFactory(getApplicationContext()),
-                    new DefaultTrackSelector(),
-                    new DefaultLoadControl());
-
-            player.addListener(exoEventListener);
-        }
-        requestAudioFocus();
-
-        // Produces DataSource instances through which media data is loaded.
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
-                Util.getUserAgent(this, Constants.USER_AGENT), null);
-        // Produces Extractor instances for parsing the media data.
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-        // This is the MediaSource representing the media to be played.
-        MediaSource audioSource = new ExtractorMediaSource(Uri.parse(streamUrl),
-                dataSourceFactory, extractorsFactory, null, null);
-
-        player.prepare(audioSource);
-        player.setPlayWhenReady(true);
     }
 
     private void play(MediaSource source) {
@@ -343,8 +302,7 @@ public class StreamService extends Service {
         if (player == null) {
             return 0;
         }
-        //TODO: don't hardcode
-        return 3600000 * player.getCurrentPeriodIndex() + player.getCurrentPosition();
+        return Constants.SHOW_SEGMENT_LENGTH * player.getCurrentPeriodIndex() + player.getCurrentPosition();
     }
 
     public void seek(long positionMillis) {

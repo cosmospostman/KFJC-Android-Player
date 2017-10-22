@@ -20,4 +20,5 @@ public class Constants {
             new KfjcMediaSource("http://netcast6.kfjc.org:80/", KfjcMediaSource.Format.MP3, "Default", "128k mp3");
 
     public static final TimeZone BROADCAST_TIMEZONE = TimeZone.getTimeZone("America/Los_Angeles");
+    public static final long SHOW_SEGMENT_LENGTH = 3600000; // Milliseconds
 }

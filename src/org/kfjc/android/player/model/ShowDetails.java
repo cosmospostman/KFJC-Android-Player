@@ -161,28 +161,7 @@ public class ShowDetails implements Parcelable {
         return urls;
     }
 
-    public File getSavedHourUrl(int hour) {
-        return ExternalStorageUtil.getSavedArchive(playlistId, urls.get(hour));
-    }
-
-    public MediaSource getMediaSource(Context context) {
-        // Produces DataSource instances through which media data is loaded.
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
-                Util.getUserAgent(context, Constants.USER_AGENT), null);
-        // Produces Extractor instances for parsing the media data.
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-
-        DynamicConcatenatingMediaSource show = new DynamicConcatenatingMediaSource();
-        for (String url : this.urls) {
-            MediaSource audioSource = new ExtractorMediaSource(Uri.parse(url),
-                    dataSourceFactory, extractorsFactory, null, null);
-            show.addMediaSource(audioSource);
-        }
-
-        return show;
-    }
-
     public long getTotalShowTimeMillis() {
-        return urls.size() * 3600000; //TODO: don't hardcode!
+        return urls.size() * Constants.SHOW_SEGMENT_LENGTH;
     }
 }

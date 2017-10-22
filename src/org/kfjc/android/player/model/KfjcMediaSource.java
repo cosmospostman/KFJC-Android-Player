@@ -7,6 +7,7 @@ import android.os.Parcelable;
 
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
+import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -106,5 +107,29 @@ public class KfjcMediaSource implements Parcelable {
             return thatSource.show.getTimestamp() == this.show.getTimestamp();
         }
         return false;
+    }
+
+    public MediaSource getMediaSource(Context context) {
+        // Produces DataSource instances through which media data is loaded.
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
+                Util.getUserAgent(context, Constants.USER_AGENT), null);
+        // Produces Extractor instances for parsing the media data.
+        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+
+        switch(type) {
+            case LIVESTREAM:
+                return new ExtractorMediaSource(Uri.parse(url),
+                        dataSourceFactory, extractorsFactory, null, null);
+            case ARCHIVE:
+                DynamicConcatenatingMediaSource show = new DynamicConcatenatingMediaSource();
+                for (String url : this.show.getUrls()) {
+                    MediaSource audioSource = new ExtractorMediaSource(Uri.parse(url),
+                            dataSourceFactory, extractorsFactory, null, null);
+                    show.addMediaSource(audioSource);
+                }
+                return show;
+            default:
+                return null;
+        }
     }
 }
