@@ -19,9 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.R;
-import org.kfjc.android.player.model.ShowListBuilder;
-import org.kfjc.android.player.model.BroadcastHour;
-import org.kfjc.android.player.model.BroadcastHourJsonImpl;
 import org.kfjc.android.player.model.ShowDetails;
 import org.kfjc.android.player.model.KfjcMediaSource;
 import org.kfjc.android.player.intent.PlayerState.State;
@@ -32,6 +29,7 @@ import org.kfjc.android.player.intent.PlayerControl;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -189,16 +187,15 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
 
         @Override
         protected List<ShowDetails> doInBackground(Void... params) {
-            ShowListBuilder archiveBuilder = ShowListBuilder.newInstance();
+            List<ShowDetails> shows = new ArrayList<>();
             try {
                 String archiveJson = HttpUtil.getUrl(Constants.ARCHIVES_URL);
-                JSONArray archiveHours = new JSONArray(archiveJson);
-                for (int i = 0; i < archiveHours.length(); i++) {
-                    BroadcastHour hour = new BroadcastHourJsonImpl(archiveHours.getJSONObject(i));
-                    archiveBuilder.addHour(hour);
+                JSONArray showList = new JSONArray(archiveJson);
+                for (int i = 0; i < showList.length(); i++) {
+                    shows.add(new ShowDetails(showList.getJSONObject(i).toString()));
                 }
             } catch (JSONException | IOException e) {}
-            return archiveBuilder.build();
+            return shows;
         }
 
         @Override

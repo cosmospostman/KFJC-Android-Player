@@ -15,7 +15,7 @@ public class Constants {
     public static final String USER_AGENT = "kfjc4droid-v" + BuildConfig.VERSION_CODE;
 
     public static final String RESOURCES_URL = "http://www.kfjc.org/api/resources.json";
-    public static final String ARCHIVES_URL = "http://kfjc.org/api/archives.php";
+    public static final String ARCHIVES_URL = "http://kfjc.org/api/shows.php";
     public static final KfjcMediaSource FALLBACK_MEDIA_SOURCE =
             new KfjcMediaSource("http://netcast6.kfjc.org:80/", KfjcMediaSource.Format.MP3, "Default", "128k mp3");
 

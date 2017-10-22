@@ -29,11 +29,11 @@ import java.util.List;
 
 public class ShowDetails implements Parcelable {
 
-    private static final String KEY_PLAYLIST_ID = "playlistId";
-    private static final String KEY_AIRNAME = "airName";
-    private static final String KEY_STARTTIME = "startTime";
+    private static final String KEY_PLAYLIST_ID = "playlist_num";
+    private static final String KEY_AIRNAME = "air_name";
+    private static final String KEY_STARTTIME = "start_time";
     private static final String KEY_URLS = "urls";
-    private static final String KEY_FILE_SIZE = "fileSize";
+    private static final String KEY_FILE_SIZE = "file_size";
 
     private String playlistId;
     private String airName;
@@ -42,21 +42,6 @@ public class ShowDetails implements Parcelable {
     private boolean hasError;
 
     private long totalFileSizeBytes;
-
-    ShowDetails(Collection<BroadcastHour> hours) {
-        urls = new ArrayList<>();
-        for (BroadcastHour hour : hours) {
-            this.playlistId = hour.getPlaylistId();
-            this.airName = hour.getAirName();
-            // Use earliest timestamp as start of show.
-            timestamp = (timestamp == 0)
-                ? hour.getTimestamp()
-                : Math.min(timestamp, hour.getTimestamp());
-            urls.add(hour.getUrl());
-            totalFileSizeBytes += hour.getFileSize();
-        }
-        Collections.sort(urls);
-    }
 
     public ShowDetails(String jsonString) {
         // TODO: ripe for a unit test!
