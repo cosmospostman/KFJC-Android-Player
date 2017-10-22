@@ -64,7 +64,6 @@ public class StreamService extends Service {
     private ExoPlayer player;
     private boolean becomingNoisyReceiverRegistered = false;
     private NotificationUtil notificationUtil;
-    private int activeSourceNumber = -1;
 
     /**
      * The Becoming Noisy broadcast intent is sent when audio output hardware changes, perhaps
@@ -159,8 +158,7 @@ public class StreamService extends Service {
                     PlayerControl.INTENT_PAUSE,
                     false);
             startForeground(NotificationUtil.KFJC_NOTIFICATION_ID, n);
-            activeSourceNumber = -1;
-            playArchiveHour(0);
+            play(mediaSource.show.getMediaSource(this));
         }
     }
 
@@ -361,22 +359,6 @@ public class StreamService extends Service {
 
     public KfjcMediaSource getSource() {
         return mediaSource;
-    }
-
-    private void playArchiveHour(int hour) {
-        if (activeSourceNumber == hour) {
-            return;
-        }
-        activeSourceNumber = hour;
-        File expectedSavedHour = mediaSource.show.getSavedHourUrl(hour);
-        stop(false);
-        if (expectedSavedHour.exists()) {
-            play(expectedSavedHour.getPath());
-        } else {
-            play(mediaSource.show.getMediaSource(this));
-//            play(mediaSource.show.getUrls().get(hour));
-        }
-        seek(mediaSource.show.getHourPaddingTimeMillis());
     }
 
     /**

@@ -7,14 +7,12 @@ import android.os.Parcelable;
 
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.google.common.primitives.Longs;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +23,6 @@ import org.kfjc.android.player.util.ExternalStorageUtil;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -36,10 +33,6 @@ public class ShowDetails implements Parcelable {
     private static final String KEY_AIRNAME = "airName";
     private static final String KEY_STARTTIME = "startTime";
     private static final String KEY_URLS = "urls";
-    private static final String KEY_PLAYTIME = "playtime";
-    private static final String KEY_PADDING = "padding";
-    private static final String KEY_TOTAL_TIME = "totalTimeMillis";
-    private static final String KEY_SEGMENT_BOUNDS = "segmentBounds";
     private static final String KEY_FILE_SIZE = "fileSize";
 
     private String playlistId;
@@ -48,13 +41,7 @@ public class ShowDetails implements Parcelable {
     private List<String> urls;
     private boolean hasError;
 
-    private long totalShowTimeMillis;
-    private long[] segmentBounds;
     private long totalFileSizeBytes;
-
-    // These are assumed to be the same for all hours.
-    private long hourPlayTimeMillis;
-    private long hourPaddingTimeMillis;
 
     ShowDetails(Collection<BroadcastHour> hours) {
         urls = new ArrayList<>();
@@ -65,31 +52,10 @@ public class ShowDetails implements Parcelable {
             timestamp = (timestamp == 0)
                 ? hour.getTimestamp()
                 : Math.min(timestamp, hour.getTimestamp());
-            this.hourPaddingTimeMillis = hour.getPaddingTimeMillis();
-            this.hourPlayTimeMillis = hour.getPlayTimeMillis();
             urls.add(hour.getUrl());
             totalFileSizeBytes += hour.getFileSize();
         }
-        countTotalShowTime();
         Collections.sort(urls);
-    }
-
-    private void countTotalShowTime() {
-        long[] bounds = new long[urls.size()];
-        long totalTime = 0;
-        for (int i = 0; i < urls.size(); i++) {
-            long showTime = hourPlayTimeMillis;
-            // Total
-            totalTime += showTime - 2 * hourPaddingTimeMillis;
-            // Bound
-            bounds[i] = totalTime + hourPaddingTimeMillis;
-            if (i == urls.size() - 1) {
-                bounds[i] += hourPaddingTimeMillis;
-            }
-        }
-        totalTime += 2 * hourPaddingTimeMillis;
-        this.totalShowTimeMillis = totalTime;
-        this.segmentBounds = bounds;
     }
 
     public ShowDetails(String jsonString) {
@@ -97,27 +63,16 @@ public class ShowDetails implements Parcelable {
         urls = new ArrayList<>();
         String playlistId = "";
         String airName = "";
-        long hourPlayTime = 0L;
-        long hourPaddingTime = 0L;
         long timestamp = 0L;
         try {
             JSONObject in = new JSONObject(jsonString);
             playlistId = in.getString(KEY_PLAYLIST_ID);
             airName = in.getString(KEY_AIRNAME);
             timestamp = in.getLong(KEY_STARTTIME);
-            hourPaddingTime = in.getLong(KEY_PADDING);
-            hourPlayTime = in.getLong(KEY_PLAYTIME);
             JSONArray inUrls = in.getJSONArray(KEY_URLS);
             for (int i = 0; i < inUrls.length(); i++) {
                 urls.add(inUrls.getString(i));
             }
-            JSONArray inSegmentBounds = in.getJSONArray(KEY_SEGMENT_BOUNDS);
-            List<Long> segmentBounds = new ArrayList<>();
-            for (int i = 0; i < inSegmentBounds.length(); i++) {
-                segmentBounds.add(inSegmentBounds.getLong(i));
-            }
-            this.segmentBounds = Longs.toArray(segmentBounds);
-            totalShowTimeMillis = in.getLong(KEY_TOTAL_TIME);
             totalFileSizeBytes = in.getLong(KEY_FILE_SIZE);
             hasError = false;
         } catch (JSONException e) {
@@ -127,8 +82,6 @@ public class ShowDetails implements Parcelable {
         this.playlistId = playlistId;
         this.airName = airName;
         this.timestamp = timestamp;
-        this.hourPlayTimeMillis = hourPlayTime;
-        this.hourPaddingTimeMillis = hourPaddingTime;
     }
 
     public ShowDetails(Parcel in) {
@@ -136,11 +89,7 @@ public class ShowDetails implements Parcelable {
         playlistId = in.readString();
         airName = in.readString();
         timestamp = in.readLong();
-        hourPaddingTimeMillis = in.readLong();
-        hourPlayTimeMillis = in.readLong();
         in.readStringList(urls);
-        segmentBounds = in.createLongArray();
-        totalShowTimeMillis = in.readLong();
         totalFileSizeBytes = in.readLong();
         Collections.sort(urls);
     }
@@ -150,11 +99,7 @@ public class ShowDetails implements Parcelable {
         dest.writeString(playlistId);
         dest.writeString(airName);
         dest.writeLong(timestamp);
-        dest.writeLong(hourPaddingTimeMillis);
-        dest.writeLong(hourPlayTimeMillis);
         dest.writeStringList(urls);
-        dest.writeLongArray(segmentBounds);
-        dest.writeLong(totalShowTimeMillis);
         dest.writeLong(totalFileSizeBytes);
     }
 
@@ -174,10 +119,6 @@ public class ShowDetails implements Parcelable {
         return totalFileSizeBytes;
     }
 
-    public long getHourPaddingTimeMillis() {
-        return hourPaddingTimeMillis;
-    }
-
     public boolean hasError() {
         return hasError;
     }
@@ -192,13 +133,8 @@ public class ShowDetails implements Parcelable {
             out.put(KEY_PLAYLIST_ID, playlistId);
             out.put(KEY_AIRNAME, airName);
             out.put(KEY_STARTTIME, timestamp);
-            out.put(KEY_PADDING, hourPaddingTimeMillis);
-            out.put(KEY_PLAYTIME, hourPlayTimeMillis);
             JSONArray urls = new JSONArray(this.urls);
             out.put(KEY_URLS, urls);
-            JSONArray segmentBounds = new JSONArray(Longs.asList(this.segmentBounds));
-            out.put(KEY_SEGMENT_BOUNDS, segmentBounds);
-            out.put(KEY_TOTAL_TIME, totalShowTimeMillis);
             out.put(KEY_FILE_SIZE, totalFileSizeBytes);
         } catch (JSONException e) {}
         return out.toString();
@@ -240,14 +176,6 @@ public class ShowDetails implements Parcelable {
         return urls;
     }
 
-    public long getTotalShowTimeMillis() {
-        return totalShowTimeMillis;
-    }
-
-    public long[] getSegmentBounds() {
-        return segmentBounds;
-    }
-
     public File getSavedHourUrl(int hour) {
         return ExternalStorageUtil.getSavedArchive(playlistId, urls.get(hour));
     }
@@ -267,5 +195,9 @@ public class ShowDetails implements Parcelable {
         }
 
         return show;
+    }
+
+    public long getTotalShowTimeMillis() {
+        return urls.size() * 3600000; //TODO: don't hardcode!
     }
 }
