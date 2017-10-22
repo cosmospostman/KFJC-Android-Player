@@ -192,7 +192,10 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
                 String archiveJson = HttpUtil.getUrl(Constants.ARCHIVES_URL);
                 JSONArray showList = new JSONArray(archiveJson);
                 for (int i = 0; i < showList.length(); i++) {
-                    shows.add(new ShowDetails(showList.getJSONObject(i).toString()));
+                    ShowDetails show = new ShowDetails(showList.getJSONObject(i).toString());
+                    if (!show.getPlaylistId().equals("0")) {
+                        shows.add(show);
+                    }
                 }
             } catch (JSONException | IOException e) {}
             return shows;
