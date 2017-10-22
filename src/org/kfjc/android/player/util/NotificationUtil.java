@@ -43,6 +43,7 @@ public class NotificationUtil {
     private void createNotificationChannel() {
         NotificationChannel notificationChannel =
                 new NotificationChannel(KFJC_NOTIFICATION_CHANNEL_ID, "default", NotificationManager.IMPORTANCE_LOW);
+        notificationChannel.setShowBadge(false);
         notificationManager.createNotificationChannel(notificationChannel);
     }
 
