@@ -212,7 +212,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
             return;
         }
         long totalShowTime = playerSource.show.getTotalShowTimeMillis();
-        podcastDetails.setText(DateUtil.formatTime(playerPos - show.getHourPaddingTimeMillis()));
+        podcastDetails.setText(DateUtil.formatTime(playerPos));
         playtimeSeekBar.setMax((int)totalShowTime/100);
         playtimeSeekBar.setProgress((int)playerPos/100);
     }

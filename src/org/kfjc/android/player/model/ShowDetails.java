@@ -1,13 +1,25 @@
 package org.kfjc.android.player.model;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.ExtractorsFactory;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
+import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.google.common.primitives.Longs;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.kfjc.android.player.Constants;
 import org.kfjc.android.player.util.DateUtil;
 import org.kfjc.android.player.util.ExternalStorageUtil;
 
@@ -238,5 +250,22 @@ public class ShowDetails implements Parcelable {
 
     public File getSavedHourUrl(int hour) {
         return ExternalStorageUtil.getSavedArchive(playlistId, urls.get(hour));
+    }
+
+    public MediaSource getMediaSource(Context context) {
+        // Produces DataSource instances through which media data is loaded.
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
+                Util.getUserAgent(context, Constants.USER_AGENT), null);
+        // Produces Extractor instances for parsing the media data.
+        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+
+        DynamicConcatenatingMediaSource show = new DynamicConcatenatingMediaSource();
+        for (String url : this.urls) {
+            MediaSource audioSource = new ExtractorMediaSource(Uri.parse(url),
+                    dataSourceFactory, extractorsFactory, null, null);
+            show.addMediaSource(audioSource);
+        }
+
+        return show;
     }
 }

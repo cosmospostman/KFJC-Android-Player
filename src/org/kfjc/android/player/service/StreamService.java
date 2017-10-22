@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -176,20 +177,14 @@ public class StreamService extends Service {
         audioManager.abandonAudioFocus(audioFocusListener);
     }
 
+    @Deprecated
     private void play(String streamUrl) {
         Log.i(TAG, "Playing stream " + streamUrl);
         if (player == null) {
-            // 1. Create a default TrackSelector
-            TrackSelector trackSelector =
-                    new DefaultTrackSelector();
-
-            // 2. Create a default LoadControl
-//            new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
-            LoadControl loadControl = new DefaultLoadControl();
-
-            // 3. Create the player
             player = ExoPlayerFactory.newSimpleInstance(
-                    getApplicationContext(), trackSelector, loadControl);
+                    new DefaultRenderersFactory(getApplicationContext()),
+                    new DefaultTrackSelector(),
+                    new DefaultLoadControl());
 
             player.addListener(exoEventListener);
         }
@@ -205,6 +200,20 @@ public class StreamService extends Service {
                 dataSourceFactory, extractorsFactory, null, null);
 
         player.prepare(audioSource);
+        player.setPlayWhenReady(true);
+    }
+
+    private void play(MediaSource source) {
+        if (player == null) {
+            player = ExoPlayerFactory.newSimpleInstance(
+                    new DefaultRenderersFactory(getApplicationContext()),
+                    new DefaultTrackSelector(),
+                    new DefaultLoadControl());
+
+            player.addListener(exoEventListener);
+        }
+        requestAudioFocus();
+        player.prepare(source);
         player.setPlayWhenReady(true);
     }
 
@@ -299,9 +308,7 @@ public class StreamService extends Service {
                 case Player.STATE_ENDED:
                     playerState.send(getApplicationContext(), PlayerState.State.STOP, mediaSource);
                     unregisterReceivers();
-                    if (!playNextArchiveHour()) {
-                        stop(true);
-                    }
+                    stop(true);
                     break;
                 case Player.STATE_IDLE:
                     break;
@@ -334,51 +341,26 @@ public class StreamService extends Service {
         public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {}
     };
 
-    /**
-     * @return true if a next hour was started.
-     */
-    private boolean playNextArchiveHour() {
-        if (mediaSource.show.getUrls().size() - 1 > activeSourceNumber) {
-            playArchiveHour(activeSourceNumber + 1);
-            seek(2 * mediaSource.show.getHourPaddingTimeMillis());
-            return true;
-        }
-        return false;
-    }
-
     public long getPlayerPosition() {
-        if (mediaSource.show == null || player == null) {
+        if (player == null) {
             return 0;
         }
-        long segmentOffset = (activeSourceNumber == 0)
-                ? 0 : mediaSource.show.getSegmentBounds()[activeSourceNumber - 1];
-        long extra = (activeSourceNumber == 0)
-                ? 0 : mediaSource.show.getHourPaddingTimeMillis();
-        return player.getCurrentPosition() + segmentOffset - extra;
+        //TODO: don't hardcode
+        return 3600000 * player.getCurrentPeriodIndex() + player.getCurrentPosition();
     }
 
     public void seek(long positionMillis) {
-        player.seekTo(positionMillis);
+        long HOUR = 3600000;
+        int targetWindow = 0;
+        while (positionMillis > HOUR) {
+            positionMillis -= HOUR;
+            targetWindow++;
+        }
+        player.seekTo(targetWindow, positionMillis);
     }
 
     public KfjcMediaSource getSource() {
         return mediaSource;
-    }
-
-    public void seekOverEntireShow(long seekToMillis) {
-        long[] segmentBounds = mediaSource.show.getSegmentBounds();
-        for (int i = 0; i < segmentBounds.length; i++) {
-            if (seekToMillis <= segmentBounds[i]) {
-                // load segment i
-                playArchiveHour(i);
-                //seek to adjusted position
-                long thisSegmentStart = (i == 0) ? 0 : segmentBounds[i-1];
-                long extraSeek = (i == 0) ? 0 : mediaSource.show.getHourPaddingTimeMillis();
-                long localSeekTo = seekToMillis - thisSegmentStart + extraSeek;
-                seek(localSeekTo);
-                return;
-            }
-        }
     }
 
     private void playArchiveHour(int hour) {
@@ -391,7 +373,8 @@ public class StreamService extends Service {
         if (expectedSavedHour.exists()) {
             play(expectedSavedHour.getPath());
         } else {
-            play(mediaSource.show.getUrls().get(hour));
+            play(mediaSource.show.getMediaSource(this));
+//            play(mediaSource.show.getUrls().get(hour));
         }
         seek(mediaSource.show.getHourPaddingTimeMillis());
     }

@@ -542,7 +542,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void seekPlayer(long positionMillis) {
-        streamService.seekOverEntireShow(positionMillis);
+        streamService.seek(positionMillis);
     }
 
 }
