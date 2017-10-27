@@ -8,4 +8,4 @@
 
 -dontwarn com.google.common.***
 
--keepattributes EnclosingMethod
+-keepattributes EnclosingMethod,SourceFile,LineNumberTable

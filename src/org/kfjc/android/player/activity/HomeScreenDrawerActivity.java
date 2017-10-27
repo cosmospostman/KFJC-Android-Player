@@ -414,7 +414,12 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                         loadFragment(R.id.nav_livestream);
                         return;
                     case ARCHIVE:
-                        loadPodcastPlayer(source.show, false);
+                        if (source.show != null) {
+                            loadPodcastPlayer(source.show, false);
+                        } else {
+                            // Be defensive, although it shouldn't happen
+                            loadFragment(R.id.nav_livestream);
+                        }
                         return;
                 }
             }
