@@ -304,6 +304,10 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     public void loadPodcastPlayer(ShowDetails show, boolean animate) {
+        if (show == null) {
+            loadPodcastListFragment(animate);
+            return;
+        }
         if (activeFragmentId == R.id.nav_podcast_player
                 && podcastPlayerFragment != null
                 && show.equals(podcastPlayerFragment.getShow())) {
@@ -414,12 +418,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                         loadFragment(R.id.nav_livestream);
                         return;
                     case ARCHIVE:
-                        if (source.show != null) {
-                            loadPodcastPlayer(source.show, false);
-                        } else {
-                            // Be defensive, although it shouldn't happen
-                            loadFragment(R.id.nav_livestream);
-                        }
+                        loadFragment(R.id.nav_livestream);
                         return;
                 }
             }
