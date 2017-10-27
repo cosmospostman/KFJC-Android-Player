@@ -16,6 +16,8 @@ import com.google.android.exoplayer2.util.Util;
 
 import org.kfjc.android.player.Constants;
 
+import java.io.File;
+
 public class KfjcMediaSource implements Parcelable {
 
     public enum Format { MP3, AAC, NONE }
@@ -123,6 +125,10 @@ public class KfjcMediaSource implements Parcelable {
             case ARCHIVE:
                 DynamicConcatenatingMediaSource show = new DynamicConcatenatingMediaSource();
                 for (String url : this.show.getUrls()) {
+                    File expectedSavedHour = this.show.getSavedHourUrl(url);
+                    if (expectedSavedHour.exists()) {
+                        url = expectedSavedHour.getPath();
+                    }
                     MediaSource audioSource = new ExtractorMediaSource(Uri.parse(url),
                             dataSourceFactory, extractorsFactory, null, null);
                     show.addMediaSource(audioSource);

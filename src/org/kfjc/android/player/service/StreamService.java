@@ -59,6 +59,9 @@ public class StreamService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                if (mediaSource == null) {
+                    return;
+                }
                 switch (mediaSource.type) {
                     case ARCHIVE:
                         pause();
