@@ -277,6 +277,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         switch (fragmentId) {
             case R.id.nav_livestream:
                 replaceFragment(new LiveStreamFragment());
+                setActionBarBackArrow(false);
                 break;
             case R.id.nav_podcast:
                 loadPodcastListFragment(false);
@@ -285,6 +286,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 if (streamService == null || streamService.getSource() == null) {
                     if (podcastPlayerFragment != null) {
                         replaceFragment(podcastPlayerFragment);
+                        setActionBarBackArrow(true);
                     } else {
                         Intent i = PlayerState.getLastPlayerState();
                         KfjcMediaSource source = i.getParcelableExtra(PlayerState.INTENT_KEY_PLAYER_SOURCE);
@@ -344,7 +346,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 .replace(R.id.home_screen_main_fragment, fragment, fragment.getFragmentTag())
                 .addToBackStack(null)
                 .commit();
-        setActionBarBackArrow(fragment.setActionBarBackArrow());
     }
 
     @Override
@@ -418,7 +419,11 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                         loadFragment(R.id.nav_livestream);
                         return;
                     case ARCHIVE:
-                        loadFragment(R.id.nav_livestream);
+                        if (source.show != null) {
+                            loadPodcastPlayer(source.show, false);
+                        } else {
+                            loadFragment(R.id.nav_livestream);
+                        }
                         return;
                 }
             }
