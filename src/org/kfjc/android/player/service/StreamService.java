@@ -178,6 +178,9 @@ public class StreamService extends Service {
     }
 
     private void pause() {
+        if (player == null) {
+            return;
+        }
         player.setPlayWhenReady(false);
         abandonAudioFocus();
         NotificationManager notificationManager =
