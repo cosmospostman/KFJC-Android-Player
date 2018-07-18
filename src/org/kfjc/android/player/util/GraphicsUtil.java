@@ -7,8 +7,8 @@ import android.widget.ImageView;
 
 public class GraphicsUtil {
 
-    private Handler handler = new Handler();
-    private Runnable runner;
+    private static Handler handler;
+    private BufferImageRunner runner;
 
     public GraphicsUtil() {
         this.handler = new Handler();
@@ -18,17 +18,29 @@ public class GraphicsUtil {
 	 * Runner that takes an image view and at short, random intervals
 	 * sets the image to one of the gray radio devils.
 	 */
-	class BufferImageRunner implements Runnable {
+	static class BufferImageRunner implements Runnable {
 		ImageView bufferImageView;
+		static boolean continueRunning = true;
 		public BufferImageRunner(ImageView imageView) {
 			this.bufferImageView = imageView;
 		}
 		
 		@Override
 		public void run() {
+			if (!this.continueRunning) {
+				return;
+			}
 			Double delayTimeMs = 20 + Math.random() * 30;
 			bufferImageView.setColorFilter(getMatrix((float)Math.random(), (float)Math.random()));
 			handler.postDelayed(this, delayTimeMs.intValue());
+		}
+
+		public void stop() {
+			continueRunning = false;
+		}
+
+		public void reset() {
+			continueRunning = true;
 		}
 	}
 
@@ -43,13 +55,17 @@ public class GraphicsUtil {
 	public void bufferDevil(ImageView view, boolean isBuffering) {
 		if (isBuffering) {
 			this.runner = new BufferImageRunner(view);
+			runner.reset();
 			runner.run();
 		} else {
-			handler.removeCallbacks(this.runner);
+		    if (this.runner != null) {
+                this.runner.stop();
+				handler.removeCallbacks(this.runner);
+            }
 		}
 	}
 
-	private ColorMatrixColorFilter getMatrix(float b, float alpha) {
+	private static ColorMatrixColorFilter getMatrix(float b, float alpha) {
 		int neg = Math.random() > 0.5 ? -1 : 1;
 		ColorMatrix matrix = new ColorMatrix();
 		matrix.setSaturation(0);

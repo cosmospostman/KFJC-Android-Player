@@ -284,7 +284,14 @@ public class StreamService extends Service {
         }
 
         @Override
-        public void onTimelineChanged(Timeline timeline, Object manifest) {}
+        public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+
+        }
+
+        @Override
+        public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
+
+        }
 
         @Override
         public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
@@ -298,10 +305,17 @@ public class StreamService extends Service {
         }
 
         @Override
-        public void onPositionDiscontinuity() {}
+        public void onPositionDiscontinuity(int reason) {
+
+        }
 
         @Override
         public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {}
+
+        @Override
+        public void onSeekProcessed() {
+
+        }
     };
 
     public long getPlayerPosition() {
