@@ -16,6 +16,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
+import javax.net.ssl.HttpsURLConnection;
+
 public class HttpUtil {
 
     private static final String TAG = HttpUtil.class.getSimpleName();
@@ -39,7 +41,8 @@ public class HttpUtil {
 	 */
 	public static String getUrl(String urlString, boolean useCache) throws IOException {
         URL url = new URL(urlString);
-        URLConnection urlConnection = url.openConnection();
+        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+        urlConnection.setSSLSocketFactory(new TLSSocketFactory());
         urlConnection.setUseCaches(useCache);
         InputStream in = new BufferedInputStream(urlConnection.getInputStream());
         return convertInputStreamToString(in);
@@ -50,7 +53,8 @@ public class HttpUtil {
      */
     public static Drawable getDrawable(String urlString) throws IOException {
         URL url = new URL(urlString);
-        URLConnection urlConnection = url.openConnection();
+        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+        urlConnection.setSSLSocketFactory(new TLSSocketFactory());
         urlConnection.setUseCaches(true);
         return BitmapDrawable.createFromStream(urlConnection.getInputStream(), "");
     }
