@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 
 public class HttpUtil {
 
@@ -38,16 +39,10 @@ public class HttpUtil {
 	 */
 	public static String getUrl(String urlString, boolean useCache) throws IOException {
         URL url = new URL(urlString);
-        String result = "";
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        URLConnection urlConnection = url.openConnection();
         urlConnection.setUseCaches(useCache);
-        try {
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            result = convertInputStreamToString(in);
-        } finally {
-            urlConnection.disconnect();
-        }
-        return result;
+        InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+        return convertInputStreamToString(in);
     }
 
     /**
@@ -55,17 +50,9 @@ public class HttpUtil {
      */
     public static Drawable getDrawable(String urlString) throws IOException {
         URL url = new URL(urlString);
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        URLConnection urlConnection = url.openConnection();
         urlConnection.setUseCaches(true);
-        int responseCode = urlConnection.getResponseCode();
-        if (responseCode != 200) {
-            throw new IOException(urlString + " got response code " + responseCode);
-        }
-        try {
-            return BitmapDrawable.createFromStream(urlConnection.getInputStream(), "");
-        } finally {
-            urlConnection.disconnect();
-        }
+        return BitmapDrawable.createFromStream(urlConnection.getInputStream(), "");
     }
  
 	/**
