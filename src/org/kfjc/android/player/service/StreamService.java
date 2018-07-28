@@ -318,6 +318,13 @@ public class StreamService extends Service {
         }
     };
 
+    public void sendPlaybackState() {
+        if (player != null && exoEventListener != null) {
+            exoEventListener.onPlayerStateChanged(
+                    player.getPlayWhenReady(), player.getPlaybackState());
+        }
+    }
+
     public long getPlayerPosition() {
         if (player == null) {
             return 0;

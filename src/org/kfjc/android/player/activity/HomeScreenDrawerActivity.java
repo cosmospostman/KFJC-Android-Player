@@ -444,6 +444,12 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         loadFragment(activeFragmentId);
     }
 
+    public void sendPlayerState() {
+        if (streamService != null) {
+            streamService.sendPlaybackState();
+        }
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);

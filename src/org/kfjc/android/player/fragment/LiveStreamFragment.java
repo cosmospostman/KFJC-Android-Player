@@ -45,12 +45,12 @@ public class LiveStreamFragment extends PlayerFragment {
         graphics = new GraphicsUtil();
         homeScreen.setActionbarTitle(getString(R.string.fragment_title_stream));
         View view = inflater.inflate(R.layout.fragment_livestream, container, false);
-        currentTrackTextView = (TextView) view.findViewById(R.id.currentTrack);
+        currentTrackTextView = view.findViewById(R.id.currentTrack);
         settingsButton = view.findViewById(R.id.settingsButton);
-        playStopButton = (FloatingActionButton) view.findViewById(R.id.playstopbutton);
+        playStopButton = view.findViewById(R.id.playstopbutton);
         View playlistButton = view.findViewById(R.id.playlist);
         playlistButton.setOnClickListener(showPlaylist);
-        radioDevil = (ImageView) view.findViewById(R.id.logo);
+        radioDevil = view.findViewById(R.id.logo);
         addButtonListeners();
         notificationUtil = new NotificationUtil(getActivity());
 
@@ -64,6 +64,7 @@ public class LiveStreamFragment extends PlayerFragment {
                 new IntentFilter(PlaylistUpdate.INTENT_PLAYLIST_UPDATE));
         playlistUpdateReceiver.onPlaylistUpdate(PlaylistUpdate.getLastPlaylist());
         homeScreen.setNavigationItemChecked(R.id.nav_livestream);
+        homeScreen.sendPlayerState();
     }
 
     @Override
