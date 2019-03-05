@@ -7,8 +7,8 @@ android {
         applicationId "org.kfjc.android.player"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 21
-        versionName "21"
+        versionCode 22
+        versionName "22"
     }
 
     buildTypes {
@@ -70,4 +70,5 @@ dependencies {
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.google.android.exoplayer:exoplayer:2.8.2'
     implementation 'com.google.guava:guava:20.0'
+    implementation 'com.google.android.gms:play-services-basement:16.2.0'
 }
