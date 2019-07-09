@@ -62,7 +62,7 @@
 			android:layout_alignParentLeft="true"
 			android:layout_centerVertical="true"
 			android:text="@string/setting_backgrounds"/>
-		<android.support.v7.widget.SwitchCompat
+		<androidx.appcompat.widget.SwitchCompat
 			android:id="@+id/backgroundSwitch"
 			android:layout_alignParentRight="true"
 			android:layout_width="wrap_content"
