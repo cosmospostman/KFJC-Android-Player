@@ -234,7 +234,7 @@ public class LavaLampActivity extends AppCompatActivity {
             progressBar.setProgress(progress[0]);
             double fileLengthMb = progress[1] / (1024*1024);
             loadingView.setVisibility(View.VISIBLE);
-            lavaLoadingText.setText(context.getString(R.string.status_lava_download_format, fileLengthMb));
+            lavaLoadingText.setText(context.getString(R.string.status_lava_download_format, Double.toString(fileLengthMb)));
         }
 
         @Override
