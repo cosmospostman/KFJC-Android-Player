@@ -56,7 +56,7 @@
     <string name="status_default_stream">Using default stream</string>
     <string name="status_playlist_unavailable">Playlist unavailable :\'(</string>
     <string name="status_lava_download">Downloading Lava&#8230;</string>
-    <string name="status_lava_download_format">Downloading Lava (%1$sMB)&#8230;</string>
+    <string name="status_lava_download_format">Loading the Lava Lamp Lifestyle (%1$sMB)&#8230;</string>
 
     <string name="trackdetails_album">Album</string>
     <string name="trackdetails_artist">Artist</string>

@@ -7,8 +7,8 @@ android {
         applicationId "org.kfjc.android.player"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 22
-        versionName "22"
+        versionCode 25
+        versionName "25"
     }
 
     buildTypes {
@@ -73,7 +73,7 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.exoplayer:exoplayer:2.8.2'
+    implementation 'com.google.android.exoplayer:exoplayer:2.10.2'
     implementation 'com.google.guava:guava:24.1-jre'
     implementation 'com.google.android.gms:play-services-basement:17.0.0'
 }

@@ -165,11 +165,7 @@ public class StreamService extends Service {
 
     private void play(MediaSource source) {
         if (player == null) {
-            player = ExoPlayerFactory.newSimpleInstance(
-                    new DefaultRenderersFactory(getApplicationContext()),
-                    new DefaultTrackSelector(),
-                    new DefaultLoadControl());
-
+            player = ExoPlayerFactory.newSimpleInstance(getApplicationContext());
             player.addListener(exoEventListener);
         }
         requestAudioFocus();
