@@ -16,5 +16,4 @@ public interface HomeScreenInterface {
     long getPlayerPosition();
     void seekPlayer(long positionMillis);
     void setActionBarBackArrow(boolean isBackArrorw);
-    void requestAndroidWritePermissions();
 }

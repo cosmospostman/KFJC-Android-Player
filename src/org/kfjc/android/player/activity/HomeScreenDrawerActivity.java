@@ -60,7 +60,6 @@ import java.util.Calendar;
 public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeScreenInterface {
 
     private static final String KEY_ACTIVE_FRAGMENT = "active-fragment";
-    private static final int KFJC_PERM_WRITE_EXTERNAL = 0;
 
     private KfjcApplication application;
 
@@ -194,32 +193,6 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 return null;
             }
         }.execute();
-    }
-
-    public void requestAndroidWritePermissions() {
-        ActivityCompat.requestPermissions(
-                HomeScreenDrawerActivity.this,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                KFJC_PERM_WRITE_EXTERNAL);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(
-            int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == KFJC_PERM_WRITE_EXTERNAL) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                onWritePermissionGranted(true);
-            } else {
-                onWritePermissionGranted(false);
-            }
-        }
-    }
-
-    private void onWritePermissionGranted(boolean wasGranted) {
-        if (podcastPlayerFragment != null) {
-            podcastPlayerFragment.onWritePermissionResult(wasGranted);
-        }
     }
 
     private void setupDrawer() {

@@ -61,20 +61,4 @@ public class DownloadUtil {
         return activeDownloads.get(id);
     }
 
-//    private List<String> getCompletedDownloads(Activity activity) {
-//        List<String> completedDownloads = new ArrayList<>();
-//        DownloadManager dm = (DownloadManager) activity.getSystemService(Context.DOWNLOAD_SERVICE);
-//        Query query = new Query();
-//
-//        query.setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL);
-//        Cursor c = dm.query(query);
-//        c.moveToFirst();
-//        while (!c.isLast()) {
-//            c.moveToNext();
-//            completedDownloads.add(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)));
-////          DownloadManager.COLUMN_URI;
-//        }
-//
-//        return completedDownloads;
-//    }
 }

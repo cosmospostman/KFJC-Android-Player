@@ -7,9 +7,9 @@ import android.os.Parcelable;
 
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
-import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
@@ -117,21 +117,20 @@ public class KfjcMediaSource implements Parcelable {
                 Util.getUserAgent(context, Constants.USER_AGENT), null);
         // Produces Extractor instances for parsing the media data.
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+        ProgressiveMediaSource.Factory mediaSourceFactory =
+                new ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory);
 
         switch(type) {
             case LIVESTREAM:
-                return new ExtractorMediaSource(Uri.parse(url),
-                        dataSourceFactory, extractorsFactory, null, null);
+                return mediaSourceFactory.createMediaSource((Uri.parse(url)));
             case ARCHIVE:
-                DynamicConcatenatingMediaSource show = new DynamicConcatenatingMediaSource();
+                ConcatenatingMediaSource show = new ConcatenatingMediaSource();
                 for (String url : this.show.getUrls()) {
                     File expectedSavedHour = this.show.getSavedHourUrl(context, url);
                     if (expectedSavedHour.exists()) {
                         url = expectedSavedHour.getPath();
                     }
-                    MediaSource audioSource = new ExtractorMediaSource(Uri.parse(url),
-                            dataSourceFactory, extractorsFactory, null, null);
-                    show.addMediaSource(audioSource);
+                    show.addMediaSource(mediaSourceFactory.createMediaSource(Uri.parse(url)));
                 }
                 return show;
             default:

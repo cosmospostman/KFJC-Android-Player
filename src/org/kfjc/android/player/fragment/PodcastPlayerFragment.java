@@ -82,11 +82,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     private View.OnClickListener downloadClicklistener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (!hasWritePermission()) {
-                homeScreen.requestAndroidWritePermissions();
-            } else {
-                showOfflineDialog();
-            }
+            showOfflineDialog();
         }
     };
 
@@ -215,13 +211,6 @@ public class PodcastPlayerFragment extends PlayerFragment {
         podcastDetails.setText(DateUtil.formatTime(playerPos));
         playtimeSeekBar.setMax((int)totalShowTime/100);
         playtimeSeekBar.setProgress((int)playerPos/100);
-    }
-
-    public void onWritePermissionResult(boolean wasGranted) {
-        if (!wasGranted) {
-            return;
-        }
-        showOfflineDialog();
     }
 
     @Override
