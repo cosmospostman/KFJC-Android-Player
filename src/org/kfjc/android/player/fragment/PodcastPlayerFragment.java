@@ -171,7 +171,7 @@ public class PodcastPlayerFragment extends PlayerFragment {
     }
 
     private void updateDownloadState() {
-        int iconResource = ExternalStorageUtil.hasAllContent(show)
+        int iconResource = ExternalStorageUtil.hasAllContent(getActivity(), show)
                 ? R.drawable.ic_offline_pin_white_48dp
                 : R.drawable.ic_file_download_white_48dp;
         downloadButton.setImageResource(iconResource);

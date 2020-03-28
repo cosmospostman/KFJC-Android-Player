@@ -1,5 +1,6 @@
 package org.kfjc.android.player.util;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -19,7 +20,7 @@ import java.util.Scanner;
 
 public class ExternalStorageUtil {
 
-    public static final String KFJC_DIRECTORY_NAME = "kfjc";
+    static final String KFJC_DIRECTORY_NAME = "kfjc";
     private static final String KFJC_INDEX_FILENAME = "index.json";
     private static final String KFJC_PLAYLIST_FILENAME = "playlist.json";
     private static final String NOMEDIA_FILENAME = ".nomedia";
@@ -37,12 +38,12 @@ public class ExternalStorageUtil {
      */
 
     /** Create a directory for an archive show. Return true if successful */
-    public static boolean createShowDir(ShowDetails show, Playlist playlist) {
+    public static boolean createShowDir(Context context, ShowDetails show, Playlist playlist) {
         if (!isExternalStorageWritable()) {
             return false;
         }
         try {
-            File podcastDir = makePodcastDir(show.getPlaylistId());
+            File podcastDir = makePodcastDir(context, show.getPlaylistId());
             Log.i("EXT", podcastDir.getCanonicalPath());
 
             // .nomedia prevents indexing and display in other apps
@@ -54,7 +55,7 @@ public class ExternalStorageUtil {
             showWriter.close();
 
             // Write the playlist
-            PrintWriter playlistWriter = new PrintWriter(getPlaylistFile(show.getPlaylistId()));
+            PrintWriter playlistWriter = new PrintWriter(getPlaylistFile(context, show.getPlaylistId()));
             playlistWriter.println(playlist.toJsonString());
             playlistWriter.close();
 
@@ -64,39 +65,41 @@ public class ExternalStorageUtil {
         }
     }
 
-    private static File getPodcastDir() {
-        File podcastDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PODCASTS), KFJC_DIRECTORY_NAME);
-        if (!podcastDir.exists()) {
-            podcastDir.mkdirs();
-        }
-        return podcastDir;
+    private static File getPodcastDir(Context context) {
+        return new File(context.getExternalFilesDir(null), "");
     }
 
-    public static File getPodcastDir(String playlistId) {
-        return new File(getPodcastDir(), playlistId);
+    public static File getPodcastDir(Context context, String playlistId) {
+        return new File(context.getExternalFilesDir(null), playlistId);
     }
 
-    public static File getPlaylistFile(String playlistId) {
-        File podcastDir = getPodcastDir(playlistId);
+    public static Uri getDestinationURIForDownload(Context context, String playlistId, String filename) {
+        File dest = new File(
+                context.getExternalFilesDir(null),
+                playlistId + "/" + filename);
+        return Uri.fromFile(dest);
+    }
+
+    public static File getPlaylistFile(Context context, String playlistId) {
+        File podcastDir = getPodcastDir(context, playlistId);
         return new File(podcastDir, KFJC_PLAYLIST_FILENAME);
     }
 
-    private static File makePodcastDir(String playlistId) {
-        File podcastDir = getPodcastDir(playlistId);
+    private static File makePodcastDir(Context context, String playlistId) {
+        File podcastDir = getPodcastDir(context, playlistId);
         if (!podcastDir.mkdirs()) {
             Log.e(LOG_TAG, "Directory not created");
         }
         return podcastDir;
     }
 
-    public static void deletePodcastDir(String playlistId) {
-        File podcastDir = getPodcastDir(playlistId);
+    public static void deletePodcastDir(Context context, String playlistId) {
+        File podcastDir = getPodcastDir(context, playlistId);
         deleteRecursively(podcastDir);
     }
 
-    public static long folderSize(String playlistId) {
-        return folderSize(getPodcastDir(playlistId));
+    public static long folderSize(Context context, String playlistId) {
+        return folderSize(getPodcastDir(context, playlistId));
     }
 
     private static long folderSize(File directory) {
@@ -129,9 +132,9 @@ public class ExternalStorageUtil {
         return false;
     }
 
-    public static List<ShowDetails> getSavedShows() {
+    public static List<ShowDetails> getSavedShows(Context context) {
         List<ShowDetails> shows = new LinkedList<>();
-        File podcastDir = getPodcastDir();
+        File podcastDir = getPodcastDir(context);
         if (podcastDir.listFiles() == null) {
             return Collections.emptyList();
         }
@@ -140,7 +143,7 @@ public class ExternalStorageUtil {
             ShowDetails show = new ShowDetails(readFile(index));
             if (show.hasError()) {
                 Log.i(LOG_TAG, "Show has error");
-            } else if (!hasAllContent(show)) {
+            } else if (!hasAllContent(context, show)) {
                 Log.i(LOG_TAG, "Missing some content");
             } else {
                 shows.add(show);
@@ -157,8 +160,8 @@ public class ExternalStorageUtil {
         }
     }
 
-    public static boolean hasAllContent(ShowDetails show) {
-        File podcastDir = getPodcastDir(show.getPlaylistId());
+    public static boolean hasAllContent(Context context, ShowDetails show) {
+        File podcastDir = getPodcastDir(context, show.getPlaylistId());
         if (! (new File(podcastDir, KFJC_INDEX_FILENAME).exists())
                 && new File(podcastDir, KFJC_PLAYLIST_FILENAME).exists()) {
             return false;
@@ -173,19 +176,19 @@ public class ExternalStorageUtil {
         return true;
     }
 
-    public static File getSavedArchive(String playlistId, String hourUrl) {
-        File podcastDir = getPodcastDir(playlistId);
+    public static File getSavedArchive(Context context, String playlistId, String hourUrl) {
+        File podcastDir = getPodcastDir(context, playlistId);
         String expectedFilename = Uri.parse(hourUrl).getLastPathSegment();
         return new File(podcastDir, expectedFilename);
     }
 
-    public static boolean bytesAvailable(long forFileSize) {
+    public static boolean bytesAvailable(Context context, long forFileSize) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             // Sorry, can't be bothered implementing. Your download might fail.
             return true;
         }
         try {
-            StatFs stat = new StatFs(getPodcastDir().getPath());
+            StatFs stat = new StatFs(getPodcastDir(context).getPath());
             return stat.getAvailableBytes() > forFileSize;
         } catch (IllegalArgumentException e) {
             return false;

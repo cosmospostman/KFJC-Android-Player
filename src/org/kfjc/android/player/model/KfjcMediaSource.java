@@ -125,7 +125,7 @@ public class KfjcMediaSource implements Parcelable {
             case ARCHIVE:
                 DynamicConcatenatingMediaSource show = new DynamicConcatenatingMediaSource();
                 for (String url : this.show.getUrls()) {
-                    File expectedSavedHour = this.show.getSavedHourUrl(url);
+                    File expectedSavedHour = this.show.getSavedHourUrl(context, url);
                     if (expectedSavedHour.exists()) {
                         url = expectedSavedHour.getPath();
                     }

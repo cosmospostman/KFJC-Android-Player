@@ -108,7 +108,7 @@ public class PodcastFragment extends PlayerFragment implements PodcastViewHolder
                 shows, PodcastRecyclerAdapter.Type.HORIZONTAL, PodcastFragment.this);
         recentShowsView.setAdapter(recentShowsAdapter);
 
-        List<ShowDetails> savedShows = ExternalStorageUtil.getSavedShows();
+        List<ShowDetails> savedShows = ExternalStorageUtil.getSavedShows(getActivity());
         getListError.setVisibility(View.GONE);
         noSavedShows.setVisibility(savedShows.size() == 0 ? View.VISIBLE : View.GONE);
         PodcastRecyclerAdapter adapter = new PodcastRecyclerAdapter(

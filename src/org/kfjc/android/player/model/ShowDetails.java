@@ -161,8 +161,8 @@ public class ShowDetails implements Parcelable {
         return urls;
     }
 
-    public File getSavedHourUrl(String url) {
-        return ExternalStorageUtil.getSavedArchive(playlistId, url);
+    public File getSavedHourUrl(Context context, String url) {
+        return ExternalStorageUtil.getSavedArchive(context, playlistId, url);
     }
 
     public long getTotalShowTimeMillis() {

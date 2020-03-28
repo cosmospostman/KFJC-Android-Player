@@ -137,7 +137,7 @@ public class PlaylistDialog extends DialogFragment {
 
             @Override
             protected Playlist doInBackground(Void... params) {
-                File playlistFile = ExternalStorageUtil.getPlaylistFile(playlistId);
+                File playlistFile = ExternalStorageUtil.getPlaylistFile(getActivity(), playlistId);
                 if (playlistFile.exists()) {
                     String playlistString = ExternalStorageUtil.readFile(playlistFile);
                     Playlist playlist = new PlaylistJsonImpl(playlistString);

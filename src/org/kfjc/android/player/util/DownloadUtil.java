@@ -22,15 +22,15 @@ public class DownloadUtil {
     private static Map<Long, ShowDetails> activeDownloads = new HashMap<>();
 
     public static void ensureDownloaded(Activity activity, ShowDetails show) throws IOException {
-        File podcastDir = ExternalStorageUtil.getPodcastDir(show.getPlaylistId());
-        File podcastPlaylist = ExternalStorageUtil.getPlaylistFile(show.getPlaylistId());
+        File podcastDir = ExternalStorageUtil.getPodcastDir(activity, show.getPlaylistId());
+        File podcastPlaylist = ExternalStorageUtil.getPlaylistFile(activity, show.getPlaylistId());
         boolean podcastDirExists = podcastDir.exists();
         boolean podcastPlaylistExistsAndNotEmpty =
                 podcastPlaylist.exists() && podcastPlaylist.length() > 0;
         if (! (podcastDirExists && podcastPlaylistExistsAndNotEmpty)) {
             String playlistUrl = Constants.PLAYLIST_URL + show.getPlaylistId();
             Playlist playlist = new PlaylistJsonImpl(HttpUtil.getUrl(playlistUrl));
-            ExternalStorageUtil.createShowDir(show, playlist);
+            ExternalStorageUtil.createShowDir(activity, show, playlist);
         }
         for (int i = 0; i < show.getUrls().size(); i++) {
             Uri uri = Uri.parse(show.getUrls().get(i));
@@ -41,9 +41,8 @@ public class DownloadUtil {
                 DownloadManager.Request req = new DownloadManager.Request(uri)
                         .setTitle(activity.getString(R.string.format_archive_file, show.getAirName(), i+1, show.getUrls().size()))
                         .setVisibleInDownloadsUi(false)
-                        .setDestinationInExternalPublicDir(
-                                Environment.DIRECTORY_PODCASTS,
-                                ExternalStorageUtil.KFJC_DIRECTORY_NAME + "/" + show.getPlaylistId() + "/" + uri.getLastPathSegment());
+                        .setDestinationUri(
+                                ExternalStorageUtil.getDestinationURIForDownload(activity, show.getPlaylistId(), filename));
                 long referenceId = dm.enqueue(req);
                 registerDownload(referenceId, show);
             }
