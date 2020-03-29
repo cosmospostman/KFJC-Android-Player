@@ -301,9 +301,7 @@ public class StreamService extends Service {
         }
 
         @Override
-        public void onPositionDiscontinuity(int reason) {
-
-        }
+        public void onPositionDiscontinuity(int reason) {}
 
         @Override
         public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {}
@@ -325,7 +323,18 @@ public class StreamService extends Service {
         if (player == null) {
             return 0;
         }
-        return Constants.SHOW_SEGMENT_LENGTH * player.getCurrentPeriodIndex() + player.getCurrentPosition();
+        int currentIndex = player.getCurrentPeriodIndex();
+        return getElapsedTimeBeforePeriod(currentIndex) + player.getCurrentPosition();
+    }
+
+    private long getElapsedTimeBeforePeriod(int periodIndex) {
+        long timeElapsedMs = 0;
+        Timeline.Period period = new Timeline.Period();
+        for (int i = 0; i < periodIndex; i++) {
+            player.getCurrentTimeline().getPeriod(i, period);
+            timeElapsedMs += period.getDurationMs();
+        }
+        return timeElapsedMs;
     }
 
     public void seek(long positionMillis) {
