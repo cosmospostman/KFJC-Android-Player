@@ -467,7 +467,12 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     public void stopPlayer() {
         if (streamService != null) {
-            PlayerControl.sendAction(this, PlayerControl.INTENT_STOP);
+            try {
+                PlayerControl.sendAction(this, PlayerControl.INTENT_STOP);
+            } catch (IllegalStateException e) {
+                // Not sure what we should do here, had been throwing IllegalStateException.
+                // Suspect it's because Activity is being destroyed and sendAction sends an Intent.
+            }
         }
         NotificationUtil.cancelKfjcNotification();
         if (!isForegroundActivity) {
