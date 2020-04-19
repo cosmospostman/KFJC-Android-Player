@@ -7,8 +7,8 @@ android {
         applicationId "org.kfjc.android.player"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 27
-        versionName "27"
+        versionCode 28
+        versionName "28"
     }
 
     buildTypes {
