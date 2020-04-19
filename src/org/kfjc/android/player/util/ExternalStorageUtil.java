@@ -103,6 +103,10 @@ public class ExternalStorageUtil {
     }
 
     private static long folderSize(File directory) {
+        if (directory == null) {
+            return 0;
+        }
+
         long length = 0;
         for (File file : directory.listFiles()) {
             if (file.isFile())

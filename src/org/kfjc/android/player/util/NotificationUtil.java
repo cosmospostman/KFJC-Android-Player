@@ -95,7 +95,7 @@ public class NotificationUtil {
                 .setContentIntent(kfjcPlayerIntent)
                 .setPriority(Notification.PRIORITY_HIGH);
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+            builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
             // Should instead build action with Icon.fromResource (but only for Api 23+)
             builder.addAction(R.drawable.ic_stop_white_48dp,
                     context.getString(R.string.action_stop),
@@ -139,6 +139,8 @@ public class NotificationUtil {
     }
 
     public static void cancelKfjcNotification() {
-        notificationManager.cancel(KFJC_NOTIFICATION_ID);
+        if (notificationManager != null) {
+            notificationManager.cancel(KFJC_NOTIFICATION_ID);
+        }
     }
 }
