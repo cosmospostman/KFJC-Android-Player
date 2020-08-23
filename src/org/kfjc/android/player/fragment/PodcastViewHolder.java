@@ -75,7 +75,11 @@ public class PodcastViewHolder extends RecyclerView.ViewHolder implements View.O
         if (show.getAirName().toUpperCase().contains("PAX")) {
             return "\u262E";
         }
-        return "" + show.getAirName().charAt(0);
+        if (show.getAirName() == null || show.getAirName().length() == 0) {
+            return "?";
+        } else {
+            return "" + show.getAirName().charAt(0);
+        }
     }
 
     private SimpleDateFormat getSimpleDateFormat() {
