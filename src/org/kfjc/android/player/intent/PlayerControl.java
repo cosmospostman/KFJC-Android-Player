@@ -26,7 +26,7 @@ public class PlayerControl {
 
     public static PendingIntent playerIntent(Context context, Intent intent) {
         return PendingIntent.getActivity(
-                context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     static Intent controlIntent(Context context, String action) {
@@ -49,6 +49,6 @@ public class PlayerControl {
 
     public static PendingIntent controlPendingIntent(Context context, String action) {
         return PendingIntent.getService(context, 1, controlIntent(context, action),
-                PendingIntent.FLAG_ONE_SHOT|PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 }

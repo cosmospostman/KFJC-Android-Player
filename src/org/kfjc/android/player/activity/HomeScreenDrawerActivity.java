@@ -425,6 +425,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
 
     @Override
     protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
         setIntent(intent);
     }
 
@@ -450,7 +451,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
                 @Override
                 public void onFailure(Throwable t) {
                 }
-            });
+            }, ContextCompat.getMainExecutor(this));
         }
     }
 
