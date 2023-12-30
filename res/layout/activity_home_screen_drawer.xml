@@ -16,13 +16,11 @@
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
 
-    <!-- Your normal content view. 24dp paddingTop for drawing under statusbar. -->
     <LinearLayout
         android:id="@+id/home_screen_main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingTop="24dp">
+        android:orientation="vertical">
 
         <!-- We use a Toolbar so that our drawer can be displayed
              in front of the action bar -->
