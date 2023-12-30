@@ -10,22 +10,17 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -187,7 +182,7 @@ public class HomeScreenDrawerActivity extends AppCompatActivity implements HomeS
         }
     }
 
-    private BroadcastReceiver mediaStateReceiver = new MediaStateReceiver() {
+    final private BroadcastReceiver mediaStateReceiver = new MediaStateReceiver() {
         @Override
         protected void onStateChange(PlayerState.State state, KfjcMediaSource source) {
             if (!PlayerState.State.STOP.equals(state)
