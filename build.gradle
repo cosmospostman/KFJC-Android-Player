@@ -16,7 +16,6 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -71,7 +70,7 @@ repositories {
 dependencies {
     apply plugin: 'idea'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.activity:activity:1.8.2'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.cardview:cardview:1.0.0'
