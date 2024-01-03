@@ -8,7 +8,7 @@ android {
         applicationId "org.kfjc.android.player"
         minSdkVersion 16
         targetSdkVersion 33
-        versionCode 31
+        versionCode 32
         versionName "31"
         multiDexEnabled true
     }
